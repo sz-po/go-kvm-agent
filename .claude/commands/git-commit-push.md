@@ -1,0 +1,1 @@
+Run git status and git diff to analyze all changes. Create a concise commit message in English that describes the changes. Stage all changes with git add, commit with the generated message, and push to upstream with git push.

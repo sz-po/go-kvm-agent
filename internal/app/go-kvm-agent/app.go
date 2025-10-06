@@ -6,8 +6,5 @@ import (
 )
 
 func Start(config Config, wg *sync.WaitGroup, ctx context.Context) error {
-	defer wg.Done()
-
-	<-ctx.Done()
 	return nil
 }

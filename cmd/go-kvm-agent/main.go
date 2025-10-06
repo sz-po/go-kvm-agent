@@ -17,36 +17,34 @@ func main() {
 	kong.Parse(&config)
 
 	// Setup slog
-	logger := setupLogger(config.LogLevel, config.LogFormat)
+	logger := setupLogger(config.Log.Level, config.Log.Format)
 	slog.SetDefault(logger)
 
 	// Context with cancellation
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	// Signal handling
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 
-	// WaitGroup
 	var wg sync.WaitGroup
 
-	// Start application
 	wg.Add(1)
 	go func() {
+		slog.Info("Starting application.")
 		if err := go_kvm_agent.Start(config, &wg, ctx); err != nil {
-			slog.Error("application error", "error", err)
+			slog.Error("Application start error.", slog.String("error", err.Error()))
 		}
+		slog.Info("Application started.")
 	}()
 
-	// Wait for signal
 	<-sigChan
-	slog.Info("shutdown signal received, stopping...")
+	wg.Done()
+	slog.Info("Shutdown signal received, stopping application.")
 	cancel()
 
-	// Wait for graceful shutdown
 	wg.Wait()
-	slog.Info("application stopped")
+	slog.Info("Application stopped.")
 }
 
 func setupLogger(level, format string) *slog.Logger {
