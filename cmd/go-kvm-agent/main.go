@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"os"
 	"os/signal"
@@ -17,7 +18,11 @@ func main() {
 	kong.Parse(&config)
 
 	// Setup slog
-	logger := setupLogger(config.Log.Level, config.Log.Format)
+	logger, err := setupLogger(config.Log.Level, config.Log.Format)
+	if err != nil {
+		slog.Error("Failed to setup logger.", slog.String("error", err.Error()))
+		os.Exit(1)
+	}
 	slog.SetDefault(logger)
 
 	// Context with cancellation
@@ -47,7 +52,7 @@ func main() {
 	slog.Info("Application stopped.")
 }
 
-func setupLogger(level, format string) *slog.Logger {
+func setupLogger(level, format string) (*slog.Logger, error) {
 	var logLevel slog.Level
 	switch level {
 	case "debug":
@@ -55,7 +60,7 @@ func setupLogger(level, format string) *slog.Logger {
 	case "info":
 		logLevel = slog.LevelInfo
 	default:
-		logLevel = slog.LevelInfo
+		return nil, fmt.Errorf("invalid log level: %s", level)
 	}
 
 	var handler slog.Handler
@@ -67,8 +72,8 @@ func setupLogger(level, format string) *slog.Logger {
 	case "text":
 		handler = slog.NewTextHandler(os.Stdout, opts)
 	default:
-		handler = slog.NewTextHandler(os.Stdout, opts)
+		return nil, fmt.Errorf("invalid log format: %s", format)
 	}
 
-	return slog.New(handler)
+	return slog.New(handler), nil
 }

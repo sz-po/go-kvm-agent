@@ -8,6 +8,8 @@ import "context"
 // workstation and streams it as display events.
 // AI-DEV: only modify this interface when the user explicitly requests it; otherwise decline the task.
 type DisplaySource interface {
+	Peripheral
+
 	// DataChannel emits display frame events.
 	// Channels can be fetched before Start; canceling the provided context signals
 	// the implementation to tear down the stream as Start/Stop do not close it.

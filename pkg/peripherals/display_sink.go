@@ -7,6 +7,8 @@ import "context"
 // where captured frames are rendered for viewing by the user.
 // AI-DEV: only modify this interface when the user explicitly requests it; otherwise decline the task.
 type DisplaySink interface {
+	Peripheral
+
 	// HandleDataEvent processes incoming frame data; callers should rely on context
 	// cancellation to stop delivery, as Start/Stop leave channel lifetimes intact.
 	HandleDataEvent(event DisplayEvent) error

@@ -9,6 +9,8 @@ import "context"
 // hardware initialization and release.
 // AI-DEV: only modify this interface when the user explicitly requests it; otherwise decline the task.
 type KeyboardSource interface {
+	Peripheral
+
 	// EventChannel emits keyboard data events.
 	EventChannel(ctx context.Context) <-chan KeyboardEvent
 

@@ -9,6 +9,8 @@ import "context"
 // Start/Stop handle device configuration.
 // AI-DEV: only modify this interface when the user explicitly requests it; otherwise decline the task.
 type KeyboardSink interface {
+	Peripheral
+
 	// HandleEvent applies a keyboard event to the sink.
 	HandleEvent(event KeyboardEvent) error
 
