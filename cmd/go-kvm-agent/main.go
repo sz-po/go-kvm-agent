@@ -17,6 +17,15 @@ func main() {
 	var config go_kvm_agent.Config
 	kong.Parse(&config)
 
+	if config.MachinesDir != "" {
+		machines, err := go_kvm_agent.LoadMachinesFromDir(config.MachinesDir)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "failed to load machines: %v\n", err)
+			os.Exit(1)
+		}
+		config.Machines = append(config.Machines, machines...)
+	}
+
 	// Setup slog
 	logger, err := setupLogger(config.Log.Level, config.Log.Format)
 	if err != nil {

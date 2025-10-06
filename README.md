@@ -22,6 +22,18 @@ Go-based KVM agent designed for pixel-perfect remote control of Linux workstatio
 3. Adjust `go.mod` module path, then run `go mod tidy` to sync dependencies.
 4. Build the agent with `go build ./cmd/go-kvm-agent`.
 
+
+## Machine Configuration
+
+Machine definitions live in standalone JSON or YAML files. Provide a directory via `--machines-dir` and the agent will load every `*.json`, `*.yaml`, or `*.yml` file found there. Each file may define a single machine or a list under `machines`.
+
+Example files are available in `examples/machines` and cover two separate workstations:
+
+```
+go run ./cmd/go-kvm-agent --machines-dir=./examples/machines
+```
+
+Within each file, `type` and `role` use the integer constants from `pkg/peripherals/peripheral_common.go` (`display`=1, `keyboard`=2, `mouse`=3; `source`=1, `sink`=2). Drivers and params are passed as-is to the corresponding peripheral implementations.
 ## Architecture
 
 The agent is organized around modular device abstractions and real-time routing:

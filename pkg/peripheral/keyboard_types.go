@@ -1,4 +1,4 @@
-package peripherals
+package peripheral
 
 // KeyboardHIDUsage represents a HID usage identifier for keyboard keys.
 type KeyboardHIDUsage uint16

@@ -1,4 +1,4 @@
-package peripherals
+package peripheral
 
 import "context"
 

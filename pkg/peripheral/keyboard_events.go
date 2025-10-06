@@ -1,4 +1,4 @@
-package peripherals
+package peripheral
 
 import "time"
 
@@ -106,7 +106,7 @@ const (
 	KeyboardErrorFatal
 )
 
-// KeyboardErrorEvent signals an error encountered by a keyboard peripherals.
+// KeyboardErrorEvent signals an error encountered by a keyboard peripheral.
 type KeyboardErrorEvent struct {
 	timestamp time.Time
 	Error     error

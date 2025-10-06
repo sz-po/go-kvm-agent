@@ -1,4 +1,4 @@
-package peripherals
+package peripheral
 
 // DisplayPixelFormat defines the pixel format for display frames.
 type DisplayPixelFormat int
