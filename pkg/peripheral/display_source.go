@@ -19,9 +19,10 @@ type DisplaySource interface {
 	// same lifecycle rules as DataChannel regarding context-driven shutdown.
 	ControlChannel(ctx context.Context) <-chan DisplayControlEvent
 
-	// GetCurrentDisplayMode returns the currently active display mode
-	// being captured from the source device.
-	GetCurrentDisplayMode() (DisplayMode, error)
+	// GetCurrentDisplayMode returns the currently active display mode being
+	// captured from the source device. A nil pointer may be returned together
+	// with an error.
+	GetCurrentDisplayMode() (*DisplayMode, error)
 
 	// Start initializes the virtual display with given parameters without affecting
 	// the lifetime of the previously acquired channels; it configures underlying HW.

@@ -106,7 +106,7 @@ const (
 	KeyboardErrorFatal
 )
 
-// KeyboardErrorEvent signals an error encountered by a keyboard peripheral.
+// KeyboardErrorEvent signals an error encountered by a keyboard peripherals.
 type KeyboardErrorEvent struct {
 	timestamp time.Time
 	Error     error

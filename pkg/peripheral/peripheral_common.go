@@ -1,8 +1,11 @@
 package peripherals
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
-// PeripheralType defines the category of peripheral device.
+// PeripheralType defines the category of peripherals device.
 type PeripheralType int
 
 const (
@@ -12,7 +15,7 @@ const (
 	PeripheralTypeMouse
 )
 
-// String returns the string representation of the peripheral type.
+// String returns the string representation of the peripherals type.
 func (pt PeripheralType) String() string {
 	switch pt {
 	case PeripheralTypeDisplay:
@@ -28,7 +31,7 @@ func (pt PeripheralType) String() string {
 	}
 }
 
-// PeripheralRole defines whether a peripheral is a source or sink.
+// PeripheralRole defines whether a peripherals is a source or sink.
 type PeripheralRole int
 
 const (
@@ -37,7 +40,7 @@ const (
 	PeripheralRoleSink
 )
 
-// String returns the string representation of the peripheral role.
+// String returns the string representation of the peripherals role.
 func (pr PeripheralRole) String() string {
 	switch pr {
 	case PeripheralRoleSource:
@@ -51,7 +54,7 @@ func (pr PeripheralRole) String() string {
 	}
 }
 
-// PeripheralID uniquely identifies a peripheral device.
+// PeripheralID uniquely identifies a peripherals device.
 type PeripheralID struct {
 	pType    PeripheralType
 	role     PeripheralRole
@@ -59,20 +62,31 @@ type PeripheralID struct {
 }
 
 // NewPeripheralID constructs a new PeripheralID with the given parameters.
-func NewPeripheralID(pType PeripheralType, role PeripheralRole, specific string) PeripheralID {
+// Returns an error if pType is Unknown, role is Unknown, or specific is empty.
+func NewPeripheralID(pType PeripheralType, role PeripheralRole, specific string) (PeripheralID, error) {
+	if pType == PeripheralTypeUnknown {
+		return PeripheralID{}, errors.New("peripherals type cannot be unknown")
+	}
+	if role == PeripheralRoleUnknown {
+		return PeripheralID{}, errors.New("peripherals role cannot be unknown")
+	}
+	if specific == "" {
+		return PeripheralID{}, errors.New("specific identifier cannot be empty")
+	}
+
 	return PeripheralID{
 		pType:    pType,
 		role:     role,
 		specific: specific,
-	}
+	}, nil
 }
 
-// Type returns the peripheral type.
+// Type returns the peripherals type.
 func (pid PeripheralID) Type() PeripheralType {
 	return pid.pType
 }
 
-// Role returns the peripheral role.
+// Role returns the peripherals role.
 func (pid PeripheralID) Role() PeripheralRole {
 	return pid.role
 }
@@ -82,12 +96,12 @@ func (pid PeripheralID) Specific() string {
 	return pid.specific
 }
 
-// String returns the formatted peripheral ID in the form: {type}/{role}/{specific}
+// String returns the formatted peripherals ID in the form: {type}/{role}/{specific}
 func (pid PeripheralID) String() string {
 	return fmt.Sprintf("%s/%s/%s", pid.pType, pid.role, pid.specific)
 }
 
-// Peripheral is the base interface for all peripheral devices.
+// Peripheral is the base interface for all peripherals devices.
 type Peripheral interface {
 	ID() PeripheralID
 }
