@@ -6,9 +6,13 @@ import "time"
 type DisplayEventType int
 
 const (
+	// DisplayEventUnknown represents an uninitialized or invalid display event type.
 	DisplayEventUnknown DisplayEventType = iota
+	// DisplayEventFrameStart signals the beginning of a new frame.
 	DisplayEventFrameStart
+	// DisplayEventFrameChunk signals a chunk of frame data.
 	DisplayEventFrameChunk
+	// DisplayEventFrameEnd signals the completion of a frame.
 	DisplayEventFrameEnd
 )
 
@@ -106,14 +110,23 @@ func (e DisplayFrameEndEvent) Timestamp() time.Time {
 type DisplayControlEventType int
 
 const (
+	// DisplayControlUnknown represents an uninitialized or invalid control event type.
 	DisplayControlUnknown DisplayControlEventType = iota
+	// DisplayControlFrameDropped signals that a frame was dropped.
 	DisplayControlFrameDropped
+	// DisplayControlCaptureError signals an error during capture.
 	DisplayControlCaptureError
+	// DisplayControlMetrics signals display metrics information.
 	DisplayControlMetrics
+	// DisplayControlModeChanged signals a change in display mode.
 	DisplayControlModeChanged
+	// DisplayControlSourceStarted signals that a display source has started.
 	DisplayControlSourceStarted
+	// DisplayControlSourceStopped signals that a display source has stopped.
 	DisplayControlSourceStopped
+	// DisplayControlSinkStarted signals that a display sink has started.
 	DisplayControlSinkStarted
+	// DisplayControlSinkStopped signals that a display sink has stopped.
 	DisplayControlSinkStopped
 )
 
@@ -127,9 +140,13 @@ type DisplayControlEvent interface {
 type DisplayErrorSeverity int
 
 const (
+	// DisplayErrorUnknown represents an uninitialized or invalid error severity.
 	DisplayErrorUnknown DisplayErrorSeverity = iota
+	// DisplayErrorWarning represents a warning that does not stop operation.
 	DisplayErrorWarning
+	// DisplayErrorError represents a recoverable error.
 	DisplayErrorError
+	// DisplayErrorFatal represents an unrecoverable error.
 	DisplayErrorFatal
 )
 

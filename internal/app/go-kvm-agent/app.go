@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/szymonpodeszwa/go-kvm-agent/internal/pkg/routing"
-	"github.com/szymonpodeszwa/go-kvm-agent/pkg/peripheral"
 )
 
 func Start(config Config, wg *sync.WaitGroup, ctx context.Context) error {
@@ -18,10 +17,9 @@ func Start(config Config, wg *sync.WaitGroup, ctx context.Context) error {
 		return fmt.Errorf("create machines: %w", err)
 	}
 
-	router, err := createDisplayRouter(
-		[]peripheral.DisplaySource{},
-		[]peripheral.DisplaySink{},
-	)
+	peripheralRepository := createPeripheralRepositoryFromMachines(machines)
+
+	router, err := createDisplayRouterFromPeripheralRepository(peripheralRepository)
 	if err != nil {
 		return fmt.Errorf("create display router: %w", err)
 	}

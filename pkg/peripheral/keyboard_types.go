@@ -10,6 +10,8 @@ type KeyboardLogicalKey struct {
 }
 
 // KeyboardLayoutBinding maps a HID usage to logical keys under various modifier states.
+// It defines how a physical key produces different logical outputs depending on
+// active modifiers (Shift, AltGr, CapsLock) and provides metadata about the key's behavior.
 type KeyboardLayoutBinding struct {
 	Primary      KeyboardLogicalKey
 	Shifted      KeyboardLogicalKey

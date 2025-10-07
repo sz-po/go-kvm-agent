@@ -4,7 +4,9 @@ package peripheral
 type DisplayPixelFormat int
 
 const (
+	// DisplayPixelFormatUnknown represents an uninitialized or invalid pixel format.
 	DisplayPixelFormatUnknown DisplayPixelFormat = iota
+	// DisplayPixelFormatRGB24 represents 24-bit RGB pixel format (8 bits per channel).
 	DisplayPixelFormatRGB24
 )
 

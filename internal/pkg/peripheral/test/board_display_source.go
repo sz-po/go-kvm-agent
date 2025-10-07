@@ -22,6 +22,8 @@ type BoardDisplaySourceConfig struct {
 	PixelFormat peripheral.DisplayPixelFormat `json:"pixelFormat"`
 }
 
+const BoardDisplaySourceDriver = peripheral.PeripheralDriver("board-display-source")
+
 // DefaultChunkSize is the default size of frame data chunks in bytes.
 // Set to 57600 bytes (10 rows for 1920x1080 RGB24), which is a multiple of many common row sizes.
 const DefaultChunkSize = 57600

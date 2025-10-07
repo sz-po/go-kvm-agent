@@ -7,7 +7,6 @@ import (
 	"os"
 	"os/signal"
 	"sync"
-	"syscall"
 
 	"github.com/alecthomas/kong"
 	go_kvm_agent "github.com/szymonpodeszwa/go-kvm-agent/internal/app/go-kvm-agent"
@@ -17,15 +16,6 @@ func main() {
 	var config go_kvm_agent.Config
 	kong.Parse(&config)
 
-	if config.MachinesDir != "" {
-		machines, err := go_kvm_agent.LoadMachinesFromDir(config.MachinesDir)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "failed to load machines: %v\n", err)
-			os.Exit(1)
-		}
-		config.Machines = append(config.Machines, machines...)
-	}
-
 	// Setup slog
 	logger, err := setupLogger(config.Log.Level, config.Log.Format)
 	if err != nil {
@@ -34,29 +24,21 @@ func main() {
 	}
 	slog.SetDefault(logger)
 
-	// Context with cancellation
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer cancel()
-
-	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 
 	var wg sync.WaitGroup
 
+	slog.Info("Starting application.")
+	if err := go_kvm_agent.Start(config, &wg, ctx); err != nil {
+		slog.Error("Application start error.", slog.String("error", err.Error()))
+		return
+	}
+
+	slog.Info("Application started.")
+
 	wg.Add(1)
-	go func() {
-		slog.Info("Starting application.")
-		if err := go_kvm_agent.Start(config, &wg, ctx); err != nil {
-			slog.Error("Application start error.", slog.String("error", err.Error()))
-		}
-		slog.Info("Application started.")
-	}()
-
-	<-sigChan
-	wg.Done()
-	slog.Info("Shutdown signal received, stopping application.")
-	cancel()
-
+	
 	wg.Wait()
 	slog.Info("Application stopped.")
 }

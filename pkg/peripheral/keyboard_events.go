@@ -6,7 +6,9 @@ import "time"
 type KeyboardEventType int
 
 const (
+	// KeyboardEventUnknown represents an uninitialized or invalid keyboard event type.
 	KeyboardEventUnknown KeyboardEventType = iota
+	// KeyboardEventKey represents a keyboard key event.
 	KeyboardEventKey
 )
 
@@ -20,9 +22,13 @@ type KeyboardEvent interface {
 type KeyboardKeyState int
 
 const (
+	// KeyboardKeyStateUnknown represents an uninitialized or invalid key state.
 	KeyboardKeyStateUnknown KeyboardKeyState = iota
+	// KeyboardKeyStatePress represents a key press action.
 	KeyboardKeyStatePress
+	// KeyboardKeyStateRelease represents a key release action.
 	KeyboardKeyStateRelease
+	// KeyboardKeyStateRepeat represents a key repeat action.
 	KeyboardKeyStateRepeat
 )
 
@@ -30,12 +36,19 @@ const (
 type KeyboardModifiers uint32
 
 const (
-	KeyboardModifierNone  KeyboardModifiers = 0
+	// KeyboardModifierNone indicates no modifiers are active.
+	KeyboardModifierNone KeyboardModifiers = 0
+	// KeyboardModifierShift indicates the Shift modifier is active.
 	KeyboardModifierShift KeyboardModifiers = 1 << iota
+	// KeyboardModifierControl indicates the Control modifier is active.
 	KeyboardModifierControl
+	// KeyboardModifierAlt indicates the Alt modifier is active.
 	KeyboardModifierAlt
+	// KeyboardModifierMeta indicates the Meta (Windows/Command) modifier is active.
 	KeyboardModifierMeta
+	// KeyboardModifierAltGr indicates the AltGr modifier is active.
 	KeyboardModifierAltGr
+	// KeyboardModifierFunction indicates the Function modifier is active.
 	KeyboardModifierFunction
 )
 
@@ -79,14 +92,23 @@ func (e KeyboardKeyEvent) Timestamp() time.Time {
 type KeyboardControlEventType int
 
 const (
+	// KeyboardControlUnknown represents an uninitialized or invalid control event type.
 	KeyboardControlUnknown KeyboardControlEventType = iota
+	// KeyboardControlError signals a keyboard error event.
 	KeyboardControlError
+	// KeyboardControlMetrics signals keyboard metrics information.
 	KeyboardControlMetrics
+	// KeyboardControlLayoutChanged signals that the keyboard layout has changed.
 	KeyboardControlLayoutChanged
+	// KeyboardControlLEDStateChanged signals that the LED state has changed.
 	KeyboardControlLEDStateChanged
+	// KeyboardControlSourceStarted signals that a keyboard source has started.
 	KeyboardControlSourceStarted
+	// KeyboardControlSourceStopped signals that a keyboard source has stopped.
 	KeyboardControlSourceStopped
+	// KeyboardControlSinkStarted signals that a keyboard sink has started.
 	KeyboardControlSinkStarted
+	// KeyboardControlSinkStopped signals that a keyboard sink has stopped.
 	KeyboardControlSinkStopped
 )
 
@@ -100,9 +122,13 @@ type KeyboardControlEvent interface {
 type KeyboardErrorSeverity int
 
 const (
+	// KeyboardErrorUnknown represents an uninitialized or invalid error severity.
 	KeyboardErrorUnknown KeyboardErrorSeverity = iota
+	// KeyboardErrorWarning represents a warning that does not stop operation.
 	KeyboardErrorWarning
+	// KeyboardErrorRecoverable represents a recoverable error.
 	KeyboardErrorRecoverable
+	// KeyboardErrorFatal represents an unrecoverable error.
 	KeyboardErrorFatal
 )
 

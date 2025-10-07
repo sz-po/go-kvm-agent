@@ -3,26 +3,41 @@ package machine
 import (
 	"errors"
 
-	"github.com/szymonpodeszwa/go-kvm-agent/pkg/peripheral"
+	peripheralSDK "github.com/szymonpodeszwa/go-kvm-agent/pkg/peripheral"
 )
 
 var (
-	// ErrPeripheralNotFound indicates that the requested peripheral does not exist in the machine.
-	ErrPeripheralNotFound = errors.New("peripheral not found")
+	// ErrPeripheralNotFound indicates that the requested peripheralSDK does not exist in the machine.
+	ErrPeripheralNotFound = errors.New("peripheralSDK not found")
 )
+
+// MachineOpt is a functional option for configuring a Machine during creation.
+type MachineOpt func(*Machine)
 
 // Machine represents a virtual machine instance with its runtime state.
 type Machine struct {
 	name        MachineName
-	peripherals map[peripheral.PeripheralID]peripheral.Peripheral
+	peripherals map[peripheralSDK.PeripheralID]peripheralSDK.Peripheral
 }
 
-// CreateMachineFromConfig creates a new Machine instance from the provided configuration.
-func CreateMachineFromConfig(config *MachineConfig) (*Machine, error) {
-	return &Machine{
-		name:        config.Name,
-		peripherals: make(map[peripheral.PeripheralID]peripheral.Peripheral),
-	}, nil
+// WithPeripheral returns a MachineOpt that adds a peripheral to the machine.
+func WithPeripheral(peripheral peripheralSDK.Peripheral) MachineOpt {
+	return func(machine *Machine) {
+		machine.peripherals[peripheral.ID()] = peripheral
+	}
+}
+
+// NewMachine creates a new Machine instance with the given name and options.
+func NewMachine(name MachineName, opts ...MachineOpt) *Machine {
+	machine := &Machine{
+		name: name,
+	}
+
+	for _, opt := range opts {
+		opt(machine)
+	}
+
+	return machine
 }
 
 // Name returns the machine name as a string.
@@ -32,17 +47,17 @@ func (machine *Machine) Name() string {
 
 // GetPeripherals returns all peripherals attached to this machine.
 // The returned slice is a copy and modifications to it will not affect the machine's state.
-func (machine *Machine) GetPeripherals() []peripheral.Peripheral {
-	peripherals := make([]peripheral.Peripheral, 0, len(machine.peripherals))
+func (machine *Machine) GetPeripherals() []peripheralSDK.Peripheral {
+	peripherals := make([]peripheralSDK.Peripheral, 0, len(machine.peripherals))
 	for _, p := range machine.peripherals {
 		peripherals = append(peripherals, p)
 	}
 	return peripherals
 }
 
-// GetPeripheralByID returns a specific peripheral by its ID.
-// Returns ErrPeripheralNotFound if the peripheral does not exist.
-func (machine *Machine) GetPeripheralByID(id peripheral.PeripheralID) (peripheral.Peripheral, error) {
+// GetPeripheralByID returns a specific peripheralSDK by its ID.
+// Returns ErrPeripheralNotFound if the peripheralSDK does not exist.
+func (machine *Machine) GetPeripheralByID(id peripheralSDK.PeripheralID) (peripheralSDK.Peripheral, error) {
 	p, ok := machine.peripherals[id]
 	if !ok {
 		return nil, ErrPeripheralNotFound

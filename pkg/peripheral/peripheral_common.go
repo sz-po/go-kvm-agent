@@ -5,13 +5,20 @@ import (
 	"fmt"
 )
 
+// PeripheralDriver identifies the driver implementation used for a peripheral.
+type PeripheralDriver string
+
 // PeripheralType defines the category of peripheral device.
 type PeripheralType int
 
 const (
+	// PeripheralTypeUnknown represents an uninitialized or invalid peripheral type.
 	PeripheralTypeUnknown PeripheralType = iota
+	// PeripheralTypeDisplay represents a display peripheral.
 	PeripheralTypeDisplay
+	// PeripheralTypeKeyboard represents a keyboard peripheral.
 	PeripheralTypeKeyboard
+	// PeripheralTypeMouse represents a mouse peripheral.
 	PeripheralTypeMouse
 )
 
@@ -35,8 +42,11 @@ func (pt PeripheralType) String() string {
 type PeripheralRole int
 
 const (
+	// PeripheralRoleUnknown represents an uninitialized or invalid peripheral role.
 	PeripheralRoleUnknown PeripheralRole = iota
+	// PeripheralRoleSource represents a peripheral that emits events or data.
 	PeripheralRoleSource
+	// PeripheralRoleSink represents a peripheral that consumes events or data.
 	PeripheralRoleSink
 )
 
