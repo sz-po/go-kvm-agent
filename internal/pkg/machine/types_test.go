@@ -27,17 +27,17 @@ func TestNewMachineName(t *testing.T) {
 		},
 		{
 			name:      "valid name with numbers",
-			input:     "test-vm-1",
+			input:     "mpv-vm-1",
 			wantError: false,
 		},
 		{
 			name:      "valid name starting with number",
-			input:     "1-test-vm",
+			input:     "1-mpv-vm",
 			wantError: false,
 		},
 		{
 			name:      "valid complex kebab-case",
-			input:     "my-test-vm-123",
+			input:     "my-mpv-vm-123",
 			wantError: false,
 		},
 		// Invalid cases
@@ -130,12 +130,12 @@ func TestNewMachineName(t *testing.T) {
 }
 
 func TestMachineNameString(t *testing.T) {
-	name, err := NewMachineName("test-machine")
+	name, err := NewMachineName("mpv-machine")
 	if !assert.NoError(t, err, "NewMachineName should succeed.") {
 		return
 	}
 
-	expected := "test-machine"
+	expected := "mpv-machine"
 	assert.Equal(t, expected, name.String(), "String should return the canonical value.")
 }
 
@@ -178,7 +178,7 @@ func TestMachineNameJSON(t *testing.T) {
 }
 
 func TestMachineNameJSONRoundTrip(t *testing.T) {
-	original := "test-vm-123"
+	original := "mpv-vm-123"
 	machineName, err := NewMachineName(original)
 	if !assert.NoError(t, err, "NewMachineName should succeed.") {
 		return
@@ -204,12 +204,12 @@ func TestMachineNameInStruct(t *testing.T) {
 		Name MachineName `json:"name"`
 	}
 
-	validJSON := `{"name":"my-test-vm"}`
+	validJSON := `{"name":"my-mpv-vm"}`
 	var valid TestStruct
 	if !assert.NoError(t, json.Unmarshal([]byte(validJSON), &valid), "Unmarshal should succeed for valid JSON.") {
 		return
 	}
-	assert.Equal(t, "my-test-vm", valid.Name.String(), "Struct should contain decoded machine name.")
+	assert.Equal(t, "my-mpv-vm", valid.Name.String(), "Struct should contain decoded machine name.")
 
 	invalidJSON := `{"name":"Invalid-Name"}`
 	var invalid TestStruct

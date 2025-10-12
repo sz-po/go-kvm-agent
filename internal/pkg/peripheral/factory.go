@@ -1,62 +1,60 @@
 package peripheral
 
 import (
+	"context"
 	"errors"
 	"fmt"
-	
+	"log/slog"
+
+	"github.com/mitchellh/mapstructure"
+	"github.com/szymonpodeszwa/go-kvm-agent/internal/pkg/peripheral/ffmpeg"
+
+	"github.com/szymonpodeszwa/go-kvm-agent/internal/pkg/peripheral/mpv"
 	peripheralSDK "github.com/szymonpodeszwa/go-kvm-agent/pkg/peripheral"
 )
 
 // CreatePeripheralFromConfig creates a peripheral instance from the provided configuration.
-// It delegates to type-specific factory functions based on the peripheral type.
-func CreatePeripheralFromConfig(config PeripheralConfig) (peripheralSDK.Peripheral, error) {
-	switch config.Type {
-	case peripheralSDK.PeripheralTypeDisplay:
-		peripheral, err := createDisplayPeripheralFromConfig(config)
-		if err != nil {
-			return nil, fmt.Errorf("error creating display peripheral: %w", err)
-		}
-
-		return peripheral, nil
-	default:
-		return nil, ErrUnsupportedPeripheralType
-	}
-}
-
-// createDisplayPeripheralFromConfig creates a display peripheral from configuration.
-// It delegates to role-specific factory functions based on the peripheral role.
-func createDisplayPeripheralFromConfig(config PeripheralConfig) (peripheralSDK.Peripheral, error) {
-	if config.Type != peripheralSDK.PeripheralTypeDisplay {
-		panic("peripheralSDK must be a display peripheralSDK")
-	}
-
-	switch config.Role {
-	case peripheralSDK.PeripheralRoleSource:
-		peripheral, err := createDisplaySourcePeripheralFromConfig(config)
-		if err != nil {
-			return nil, fmt.Errorf("error creating display source peripheral: %w", err)
-		}
-
-		return peripheral, nil
-	default:
-		return nil, ErrUnsupportedPeripheralRole
-	}
-}
-
-// createDisplaySourcePeripheralFromConfig creates a display source peripheral from configuration.
 // It delegates to driver-specific factory functions based on the peripheral driver.
-func createDisplaySourcePeripheralFromConfig(config PeripheralConfig) (peripheralSDK.Peripheral, error) {
+func CreatePeripheralFromConfig(ctx context.Context, config PeripheralConfig) (peripheralSDK.Peripheral, error) {
+	logger := slog.With(
+		slog.String("peripheralDriver", string(config.Driver)),
+	)
+
 	switch config.Driver {
+	case ffmpeg.DisplaySourceDriver:
+		ffmpegDisplaySourceConfig := ffmpeg.DisplaySourceConfig{}
+
+		err := mapstructure.Decode(config.Config, &ffmpegDisplaySourceConfig)
+		if err != nil {
+			return nil, fmt.Errorf("decode ffmpeg-display-source config: %w", err)
+		}
+
+		ffmpegDisplaySource, err := ffmpeg.NewDisplaySource(ctx, ffmpegDisplaySourceConfig, ffmpeg.WithDisplaySourceLogger(logger))
+		if err != nil {
+			return nil, fmt.Errorf("create ffmpeg-display-source peripheral: %w", err)
+		}
+
+		return ffmpegDisplaySource, nil
+	case mpv.WindowDriver:
+		gioWindowConfig := mpv.WindowConfig{}
+
+		err := mapstructure.Decode(config.Config, &gioWindowConfig)
+		if err != nil {
+			return nil, fmt.Errorf("decode gio-window config: %w", err)
+		}
+
+		gioWindow, err := mpv.NewMPVWindow(ctx, gioWindowConfig)
+		if err != nil {
+			return nil, fmt.Errorf("create gio-window peripheral: %w", err)
+		}
+
+		return gioWindow, nil
 	default:
-		return nil, ErrUnsupportedPeripheralDriver
+		return nil, fmt.Errorf("%w: %s", ErrUnsupportedPeripheralDriver, config.Driver)
 	}
 }
 
 var (
-	// ErrUnsupportedPeripheralType indicates that the peripheral type is not supported by the factory.
-	ErrUnsupportedPeripheralType = errors.New("unsupported peripheralSDK type")
-	// ErrUnsupportedPeripheralRole indicates that the peripheral role is not supported by the factory.
-	ErrUnsupportedPeripheralRole = errors.New("unsupported peripheralSDK role")
 	// ErrUnsupportedPeripheralDriver indicates that the peripheral driver is not supported by the factory.
-	ErrUnsupportedPeripheralDriver = errors.New("unsupported peripheralSDK driver")
+	ErrUnsupportedPeripheralDriver = errors.New("unsupported peripheral driver")
 )

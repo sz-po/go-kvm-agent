@@ -67,11 +67,3 @@ type KeyboardLEDState struct {
 	ScrollLock bool
 	Custom     map[string]bool
 }
-
-// KeyboardSinkCapabilities enumerates configurable aspects of a sink implementation.
-type KeyboardSinkCapabilities struct {
-	SupportsLayoutNegotiation bool
-	SupportsLEDUpdates        bool
-	SupportsMacroPlayback     bool
-	MaxMacroLength            uint32
-}

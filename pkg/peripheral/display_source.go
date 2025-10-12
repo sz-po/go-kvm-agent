@@ -1,6 +1,11 @@
 package peripheral
 
-import "context"
+import (
+	"context"
+)
+
+// DisplaySourceCapability is the capability provided by all DisplaySource implementations.
+var DisplaySourceCapability = NewCapability[DisplaySource](PeripheralKindDisplay, PeripheralRoleSource)
 
 // DisplaySource emits frame payloads for active display sinks.
 // Represents a capture device (e.g., HDMI grabber) connected to a workstation
@@ -10,24 +15,19 @@ import "context"
 type DisplaySource interface {
 	Peripheral
 
-	// DataChannel emits display frame events.
-	// Channels can be fetched before Start; canceling the provided context signals
-	// the implementation to tear down the stream as Start/Stop do not close it.
-	DataChannel(ctx context.Context) <-chan DisplayEvent
+	// DisplayDataChannel emits display frame events.
+	// Channels can be fetched before DisplayStart; canceling the provided context signals
+	// the implementation to tear down the stream as DisplayStart/DisplayStop do not close it.
+	DisplayDataChannel(ctx context.Context) <-chan DisplayDataEvent
 
-	// ControlChannel emits control events (metrics, errors, status) and follows the
-	// same lifecycle rules as DataChannel regarding context-driven shutdown.
-	ControlChannel(ctx context.Context) <-chan DisplayControlEvent
+	// DisplayControlChannel emits control events (metrics, errors, status) and follows the
+	// same lifecycle rules as DisplayDataChannel regarding context-driven shutdown.
+	DisplayControlChannel(ctx context.Context) <-chan DisplayControlEvent
 
 	// GetCurrentDisplayMode returns the currently active display mode being
 	// captured from the source device. A nil pointer may be returned together
 	// with an error.
 	GetCurrentDisplayMode() (*DisplayMode, error)
 
-	// Start initializes the virtual display with given parameters without affecting
-	// the lifetime of the previously acquired channels; it configures underlying HW.
-	Start(ctx context.Context, info DisplayInfo) error
-
-	// Stop stops the display source HW; channel teardown is still governed by ctx.
-	Stop(ctx context.Context) error
+	GetDisplaySourceMetrics() DisplaySourceMetrics
 }

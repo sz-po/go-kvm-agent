@@ -13,12 +13,29 @@
 - **Error Convention**: When it makes sense, define errors as variables with the `Err` prefix (for example `var ErrNotFound = errors.New("not found")`). This is the standard Go convention for sentinel errors.
 - **Error Wrapping**: When returning errors, always add clear context with `fmt.Errorf` and the `%w` verb (for example `fmt.Errorf("create machine from config: %w", err)` or `fmt.Errorf("read file %s: %w", filePath, err)`) instead of passing the original error unchanged.
 - **Testing Assertions**: When writing tests in Go, use the `testify/assert` package directly (for example `assert.NoError(t, err)`, `assert.Equal(t, expected, actual)`) instead of creating custom assertion helpers, so failures produce descriptive messages out of the box.
+- **Mock Testing**: When using testify/mock with expecters (mockery generated mocks), follow these conventions:
+  - **Mock Structure**: Mock structs embed `mock.Mock` without additional fields for storing values (for example `type MyMock struct { mock.Mock }` instead of `type MyMock struct { mock.Mock; value string }`).
+  - **Use Generated Constructors**: Always create mocks using the generated constructor that accepts `*testing.T` (for example `m := NewMockRequester(t)`). The constructor automatically registers expectations and cleanup.
+  - **Configure with EXPECT()/Return**: Set mock behavior using the expecter pattern `mockObj.EXPECT().MethodName(args...).Return(values...)` instead of `On()`. For example:
+    ```go
+    m := NewMockRequester(t)
+    m.EXPECT().Get("foo").Return("bar", nil).Once()
+    retString, err := m.Get("foo")
+    ```
+  - See [testify/mock documentation](https://pkg.go.dev/github.com/stretchr/testify/mock) for details on expecter pattern, `Return()`, `Once()`, and argument matchers like `mock.Anything` or `mock.MatchedBy()`.
 - **Peripheral SDK Alias**: Always import `github.com/szymonpodeszwa/go-kvm-agent/pkg/peripheral` using the alias `peripheralSDK` to avoid naming conflicts with internal packages.
 - **Naming Conventions**:
   - **JSON Tags**: Always use camelCase for field names in JSON tags (for example `json:"userName"` instead of `json:"user_name"`).
   - **Enum and Config Values**: Always use kebab-case for enum values and configuration option values (for example `"auto-detect"`, `"usb-device"`, `"high-performance"`).
   - **Receivers**: Receiver names must be clear and descriptive, not single or two-letter abbreviations. Use meaningful names that indicate the receiver's role (for example `(manager *Manager)` is acceptable, but prefer `(displayManager *Manager)` when there are multiple manager types. Avoid generic `(m *Manager)` or `(d *Display)`).
   - **Variables**: Avoid single-letter variable names and meaningless abbreviations. Use full, descriptive names (for example `config` instead of `cfg`, `connection` instead of `conn`). Exceptions are allowed for universally accepted short names in limited scopes (like `i` in simple for-loops iterating over indices, `err` for errors, `ok` for boolean checks, `ctx` for context.Context, and `wg` for sync.WaitGroup).
+- **Code Readability**: Code readability is the top priority when writing code. Follow these principles:
+  - Write self-documenting code with clear, descriptive variable and function names that express intent
+  - Avoid abbreviations and single-letter variable names (exceptions listed in Naming Conventions above)
+  - Structure code in logical blocks that are easy to follow
+  - Add comments only where truly necessary - when the code cannot be made self-explanatory or when documenting complex business logic, algorithms, or non-obvious decisions
+  - Prefer refactoring unclear code over adding explanatory comments
+  - When comments are needed, write them as complete sentences explaining "why" rather than "what"
 - **MCP Servers**: When you perform code operations, prefer using MCP server tools over traditional command-line utilities, as they provide better integration with the development environment. Follow these preferences:
 
   **File Operations:**
@@ -40,9 +57,3 @@
   - File-level problems: use `get_file_problems` to check errors and warnings in specific files
   - Project-level problems: use `get_project_problems` for global code analysis
   - Project structure: use `get_project_modules` and `get_project_dependencies` to understand architecture
-
-  **Running and Testing:**
-  - **Tests**: Always run tests using `execute_run_configuration` with appropriate test run configurations (e.g., "All Tests", "Package Tests"). Never use `go test` directly via terminal
-  - Prefer `execute_run_configuration` over manual terminal commands when run configurations exist
-  - Use `get_run_configurations` to discover available build/test/run configurations
-  - Use `execute_terminal_command` only when MCP-specific tools are not applicable

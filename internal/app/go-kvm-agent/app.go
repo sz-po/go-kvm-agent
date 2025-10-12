@@ -2,47 +2,56 @@ package go_kvm_agent
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log/slog"
 	"sync"
-	"time"
 
-	"github.com/szymonpodeszwa/go-kvm-agent/internal/pkg/routing"
+	"github.com/szymonpodeszwa/go-kvm-agent/internal/pkg/api/control/handler"
+	"github.com/szymonpodeszwa/go-kvm-agent/internal/pkg/http"
+	"github.com/szymonpodeszwa/go-kvm-agent/internal/pkg/machine"
 )
 
-func Start(config Config, wg *sync.WaitGroup, ctx context.Context) error {
-	machines, err := createMachineFromConfigPath(config.Machine.ConfigPath)
+func Start(ctx context.Context, wg *sync.WaitGroup, config Config) error {
+	var machines []*machine.Machine
+
+	for _, machineConfig := range config.Machines {
+		newMachine, err := machine.CreateMachineFromConfig(ctx, machineConfig)
+		if err != nil {
+			return fmt.Errorf("create machine: %s: %w", machineConfig.Name, err)
+		}
+
+		peripherals := newMachine.GetPeripherals()
+
+		slog.Info("Machine created.",
+			slog.String("machineName", string(machineConfig.Name)),
+			slog.Int("peripheralsCount", len(peripherals)),
+		)
+
+		machines = append(machines, newMachine)
+	}
+
+	peripheralRepository, err := createPeripheralRepositoryFromMachines(machines)
 	if err != nil {
-		return fmt.Errorf("create machines: %w", err)
+		return fmt.Errorf("create peripheral repository: %w", err)
 	}
 
-	peripheralRepository := createPeripheralRepositoryFromMachines(machines)
-
-	router, err := createDisplayRouterFromPeripheralRepository(peripheralRepository)
+	displayRouter, err := createLocalDisplayRouterFromPeripheralRepository(peripheralRepository)
 	if err != nil {
-		return fmt.Errorf("create display router: %w", err)
+		return fmt.Errorf("create display routing: %w", err)
 	}
 
-	if err := router.Start(ctx); err != nil {
-		return fmt.Errorf("start display router: %w", err)
+	err = http.Listen(ctx, config.Api.ControlApi.Server,
+		http.WithHandler(handler.NewDisplayRouterHandler(displayRouter)),
+	)
+	if err != nil {
+		return fmt.Errorf("control api: http server: listen: %w", err)
 	}
 
-	if wg != nil {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-
-			<-ctx.Done()
-
-			stopCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-			defer cancel()
-
-			if err := router.Stop(stopCtx); err != nil && !errors.Is(err, context.Canceled) && !errors.Is(err, routing.ErrDisplayRouterNotStarted) {
-				slog.Error("Failed to stop display router.", slog.String("error", err.Error()))
-			}
-		}()
-	}
+	wg.Add(1)
+	go func() {
+		<-ctx.Done()
+		wg.Done()
+	}()
 
 	return nil
 }

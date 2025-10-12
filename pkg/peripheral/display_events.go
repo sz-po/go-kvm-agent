@@ -16,8 +16,8 @@ const (
 	DisplayEventFrameEnd
 )
 
-// DisplayEvent represents a display data event.
-type DisplayEvent interface {
+// DisplayDataEvent represents a display data event.
+type DisplayDataEvent interface {
 	Type() DisplayEventType
 	Timestamp() time.Time
 }

@@ -1,0 +1,18 @@
+all: false
+template: testify
+filename: "{{.InterfaceName | snakecase}}_mock.go"
+structname: '{{.InterfaceName}}Mock'
+inpackage: true
+packages:
+  github.com/szymonpodeszwa/go-kvm-agent/pkg/peripheral:
+    interfaces:
+      Peripheral:
+      DisplaySource:
+      DisplaySink:
+      KeyboardSource:
+      KeyboardSink:
+      MouseSource:
+      MouseSink:
+  github.com/szymonpodeszwa/go-kvm-agent/pkg/routing:
+    interfaces:
+      DisplayRouter:

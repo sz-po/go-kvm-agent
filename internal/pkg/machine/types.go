@@ -26,7 +26,7 @@ var (
 // digits (0-9), and hyphens (-) as separators. It cannot be empty, start or end
 // with a hyphen, or contain consecutive hyphens.
 //
-// Valid examples: "my-machine", "test-vm-1", "server"
+// Valid examples: "my-machine", "mpv-vm-1", "server"
 // Invalid examples: "My-Machine", "my machine", "-start", "end-", "double--dash", ""
 func NewMachineName(name string) (MachineName, error) {
 	if name == "" {
