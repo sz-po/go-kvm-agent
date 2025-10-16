@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"os"
 	"os/exec"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -418,11 +419,15 @@ func createCommand(specification Specification) (*exec.Cmd, error) {
 // It sets up pipes for stdin, stdout, and stderr, and starts monitoring the process.
 // Returns the processInstance or an error if launch fails.
 func (supervisor *supervisorLocal) launchProcess(ctx context.Context) (*processInstance, error) {
+	cmdInfo := fmt.Sprintf("[%s %s]",
+		supervisor.specification.ExecutablePath,
+		strings.Join(supervisor.specification.Arguments, " "))
+
 	command, err := createCommand(supervisor.specification)
 	if err != nil {
 		supervisor.logger.Error("Failed to create command.",
 			slog.String("error", err.Error()))
-		return nil, fmt.Errorf("create command: %w", err)
+		return nil, fmt.Errorf("create command %s: %w", cmdInfo, err)
 	}
 
 	// Create pipes for process IO
@@ -430,28 +435,28 @@ func (supervisor *supervisorLocal) launchProcess(ctx context.Context) (*processI
 	if err != nil {
 		supervisor.logger.Error("Failed to create stdout pipe.",
 			slog.String("error", err.Error()))
-		return nil, fmt.Errorf("create stdout pipe: %w", err)
+		return nil, fmt.Errorf("create stdout pipe %s: %w", cmdInfo, err)
 	}
 
 	stderrPipe, err := command.StderrPipe()
 	if err != nil {
 		supervisor.logger.Error("Failed to create stderr pipe.",
 			slog.String("error", err.Error()))
-		return nil, fmt.Errorf("create stderr pipe: %w", err)
+		return nil, fmt.Errorf("create stderr pipe %s: %w", cmdInfo, err)
 	}
 
 	stdinPipe, err := command.StdinPipe()
 	if err != nil {
 		supervisor.logger.Error("Failed to create stdin pipe.",
 			slog.String("error", err.Error()))
-		return nil, fmt.Errorf("create stdin pipe: %w", err)
+		return nil, fmt.Errorf("create stdin pipe %s: %w", cmdInfo, err)
 	}
 
 	// Start the process
 	if err := command.Start(); err != nil {
 		supervisor.logger.Error("Failed to start process.",
 			slog.String("error", err.Error()))
-		return nil, fmt.Errorf("start process: %w", err)
+		return nil, fmt.Errorf("start process %s: %w", cmdInfo, err)
 	}
 
 	instanceContext, instanceCancelFunc := context.WithCancel(ctx)
@@ -737,6 +742,10 @@ func (supervisor *supervisorLocal) switchStdinTarget(newInstance *processInstanc
 // If the process exits before stability is reached, Start returns ErrFailedToStart wrapping the cause.
 // Start can only be called when the supervisor is in the Idle state.
 func (supervisor *supervisorLocal) Start(ctx context.Context, stableFor time.Duration) error {
+	cmdInfo := fmt.Sprintf("[%s %s]",
+		supervisor.specification.ExecutablePath,
+		strings.Join(supervisor.specification.Arguments, " "))
+
 	supervisor.logger.Info("Starting process.",
 		slog.String("executablePath", supervisor.specification.ExecutablePath),
 		slog.Duration("stableFor", stableFor))
@@ -792,7 +801,7 @@ func (supervisor *supervisorLocal) Start(ctx context.Context, stableFor time.Dur
 		supervisor.logger.Error("Process exited before reaching stability.",
 			slog.Int("pid", instance.pid),
 			slog.String("error", exitError.Error()))
-		return fmt.Errorf("%w: %w", ErrFailedToStart, exitError)
+		return fmt.Errorf("%w %s: %w", ErrFailedToStart, cmdInfo, exitError)
 
 	case <-ctx.Done():
 		// Context canceled before stability
@@ -991,6 +1000,10 @@ func (supervisor *supervisorLocal) Stop(ctx context.Context) error {
 //
 // The caller must hold appropriate locks and manage state transitions.
 func (supervisor *supervisorLocal) attemptAutoRestart(ctx context.Context, oldPID int, stableFor time.Duration) error {
+	cmdInfo := fmt.Sprintf("[%s %s]",
+		supervisor.specification.ExecutablePath,
+		strings.Join(supervisor.specification.Arguments, " "))
+
 	supervisor.logger.Info("Launching new process for auto-restart.",
 		slog.Int("oldPid", oldPID))
 
@@ -1025,7 +1038,7 @@ func (supervisor *supervisorLocal) attemptAutoRestart(ctx context.Context, oldPI
 		supervisor.logger.Error("New process for auto-restart exited before stability.",
 			slog.Int("newPid", newInstance.pid),
 			slog.String("error", exitError.Error()))
-		return fmt.Errorf("new process exited before stability: %w", exitError)
+		return fmt.Errorf("new process %s exited before stability: %w", cmdInfo, exitError)
 
 	case <-ctx.Done():
 		// Context canceled before stability
@@ -1061,6 +1074,10 @@ func (supervisor *supervisorLocal) attemptAutoRestart(ctx context.Context, oldPI
 // It stops the old process first, then starts a new process and waits for stability.
 // Reload publishes RestartedEvent followed by ReloadedEvent upon success.
 func (supervisor *supervisorLocal) Reload(ctx context.Context, stableFor time.Duration) error {
+	cmdInfo := fmt.Sprintf("[%s %s]",
+		supervisor.specification.ExecutablePath,
+		strings.Join(supervisor.specification.Arguments, " "))
+
 	// State transition guard: Running → Reloading
 	supervisor.stateMutex.Lock()
 	if supervisor.state != StateRunning {
@@ -1158,7 +1175,7 @@ func (supervisor *supervisorLocal) Reload(ctx context.Context, stableFor time.Du
 		supervisor.logger.Error("New process exited before reaching stability.",
 			slog.Int("pid", newInstance.pid),
 			slog.String("error", exitError.Error()))
-		return fmt.Errorf("%w: new process exited: %w", ErrFailedToStart, exitError)
+		return fmt.Errorf("%w: new process %s exited: %w", ErrFailedToStart, cmdInfo, exitError)
 
 	case <-ctx.Done():
 		// Context canceled before stability

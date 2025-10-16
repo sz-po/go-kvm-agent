@@ -41,6 +41,22 @@ func (displayMode DisplayMode) String() string {
 	return fmt.Sprintf("%dx%d@%d", displayMode.Width, displayMode.Height, displayMode.RefreshRate)
 }
 
+func (displayMode DisplayMode) Valid() error {
+	if displayMode.Width <= 0 {
+		return errors.New("invalid display mode width")
+	}
+
+	if displayMode.Height <= 0 {
+		return errors.New("invalid display mode height")
+	}
+
+	if displayMode.RefreshRate <= 0 {
+		return errors.New("invalid display mode refresh rate")
+	}
+
+	return nil
+}
+
 type DisplayModeList []DisplayMode
 
 func (displayModeList DisplayModeList) Supports(testedMode DisplayMode) bool {
@@ -62,7 +78,7 @@ type DisplayInfo struct {
 	Model          string
 	SerialNumber   string
 	SupportedModes []DisplayMode
-	CurrentMode    *DisplayMode
+	CurrentMode    DisplayMode
 }
 
 var ErrUnsupportedDisplayMode = errors.New("unsupported display mode")

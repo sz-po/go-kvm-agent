@@ -1,15 +1,24 @@
 package peripheral
 
-// TODO: Fix and popraw komentarze
+// TODO: refine comments
 
+// DisplaySourceMetrics captures throughput counters exposed by display sources.
 type DisplaySourceMetrics struct {
-	// InputProcessedBytes indicates how many bytes are read from raw input (raw HDMI, socket, etc).
+	// InputProcessedBytes counts the bytes read from the raw input stream (for example HDMI or socket transport).
 	InputProcessedBytes uint64 `json:"inputProcessedBytes"`
 
-	// InputProcessedReadCalls indicates how many read calls was made to read data from input.
+	// InputProcessedReadCalls counts how many read operations were executed against the input stream.
 	InputProcessedReadCalls uint64 `json:"inputProcessedReadCalls"`
 
-	EmittedDisplayFrameEndEventCount   uint64 `json:"emittedDisplayFrameEndEventCount"`
-	EmittedDisplayFrameChunkEventCount uint64 `json:"emittedDisplayFrameChunkEventCount"`
-	EmittedDisplayFrameStartEventCount uint64 `json:"emittedDisplayFrameStartEventCount"`
+	// FrameBufferSwaps indicates how many times frame buffer was swapped.
+	FrameBufferSwaps uint64 `json:"frameBufferSwaps"`
+
+	// FrameBufferWrittenBytes indicates how many bytes was written to frame buffer.
+	FrameBufferWrittenBytes uint64 `json:"frameBufferWrittenBytes"`
+
+	// FramesPerSecond indicates how many frames per second source process.
+	FramesPerSecond uint64 `json:"framesPerSecond"`
+
+	// AdditionalMetrics may contain metrics related to underlying source.
+	AdditionalMetrics map[string]interface{} `json:"additionalMetrics"`
 }

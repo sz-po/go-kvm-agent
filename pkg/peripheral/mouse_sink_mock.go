@@ -37,12 +37,12 @@ func (_m *MouseSinkMock) EXPECT() *MouseSinkMock_Expecter {
 	return &MouseSinkMock_Expecter{mock: &_m.Mock}
 }
 
-// Capabilities provides a mock function for the type MouseSinkMock
-func (_mock *MouseSinkMock) Capabilities() []PeripheralCapability {
+// GetCapabilities provides a mock function for the type MouseSinkMock
+func (_mock *MouseSinkMock) GetCapabilities() []PeripheralCapability {
 	ret := _mock.Called()
 
 	if len(ret) == 0 {
-		panic("no return value specified for Capabilities")
+		panic("no return value specified for GetCapabilities")
 	}
 
 	var r0 []PeripheralCapability
@@ -56,39 +56,39 @@ func (_mock *MouseSinkMock) Capabilities() []PeripheralCapability {
 	return r0
 }
 
-// MouseSinkMock_Capabilities_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Capabilities'
-type MouseSinkMock_Capabilities_Call struct {
+// MouseSinkMock_GetCapabilities_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetCapabilities'
+type MouseSinkMock_GetCapabilities_Call struct {
 	*mock.Call
 }
 
-// Capabilities is a helper method to define mock.On call
-func (_e *MouseSinkMock_Expecter) Capabilities() *MouseSinkMock_Capabilities_Call {
-	return &MouseSinkMock_Capabilities_Call{Call: _e.mock.On("Capabilities")}
+// GetCapabilities is a helper method to define mock.On call
+func (_e *MouseSinkMock_Expecter) GetCapabilities() *MouseSinkMock_GetCapabilities_Call {
+	return &MouseSinkMock_GetCapabilities_Call{Call: _e.mock.On("GetCapabilities")}
 }
 
-func (_c *MouseSinkMock_Capabilities_Call) Run(run func()) *MouseSinkMock_Capabilities_Call {
+func (_c *MouseSinkMock_GetCapabilities_Call) Run(run func()) *MouseSinkMock_GetCapabilities_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run()
 	})
 	return _c
 }
 
-func (_c *MouseSinkMock_Capabilities_Call) Return(peripheralCapabilitys []PeripheralCapability) *MouseSinkMock_Capabilities_Call {
+func (_c *MouseSinkMock_GetCapabilities_Call) Return(peripheralCapabilitys []PeripheralCapability) *MouseSinkMock_GetCapabilities_Call {
 	_c.Call.Return(peripheralCapabilitys)
 	return _c
 }
 
-func (_c *MouseSinkMock_Capabilities_Call) RunAndReturn(run func() []PeripheralCapability) *MouseSinkMock_Capabilities_Call {
+func (_c *MouseSinkMock_GetCapabilities_Call) RunAndReturn(run func() []PeripheralCapability) *MouseSinkMock_GetCapabilities_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// Id provides a mock function for the type MouseSinkMock
-func (_mock *MouseSinkMock) Id() PeripheralId {
+// GetId provides a mock function for the type MouseSinkMock
+func (_mock *MouseSinkMock) GetId() PeripheralId {
 	ret := _mock.Called()
 
 	if len(ret) == 0 {
-		panic("no return value specified for Id")
+		panic("no return value specified for GetId")
 	}
 
 	var r0 PeripheralId
@@ -100,29 +100,73 @@ func (_mock *MouseSinkMock) Id() PeripheralId {
 	return r0
 }
 
-// MouseSinkMock_Id_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Id'
-type MouseSinkMock_Id_Call struct {
+// MouseSinkMock_GetId_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetId'
+type MouseSinkMock_GetId_Call struct {
 	*mock.Call
 }
 
-// Id is a helper method to define mock.On call
-func (_e *MouseSinkMock_Expecter) Id() *MouseSinkMock_Id_Call {
-	return &MouseSinkMock_Id_Call{Call: _e.mock.On("Id")}
+// GetId is a helper method to define mock.On call
+func (_e *MouseSinkMock_Expecter) GetId() *MouseSinkMock_GetId_Call {
+	return &MouseSinkMock_GetId_Call{Call: _e.mock.On("GetId")}
 }
 
-func (_c *MouseSinkMock_Id_Call) Run(run func()) *MouseSinkMock_Id_Call {
+func (_c *MouseSinkMock_GetId_Call) Run(run func()) *MouseSinkMock_GetId_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run()
 	})
 	return _c
 }
 
-func (_c *MouseSinkMock_Id_Call) Return(peripheralId PeripheralId) *MouseSinkMock_Id_Call {
+func (_c *MouseSinkMock_GetId_Call) Return(peripheralId PeripheralId) *MouseSinkMock_GetId_Call {
 	_c.Call.Return(peripheralId)
 	return _c
 }
 
-func (_c *MouseSinkMock_Id_Call) RunAndReturn(run func() PeripheralId) *MouseSinkMock_Id_Call {
+func (_c *MouseSinkMock_GetId_Call) RunAndReturn(run func() PeripheralId) *MouseSinkMock_GetId_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetName provides a mock function for the type MouseSinkMock
+func (_mock *MouseSinkMock) GetName() PeripheralName {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetName")
+	}
+
+	var r0 PeripheralName
+	if returnFunc, ok := ret.Get(0).(func() PeripheralName); ok {
+		r0 = returnFunc()
+	} else {
+		r0 = ret.Get(0).(PeripheralName)
+	}
+	return r0
+}
+
+// MouseSinkMock_GetName_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetName'
+type MouseSinkMock_GetName_Call struct {
+	*mock.Call
+}
+
+// GetName is a helper method to define mock.On call
+func (_e *MouseSinkMock_Expecter) GetName() *MouseSinkMock_GetName_Call {
+	return &MouseSinkMock_GetName_Call{Call: _e.mock.On("GetName")}
+}
+
+func (_c *MouseSinkMock_GetName_Call) Run(run func()) *MouseSinkMock_GetName_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *MouseSinkMock_GetName_Call) Return(peripheralName PeripheralName) *MouseSinkMock_GetName_Call {
+	_c.Call.Return(peripheralName)
+	return _c
+}
+
+func (_c *MouseSinkMock_GetName_Call) RunAndReturn(run func() PeripheralName) *MouseSinkMock_GetName_Call {
 	_c.Call.Return(run)
 	return _c
 }

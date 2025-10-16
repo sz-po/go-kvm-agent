@@ -2,6 +2,7 @@ package peripheral
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"reflect"
@@ -67,7 +68,7 @@ func NewCapability[T Peripheral](kind PeripheralKind, role PeripheralRole) Perip
 		validationFn: func(peripheral Peripheral) error {
 			if _, ok := peripheral.(T); !ok {
 				return errors.New(fmt.Sprintf("peripheral %s does not implement %v",
-					peripheral.Id(),
+					peripheral.GetId(),
 					reflect.TypeOf((*T)(nil)).Elem(),
 				))
 			}
@@ -105,6 +106,27 @@ func (name PeripheralName) String() string {
 	return string(name)
 }
 
+// UnmarshalJSON implements json.Unmarshaler interface with validation.
+func (name *PeripheralName) UnmarshalJSON(data []byte) error {
+	var nameStr string
+	if err := json.Unmarshal(data, &nameStr); err != nil {
+		return fmt.Errorf("unmarshal peripheral name: %w", err)
+	}
+
+	validated, err := NewPeripheralName(nameStr)
+	if err != nil {
+		return fmt.Errorf("unmarshal peripheral name: %w", err)
+	}
+
+	*name = validated
+	return nil
+}
+
+// MarshalJSON implements json.Marshaler interface.
+func (name PeripheralName) MarshalJSON() ([]byte, error) {
+	return json.Marshal(string(name))
+}
+
 type PeripheralId string
 
 func CreatePeripheralRandomId(prefix string) PeripheralId {
@@ -127,10 +149,31 @@ func (id PeripheralId) String() string {
 	return string(id)
 }
 
+// UnmarshalJSON implements json.Unmarshaler interface with validation.
+func (id *PeripheralId) UnmarshalJSON(data []byte) error {
+	var idStr string
+	if err := json.Unmarshal(data, &idStr); err != nil {
+		return fmt.Errorf("unmarshal peripheral id: %w", err)
+	}
+
+	validated, err := NewPeripheralId(idStr)
+	if err != nil {
+		return fmt.Errorf("unmarshal peripheral id: %w", err)
+	}
+
+	*id = validated
+	return nil
+}
+
+// MarshalJSON implements json.Marshaler interface.
+func (id PeripheralId) MarshalJSON() ([]byte, error) {
+	return json.Marshal(string(id))
+}
+
 func ValidatePeripheralCapabilities(peripheral Peripheral) error {
-	for _, capability := range peripheral.Capabilities() {
+	for _, capability := range peripheral.GetCapabilities() {
 		if err := capability.Validate(peripheral); err != nil {
-			return fmt.Errorf("peripheral %s capability %s validation: %w", peripheral.Id(), capability, err)
+			return fmt.Errorf("peripheral %s capability %s validation: %w", peripheral.GetId(), capability, err)
 		}
 	}
 
@@ -139,9 +182,16 @@ func ValidatePeripheralCapabilities(peripheral Peripheral) error {
 
 // Peripheral is the base interface for all peripheral devices.
 type Peripheral interface {
-	Capabilities() []PeripheralCapability
-	Id() PeripheralId
+	GetCapabilities() []PeripheralCapability
+
+	GetId() PeripheralId
+
+	GetName() PeripheralName
 
 	// Terminate peripheral. It must be called only once in peripheral life.
 	Terminate(ctx context.Context) error
+}
+
+type PeripheralProvider interface {
+	GetAllPeripherals(ctx context.Context) ([]Peripheral, error)
 }

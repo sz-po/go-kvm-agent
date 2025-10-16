@@ -8,11 +8,20 @@
   - `AI-DEV: never modify this interface`
   - `AI-DEV: always ask user before modifying this interface`
   - Follow these directives strictly when working with the codebase.
+- **When Uncertain - Ask First**: Before making changes or implementing features, **always ask the user for clarification** when:
+  - You don't fully understand what the user expects or wants to achieve
+  - The user's request is ambiguous or could be interpreted in multiple ways
+  - You're unsure about the purpose or intended behavior of existing code you're working with
+  - You need to make architectural decisions that could impact system design
+  - You're uncertain whether your proposed solution aligns with user expectations
+  - Multiple valid approaches exist and the best choice depends on user preferences or requirements
+  - **Never guess or assume** - it's always better to ask than to implement the wrong solution. Present your understanding and ask for confirmation before proceeding with significant changes.
 - **Enum Convention**: When defining integer-based enums in Go (using `iota`), always include an `Unknown` or equivalent zero-value constant as the first element (position 0). This ensures a safe default state for uninitialized or invalid values.
 - **Structured Logging**: When using Go's `slog`, always wrap attribute values with the appropriate helpers (for example `slog.String`, `slog.Int`). Prefer camelCase over snake_case for field names in contextual loggers (e.g., `slog.String("userId", id)` instead of `slog.String("user_id", id)`). Log messages should be complete sentences with proper capitalization and punctuation (e.g., `logger.Info("Failed to connect to server.")` instead of `logger.Info("failed to connect")`).
 - **Error Convention**: When it makes sense, define errors as variables with the `Err` prefix (for example `var ErrNotFound = errors.New("not found")`). This is the standard Go convention for sentinel errors.
 - **Error Wrapping**: When returning errors, always add clear context with `fmt.Errorf` and the `%w` verb (for example `fmt.Errorf("create machine from config: %w", err)` or `fmt.Errorf("read file %s: %w", filePath, err)`) instead of passing the original error unchanged.
 - **Testing Assertions**: When writing tests in Go, use the `testify/assert` package directly (for example `assert.NoError(t, err)`, `assert.Equal(t, expected, actual)`) instead of creating custom assertion helpers, so failures produce descriptive messages out of the box.
+- **Coverage Verification**: After adding or updating tests, run them with coverage enabled and inspect the report (for example `go test -coverprofile` followed by `go tool cover -func`) to confirm the affected files are exercised.
 - **Mock Testing**: When using testify/mock with expecters (mockery generated mocks), follow these conventions:
   - **Mock Structure**: Mock structs embed `mock.Mock` without additional fields for storing values (for example `type MyMock struct { mock.Mock }` instead of `type MyMock struct { mock.Mock; value string }`).
   - **Use Generated Constructors**: Always create mocks using the generated constructor that accepts `*testing.T` (for example `m := NewMockRequester(t)`). The constructor automatically registers expectations and cleanup.

@@ -5,6 +5,8 @@
 package routing
 
 import (
+	"context"
+
 	mock "github.com/stretchr/testify/mock"
 	"github.com/szymonpodeszwa/go-kvm-agent/pkg/peripheral"
 )
@@ -37,16 +39,16 @@ func (_m *DisplayRouterMock) EXPECT() *DisplayRouterMock_Expecter {
 }
 
 // Connect provides a mock function for the type DisplayRouterMock
-func (_mock *DisplayRouterMock) Connect(sourceId peripheral.PeripheralId, sinkId peripheral.PeripheralId) error {
-	ret := _mock.Called(sourceId, sinkId)
+func (_mock *DisplayRouterMock) Connect(ctx context.Context, sourceId peripheral.PeripheralId, sinkId peripheral.PeripheralId) error {
+	ret := _mock.Called(ctx, sourceId, sinkId)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Connect")
 	}
 
 	var r0 error
-	if returnFunc, ok := ret.Get(0).(func(peripheral.PeripheralId, peripheral.PeripheralId) error); ok {
-		r0 = returnFunc(sourceId, sinkId)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, peripheral.PeripheralId, peripheral.PeripheralId) error); ok {
+		r0 = returnFunc(ctx, sourceId, sinkId)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -59,17 +61,80 @@ type DisplayRouterMock_Connect_Call struct {
 }
 
 // Connect is a helper method to define mock.On call
+//   - ctx context.Context
 //   - sourceId peripheral.PeripheralId
 //   - sinkId peripheral.PeripheralId
-func (_e *DisplayRouterMock_Expecter) Connect(sourceId interface{}, sinkId interface{}) *DisplayRouterMock_Connect_Call {
-	return &DisplayRouterMock_Connect_Call{Call: _e.mock.On("Connect", sourceId, sinkId)}
+func (_e *DisplayRouterMock_Expecter) Connect(ctx interface{}, sourceId interface{}, sinkId interface{}) *DisplayRouterMock_Connect_Call {
+	return &DisplayRouterMock_Connect_Call{Call: _e.mock.On("Connect", ctx, sourceId, sinkId)}
 }
 
-func (_c *DisplayRouterMock_Connect_Call) Run(run func(sourceId peripheral.PeripheralId, sinkId peripheral.PeripheralId)) *DisplayRouterMock_Connect_Call {
+func (_c *DisplayRouterMock_Connect_Call) Run(run func(ctx context.Context, sourceId peripheral.PeripheralId, sinkId peripheral.PeripheralId)) *DisplayRouterMock_Connect_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		var arg0 peripheral.PeripheralId
+		var arg0 context.Context
 		if args[0] != nil {
-			arg0 = args[0].(peripheral.PeripheralId)
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 peripheral.PeripheralId
+		if args[1] != nil {
+			arg1 = args[1].(peripheral.PeripheralId)
+		}
+		var arg2 peripheral.PeripheralId
+		if args[2] != nil {
+			arg2 = args[2].(peripheral.PeripheralId)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *DisplayRouterMock_Connect_Call) Return(err error) *DisplayRouterMock_Connect_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *DisplayRouterMock_Connect_Call) RunAndReturn(run func(ctx context.Context, sourceId peripheral.PeripheralId, sinkId peripheral.PeripheralId) error) *DisplayRouterMock_Connect_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// DisconnectSink provides a mock function for the type DisplayRouterMock
+func (_mock *DisplayRouterMock) DisconnectSink(ctx context.Context, sinkId peripheral.PeripheralId) error {
+	ret := _mock.Called(ctx, sinkId)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DisconnectSink")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, peripheral.PeripheralId) error); ok {
+		r0 = returnFunc(ctx, sinkId)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// DisplayRouterMock_DisconnectSink_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DisconnectSink'
+type DisplayRouterMock_DisconnectSink_Call struct {
+	*mock.Call
+}
+
+// DisconnectSink is a helper method to define mock.On call
+//   - ctx context.Context
+//   - sinkId peripheral.PeripheralId
+func (_e *DisplayRouterMock_Expecter) DisconnectSink(ctx interface{}, sinkId interface{}) *DisplayRouterMock_DisconnectSink_Call {
+	return &DisplayRouterMock_DisconnectSink_Call{Call: _e.mock.On("DisconnectSink", ctx, sinkId)}
+}
+
+func (_c *DisplayRouterMock_DisconnectSink_Call) Run(run func(ctx context.Context, sinkId peripheral.PeripheralId)) *DisplayRouterMock_DisconnectSink_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
 		}
 		var arg1 peripheral.PeripheralId
 		if args[1] != nil {
@@ -83,78 +148,27 @@ func (_c *DisplayRouterMock_Connect_Call) Run(run func(sourceId peripheral.Perip
 	return _c
 }
 
-func (_c *DisplayRouterMock_Connect_Call) Return(err error) *DisplayRouterMock_Connect_Call {
-	_c.Call.Return(err)
-	return _c
-}
-
-func (_c *DisplayRouterMock_Connect_Call) RunAndReturn(run func(sourceId peripheral.PeripheralId, sinkId peripheral.PeripheralId) error) *DisplayRouterMock_Connect_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// DisconnectSink provides a mock function for the type DisplayRouterMock
-func (_mock *DisplayRouterMock) DisconnectSink(sinkId peripheral.PeripheralId) error {
-	ret := _mock.Called(sinkId)
-
-	if len(ret) == 0 {
-		panic("no return value specified for DisconnectSink")
-	}
-
-	var r0 error
-	if returnFunc, ok := ret.Get(0).(func(peripheral.PeripheralId) error); ok {
-		r0 = returnFunc(sinkId)
-	} else {
-		r0 = ret.Error(0)
-	}
-	return r0
-}
-
-// DisplayRouterMock_DisconnectSink_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DisconnectSink'
-type DisplayRouterMock_DisconnectSink_Call struct {
-	*mock.Call
-}
-
-// DisconnectSink is a helper method to define mock.On call
-//   - sinkId peripheral.PeripheralId
-func (_e *DisplayRouterMock_Expecter) DisconnectSink(sinkId interface{}) *DisplayRouterMock_DisconnectSink_Call {
-	return &DisplayRouterMock_DisconnectSink_Call{Call: _e.mock.On("DisconnectSink", sinkId)}
-}
-
-func (_c *DisplayRouterMock_DisconnectSink_Call) Run(run func(sinkId peripheral.PeripheralId)) *DisplayRouterMock_DisconnectSink_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		var arg0 peripheral.PeripheralId
-		if args[0] != nil {
-			arg0 = args[0].(peripheral.PeripheralId)
-		}
-		run(
-			arg0,
-		)
-	})
-	return _c
-}
-
 func (_c *DisplayRouterMock_DisconnectSink_Call) Return(err error) *DisplayRouterMock_DisconnectSink_Call {
 	_c.Call.Return(err)
 	return _c
 }
 
-func (_c *DisplayRouterMock_DisconnectSink_Call) RunAndReturn(run func(sinkId peripheral.PeripheralId) error) *DisplayRouterMock_DisconnectSink_Call {
+func (_c *DisplayRouterMock_DisconnectSink_Call) RunAndReturn(run func(ctx context.Context, sinkId peripheral.PeripheralId) error) *DisplayRouterMock_DisconnectSink_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // DisconnectSource provides a mock function for the type DisplayRouterMock
-func (_mock *DisplayRouterMock) DisconnectSource(sourceId peripheral.PeripheralId) error {
-	ret := _mock.Called(sourceId)
+func (_mock *DisplayRouterMock) DisconnectSource(ctx context.Context, sourceId peripheral.PeripheralId) error {
+	ret := _mock.Called(ctx, sourceId)
 
 	if len(ret) == 0 {
 		panic("no return value specified for DisconnectSource")
 	}
 
 	var r0 error
-	if returnFunc, ok := ret.Get(0).(func(peripheral.PeripheralId) error); ok {
-		r0 = returnFunc(sourceId)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, peripheral.PeripheralId) error); ok {
+		r0 = returnFunc(ctx, sourceId)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -167,19 +181,25 @@ type DisplayRouterMock_DisconnectSource_Call struct {
 }
 
 // DisconnectSource is a helper method to define mock.On call
+//   - ctx context.Context
 //   - sourceId peripheral.PeripheralId
-func (_e *DisplayRouterMock_Expecter) DisconnectSource(sourceId interface{}) *DisplayRouterMock_DisconnectSource_Call {
-	return &DisplayRouterMock_DisconnectSource_Call{Call: _e.mock.On("DisconnectSource", sourceId)}
+func (_e *DisplayRouterMock_Expecter) DisconnectSource(ctx interface{}, sourceId interface{}) *DisplayRouterMock_DisconnectSource_Call {
+	return &DisplayRouterMock_DisconnectSource_Call{Call: _e.mock.On("DisconnectSource", ctx, sourceId)}
 }
 
-func (_c *DisplayRouterMock_DisconnectSource_Call) Run(run func(sourceId peripheral.PeripheralId)) *DisplayRouterMock_DisconnectSource_Call {
+func (_c *DisplayRouterMock_DisconnectSource_Call) Run(run func(ctx context.Context, sourceId peripheral.PeripheralId)) *DisplayRouterMock_DisconnectSource_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		var arg0 peripheral.PeripheralId
+		var arg0 context.Context
 		if args[0] != nil {
-			arg0 = args[0].(peripheral.PeripheralId)
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 peripheral.PeripheralId
+		if args[1] != nil {
+			arg1 = args[1].(peripheral.PeripheralId)
 		}
 		run(
 			arg0,
+			arg1,
 		)
 	})
 	return _c
@@ -190,7 +210,7 @@ func (_c *DisplayRouterMock_DisconnectSource_Call) Return(err error) *DisplayRou
 	return _c
 }
 
-func (_c *DisplayRouterMock_DisconnectSource_Call) RunAndReturn(run func(sourceId peripheral.PeripheralId) error) *DisplayRouterMock_DisconnectSource_Call {
+func (_c *DisplayRouterMock_DisconnectSource_Call) RunAndReturn(run func(ctx context.Context, sourceId peripheral.PeripheralId) error) *DisplayRouterMock_DisconnectSource_Call {
 	_c.Call.Return(run)
 	return _c
 }

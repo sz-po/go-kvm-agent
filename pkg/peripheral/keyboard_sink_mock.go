@@ -37,12 +37,12 @@ func (_m *KeyboardSinkMock) EXPECT() *KeyboardSinkMock_Expecter {
 	return &KeyboardSinkMock_Expecter{mock: &_m.Mock}
 }
 
-// Capabilities provides a mock function for the type KeyboardSinkMock
-func (_mock *KeyboardSinkMock) Capabilities() []PeripheralCapability {
+// GetCapabilities provides a mock function for the type KeyboardSinkMock
+func (_mock *KeyboardSinkMock) GetCapabilities() []PeripheralCapability {
 	ret := _mock.Called()
 
 	if len(ret) == 0 {
-		panic("no return value specified for Capabilities")
+		panic("no return value specified for GetCapabilities")
 	}
 
 	var r0 []PeripheralCapability
@@ -56,29 +56,117 @@ func (_mock *KeyboardSinkMock) Capabilities() []PeripheralCapability {
 	return r0
 }
 
-// KeyboardSinkMock_Capabilities_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Capabilities'
-type KeyboardSinkMock_Capabilities_Call struct {
+// KeyboardSinkMock_GetCapabilities_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetCapabilities'
+type KeyboardSinkMock_GetCapabilities_Call struct {
 	*mock.Call
 }
 
-// Capabilities is a helper method to define mock.On call
-func (_e *KeyboardSinkMock_Expecter) Capabilities() *KeyboardSinkMock_Capabilities_Call {
-	return &KeyboardSinkMock_Capabilities_Call{Call: _e.mock.On("Capabilities")}
+// GetCapabilities is a helper method to define mock.On call
+func (_e *KeyboardSinkMock_Expecter) GetCapabilities() *KeyboardSinkMock_GetCapabilities_Call {
+	return &KeyboardSinkMock_GetCapabilities_Call{Call: _e.mock.On("GetCapabilities")}
 }
 
-func (_c *KeyboardSinkMock_Capabilities_Call) Run(run func()) *KeyboardSinkMock_Capabilities_Call {
+func (_c *KeyboardSinkMock_GetCapabilities_Call) Run(run func()) *KeyboardSinkMock_GetCapabilities_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run()
 	})
 	return _c
 }
 
-func (_c *KeyboardSinkMock_Capabilities_Call) Return(peripheralCapabilitys []PeripheralCapability) *KeyboardSinkMock_Capabilities_Call {
+func (_c *KeyboardSinkMock_GetCapabilities_Call) Return(peripheralCapabilitys []PeripheralCapability) *KeyboardSinkMock_GetCapabilities_Call {
 	_c.Call.Return(peripheralCapabilitys)
 	return _c
 }
 
-func (_c *KeyboardSinkMock_Capabilities_Call) RunAndReturn(run func() []PeripheralCapability) *KeyboardSinkMock_Capabilities_Call {
+func (_c *KeyboardSinkMock_GetCapabilities_Call) RunAndReturn(run func() []PeripheralCapability) *KeyboardSinkMock_GetCapabilities_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetId provides a mock function for the type KeyboardSinkMock
+func (_mock *KeyboardSinkMock) GetId() PeripheralId {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetId")
+	}
+
+	var r0 PeripheralId
+	if returnFunc, ok := ret.Get(0).(func() PeripheralId); ok {
+		r0 = returnFunc()
+	} else {
+		r0 = ret.Get(0).(PeripheralId)
+	}
+	return r0
+}
+
+// KeyboardSinkMock_GetId_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetId'
+type KeyboardSinkMock_GetId_Call struct {
+	*mock.Call
+}
+
+// GetId is a helper method to define mock.On call
+func (_e *KeyboardSinkMock_Expecter) GetId() *KeyboardSinkMock_GetId_Call {
+	return &KeyboardSinkMock_GetId_Call{Call: _e.mock.On("GetId")}
+}
+
+func (_c *KeyboardSinkMock_GetId_Call) Run(run func()) *KeyboardSinkMock_GetId_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *KeyboardSinkMock_GetId_Call) Return(peripheralId PeripheralId) *KeyboardSinkMock_GetId_Call {
+	_c.Call.Return(peripheralId)
+	return _c
+}
+
+func (_c *KeyboardSinkMock_GetId_Call) RunAndReturn(run func() PeripheralId) *KeyboardSinkMock_GetId_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetName provides a mock function for the type KeyboardSinkMock
+func (_mock *KeyboardSinkMock) GetName() PeripheralName {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetName")
+	}
+
+	var r0 PeripheralName
+	if returnFunc, ok := ret.Get(0).(func() PeripheralName); ok {
+		r0 = returnFunc()
+	} else {
+		r0 = ret.Get(0).(PeripheralName)
+	}
+	return r0
+}
+
+// KeyboardSinkMock_GetName_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetName'
+type KeyboardSinkMock_GetName_Call struct {
+	*mock.Call
+}
+
+// GetName is a helper method to define mock.On call
+func (_e *KeyboardSinkMock_Expecter) GetName() *KeyboardSinkMock_GetName_Call {
+	return &KeyboardSinkMock_GetName_Call{Call: _e.mock.On("GetName")}
+}
+
+func (_c *KeyboardSinkMock_GetName_Call) Run(run func()) *KeyboardSinkMock_GetName_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *KeyboardSinkMock_GetName_Call) Return(peripheralName PeripheralName) *KeyboardSinkMock_GetName_Call {
+	_c.Call.Return(peripheralName)
+	return _c
+}
+
+func (_c *KeyboardSinkMock_GetName_Call) RunAndReturn(run func() PeripheralName) *KeyboardSinkMock_GetName_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -130,50 +218,6 @@ func (_c *KeyboardSinkMock_HandleKeyboardDataEvent_Call) Return(err error) *Keyb
 }
 
 func (_c *KeyboardSinkMock_HandleKeyboardDataEvent_Call) RunAndReturn(run func(event KeyboardEvent) error) *KeyboardSinkMock_HandleKeyboardDataEvent_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// Id provides a mock function for the type KeyboardSinkMock
-func (_mock *KeyboardSinkMock) Id() PeripheralId {
-	ret := _mock.Called()
-
-	if len(ret) == 0 {
-		panic("no return value specified for Id")
-	}
-
-	var r0 PeripheralId
-	if returnFunc, ok := ret.Get(0).(func() PeripheralId); ok {
-		r0 = returnFunc()
-	} else {
-		r0 = ret.Get(0).(PeripheralId)
-	}
-	return r0
-}
-
-// KeyboardSinkMock_Id_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Id'
-type KeyboardSinkMock_Id_Call struct {
-	*mock.Call
-}
-
-// Id is a helper method to define mock.On call
-func (_e *KeyboardSinkMock_Expecter) Id() *KeyboardSinkMock_Id_Call {
-	return &KeyboardSinkMock_Id_Call{Call: _e.mock.On("Id")}
-}
-
-func (_c *KeyboardSinkMock_Id_Call) Run(run func()) *KeyboardSinkMock_Id_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run()
-	})
-	return _c
-}
-
-func (_c *KeyboardSinkMock_Id_Call) Return(peripheralId PeripheralId) *KeyboardSinkMock_Id_Call {
-	_c.Call.Return(peripheralId)
-	return _c
-}
-
-func (_c *KeyboardSinkMock_Id_Call) RunAndReturn(run func() PeripheralId) *KeyboardSinkMock_Id_Call {
 	_c.Call.Return(run)
 	return _c
 }

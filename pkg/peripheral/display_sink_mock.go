@@ -37,12 +37,56 @@ func (_m *DisplaySinkMock) EXPECT() *DisplaySinkMock_Expecter {
 	return &DisplaySinkMock_Expecter{mock: &_m.Mock}
 }
 
-// Capabilities provides a mock function for the type DisplaySinkMock
-func (_mock *DisplaySinkMock) Capabilities() []PeripheralCapability {
+// ClearDisplayFrameBufferProvider provides a mock function for the type DisplaySinkMock
+func (_mock *DisplaySinkMock) ClearDisplayFrameBufferProvider() error {
 	ret := _mock.Called()
 
 	if len(ret) == 0 {
-		panic("no return value specified for Capabilities")
+		panic("no return value specified for ClearDisplayFrameBufferProvider")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func() error); ok {
+		r0 = returnFunc()
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// DisplaySinkMock_ClearDisplayFrameBufferProvider_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ClearDisplayFrameBufferProvider'
+type DisplaySinkMock_ClearDisplayFrameBufferProvider_Call struct {
+	*mock.Call
+}
+
+// ClearDisplayFrameBufferProvider is a helper method to define mock.On call
+func (_e *DisplaySinkMock_Expecter) ClearDisplayFrameBufferProvider() *DisplaySinkMock_ClearDisplayFrameBufferProvider_Call {
+	return &DisplaySinkMock_ClearDisplayFrameBufferProvider_Call{Call: _e.mock.On("ClearDisplayFrameBufferProvider")}
+}
+
+func (_c *DisplaySinkMock_ClearDisplayFrameBufferProvider_Call) Run(run func()) *DisplaySinkMock_ClearDisplayFrameBufferProvider_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *DisplaySinkMock_ClearDisplayFrameBufferProvider_Call) Return(err error) *DisplaySinkMock_ClearDisplayFrameBufferProvider_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *DisplaySinkMock_ClearDisplayFrameBufferProvider_Call) RunAndReturn(run func() error) *DisplaySinkMock_ClearDisplayFrameBufferProvider_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetCapabilities provides a mock function for the type DisplaySinkMock
+func (_mock *DisplaySinkMock) GetCapabilities() []PeripheralCapability {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetCapabilities")
 	}
 
 	var r0 []PeripheralCapability
@@ -56,194 +100,39 @@ func (_mock *DisplaySinkMock) Capabilities() []PeripheralCapability {
 	return r0
 }
 
-// DisplaySinkMock_Capabilities_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Capabilities'
-type DisplaySinkMock_Capabilities_Call struct {
+// DisplaySinkMock_GetCapabilities_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetCapabilities'
+type DisplaySinkMock_GetCapabilities_Call struct {
 	*mock.Call
 }
 
-// Capabilities is a helper method to define mock.On call
-func (_e *DisplaySinkMock_Expecter) Capabilities() *DisplaySinkMock_Capabilities_Call {
-	return &DisplaySinkMock_Capabilities_Call{Call: _e.mock.On("Capabilities")}
+// GetCapabilities is a helper method to define mock.On call
+func (_e *DisplaySinkMock_Expecter) GetCapabilities() *DisplaySinkMock_GetCapabilities_Call {
+	return &DisplaySinkMock_GetCapabilities_Call{Call: _e.mock.On("GetCapabilities")}
 }
 
-func (_c *DisplaySinkMock_Capabilities_Call) Run(run func()) *DisplaySinkMock_Capabilities_Call {
+func (_c *DisplaySinkMock_GetCapabilities_Call) Run(run func()) *DisplaySinkMock_GetCapabilities_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run()
 	})
 	return _c
 }
 
-func (_c *DisplaySinkMock_Capabilities_Call) Return(peripheralCapabilitys []PeripheralCapability) *DisplaySinkMock_Capabilities_Call {
+func (_c *DisplaySinkMock_GetCapabilities_Call) Return(peripheralCapabilitys []PeripheralCapability) *DisplaySinkMock_GetCapabilities_Call {
 	_c.Call.Return(peripheralCapabilitys)
 	return _c
 }
 
-func (_c *DisplaySinkMock_Capabilities_Call) RunAndReturn(run func() []PeripheralCapability) *DisplaySinkMock_Capabilities_Call {
+func (_c *DisplaySinkMock_GetCapabilities_Call) RunAndReturn(run func() []PeripheralCapability) *DisplaySinkMock_GetCapabilities_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// GetDisplayInfo provides a mock function for the type DisplaySinkMock
-func (_mock *DisplaySinkMock) GetDisplayInfo() (DisplayInfo, error) {
+// GetId provides a mock function for the type DisplaySinkMock
+func (_mock *DisplaySinkMock) GetId() PeripheralId {
 	ret := _mock.Called()
 
 	if len(ret) == 0 {
-		panic("no return value specified for GetDisplayInfo")
-	}
-
-	var r0 DisplayInfo
-	var r1 error
-	if returnFunc, ok := ret.Get(0).(func() (DisplayInfo, error)); ok {
-		return returnFunc()
-	}
-	if returnFunc, ok := ret.Get(0).(func() DisplayInfo); ok {
-		r0 = returnFunc()
-	} else {
-		r0 = ret.Get(0).(DisplayInfo)
-	}
-	if returnFunc, ok := ret.Get(1).(func() error); ok {
-		r1 = returnFunc()
-	} else {
-		r1 = ret.Error(1)
-	}
-	return r0, r1
-}
-
-// DisplaySinkMock_GetDisplayInfo_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetDisplayInfo'
-type DisplaySinkMock_GetDisplayInfo_Call struct {
-	*mock.Call
-}
-
-// GetDisplayInfo is a helper method to define mock.On call
-func (_e *DisplaySinkMock_Expecter) GetDisplayInfo() *DisplaySinkMock_GetDisplayInfo_Call {
-	return &DisplaySinkMock_GetDisplayInfo_Call{Call: _e.mock.On("GetDisplayInfo")}
-}
-
-func (_c *DisplaySinkMock_GetDisplayInfo_Call) Run(run func()) *DisplaySinkMock_GetDisplayInfo_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run()
-	})
-	return _c
-}
-
-func (_c *DisplaySinkMock_GetDisplayInfo_Call) Return(displayInfo DisplayInfo, err error) *DisplaySinkMock_GetDisplayInfo_Call {
-	_c.Call.Return(displayInfo, err)
-	return _c
-}
-
-func (_c *DisplaySinkMock_GetDisplayInfo_Call) RunAndReturn(run func() (DisplayInfo, error)) *DisplaySinkMock_GetDisplayInfo_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// HandleDisplayControlEvent provides a mock function for the type DisplaySinkMock
-func (_mock *DisplaySinkMock) HandleDisplayControlEvent(event DisplayControlEvent) error {
-	ret := _mock.Called(event)
-
-	if len(ret) == 0 {
-		panic("no return value specified for HandleDisplayControlEvent")
-	}
-
-	var r0 error
-	if returnFunc, ok := ret.Get(0).(func(DisplayControlEvent) error); ok {
-		r0 = returnFunc(event)
-	} else {
-		r0 = ret.Error(0)
-	}
-	return r0
-}
-
-// DisplaySinkMock_HandleDisplayControlEvent_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'HandleDisplayControlEvent'
-type DisplaySinkMock_HandleDisplayControlEvent_Call struct {
-	*mock.Call
-}
-
-// HandleDisplayControlEvent is a helper method to define mock.On call
-//   - event DisplayControlEvent
-func (_e *DisplaySinkMock_Expecter) HandleDisplayControlEvent(event interface{}) *DisplaySinkMock_HandleDisplayControlEvent_Call {
-	return &DisplaySinkMock_HandleDisplayControlEvent_Call{Call: _e.mock.On("HandleDisplayControlEvent", event)}
-}
-
-func (_c *DisplaySinkMock_HandleDisplayControlEvent_Call) Run(run func(event DisplayControlEvent)) *DisplaySinkMock_HandleDisplayControlEvent_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		var arg0 DisplayControlEvent
-		if args[0] != nil {
-			arg0 = args[0].(DisplayControlEvent)
-		}
-		run(
-			arg0,
-		)
-	})
-	return _c
-}
-
-func (_c *DisplaySinkMock_HandleDisplayControlEvent_Call) Return(err error) *DisplaySinkMock_HandleDisplayControlEvent_Call {
-	_c.Call.Return(err)
-	return _c
-}
-
-func (_c *DisplaySinkMock_HandleDisplayControlEvent_Call) RunAndReturn(run func(event DisplayControlEvent) error) *DisplaySinkMock_HandleDisplayControlEvent_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// HandleDisplayDataEvent provides a mock function for the type DisplaySinkMock
-func (_mock *DisplaySinkMock) HandleDisplayDataEvent(event DisplayDataEvent) error {
-	ret := _mock.Called(event)
-
-	if len(ret) == 0 {
-		panic("no return value specified for HandleDisplayDataEvent")
-	}
-
-	var r0 error
-	if returnFunc, ok := ret.Get(0).(func(DisplayDataEvent) error); ok {
-		r0 = returnFunc(event)
-	} else {
-		r0 = ret.Error(0)
-	}
-	return r0
-}
-
-// DisplaySinkMock_HandleDisplayDataEvent_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'HandleDisplayDataEvent'
-type DisplaySinkMock_HandleDisplayDataEvent_Call struct {
-	*mock.Call
-}
-
-// HandleDisplayDataEvent is a helper method to define mock.On call
-//   - event DisplayDataEvent
-func (_e *DisplaySinkMock_Expecter) HandleDisplayDataEvent(event interface{}) *DisplaySinkMock_HandleDisplayDataEvent_Call {
-	return &DisplaySinkMock_HandleDisplayDataEvent_Call{Call: _e.mock.On("HandleDisplayDataEvent", event)}
-}
-
-func (_c *DisplaySinkMock_HandleDisplayDataEvent_Call) Run(run func(event DisplayDataEvent)) *DisplaySinkMock_HandleDisplayDataEvent_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		var arg0 DisplayDataEvent
-		if args[0] != nil {
-			arg0 = args[0].(DisplayDataEvent)
-		}
-		run(
-			arg0,
-		)
-	})
-	return _c
-}
-
-func (_c *DisplaySinkMock_HandleDisplayDataEvent_Call) Return(err error) *DisplaySinkMock_HandleDisplayDataEvent_Call {
-	_c.Call.Return(err)
-	return _c
-}
-
-func (_c *DisplaySinkMock_HandleDisplayDataEvent_Call) RunAndReturn(run func(event DisplayDataEvent) error) *DisplaySinkMock_HandleDisplayDataEvent_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// Id provides a mock function for the type DisplaySinkMock
-func (_mock *DisplaySinkMock) Id() PeripheralId {
-	ret := _mock.Called()
-
-	if len(ret) == 0 {
-		panic("no return value specified for Id")
+		panic("no return value specified for GetId")
 	}
 
 	var r0 PeripheralId
@@ -255,66 +144,110 @@ func (_mock *DisplaySinkMock) Id() PeripheralId {
 	return r0
 }
 
-// DisplaySinkMock_Id_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Id'
-type DisplaySinkMock_Id_Call struct {
+// DisplaySinkMock_GetId_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetId'
+type DisplaySinkMock_GetId_Call struct {
 	*mock.Call
 }
 
-// Id is a helper method to define mock.On call
-func (_e *DisplaySinkMock_Expecter) Id() *DisplaySinkMock_Id_Call {
-	return &DisplaySinkMock_Id_Call{Call: _e.mock.On("Id")}
+// GetId is a helper method to define mock.On call
+func (_e *DisplaySinkMock_Expecter) GetId() *DisplaySinkMock_GetId_Call {
+	return &DisplaySinkMock_GetId_Call{Call: _e.mock.On("GetId")}
 }
 
-func (_c *DisplaySinkMock_Id_Call) Run(run func()) *DisplaySinkMock_Id_Call {
+func (_c *DisplaySinkMock_GetId_Call) Run(run func()) *DisplaySinkMock_GetId_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run()
 	})
 	return _c
 }
 
-func (_c *DisplaySinkMock_Id_Call) Return(peripheralId PeripheralId) *DisplaySinkMock_Id_Call {
+func (_c *DisplaySinkMock_GetId_Call) Return(peripheralId PeripheralId) *DisplaySinkMock_GetId_Call {
 	_c.Call.Return(peripheralId)
 	return _c
 }
 
-func (_c *DisplaySinkMock_Id_Call) RunAndReturn(run func() PeripheralId) *DisplaySinkMock_Id_Call {
+func (_c *DisplaySinkMock_GetId_Call) RunAndReturn(run func() PeripheralId) *DisplaySinkMock_GetId_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// SetDisplayMode provides a mock function for the type DisplaySinkMock
-func (_mock *DisplaySinkMock) SetDisplayMode(mode DisplayMode) error {
-	ret := _mock.Called(mode)
+// GetName provides a mock function for the type DisplaySinkMock
+func (_mock *DisplaySinkMock) GetName() PeripheralName {
+	ret := _mock.Called()
 
 	if len(ret) == 0 {
-		panic("no return value specified for SetDisplayMode")
+		panic("no return value specified for GetName")
+	}
+
+	var r0 PeripheralName
+	if returnFunc, ok := ret.Get(0).(func() PeripheralName); ok {
+		r0 = returnFunc()
+	} else {
+		r0 = ret.Get(0).(PeripheralName)
+	}
+	return r0
+}
+
+// DisplaySinkMock_GetName_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetName'
+type DisplaySinkMock_GetName_Call struct {
+	*mock.Call
+}
+
+// GetName is a helper method to define mock.On call
+func (_e *DisplaySinkMock_Expecter) GetName() *DisplaySinkMock_GetName_Call {
+	return &DisplaySinkMock_GetName_Call{Call: _e.mock.On("GetName")}
+}
+
+func (_c *DisplaySinkMock_GetName_Call) Run(run func()) *DisplaySinkMock_GetName_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *DisplaySinkMock_GetName_Call) Return(peripheralName PeripheralName) *DisplaySinkMock_GetName_Call {
+	_c.Call.Return(peripheralName)
+	return _c
+}
+
+func (_c *DisplaySinkMock_GetName_Call) RunAndReturn(run func() PeripheralName) *DisplaySinkMock_GetName_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// SetDisplayFrameBufferProvider provides a mock function for the type DisplaySinkMock
+func (_mock *DisplaySinkMock) SetDisplayFrameBufferProvider(provider DisplayFrameBufferProvider) error {
+	ret := _mock.Called(provider)
+
+	if len(ret) == 0 {
+		panic("no return value specified for SetDisplayFrameBufferProvider")
 	}
 
 	var r0 error
-	if returnFunc, ok := ret.Get(0).(func(DisplayMode) error); ok {
-		r0 = returnFunc(mode)
+	if returnFunc, ok := ret.Get(0).(func(DisplayFrameBufferProvider) error); ok {
+		r0 = returnFunc(provider)
 	} else {
 		r0 = ret.Error(0)
 	}
 	return r0
 }
 
-// DisplaySinkMock_SetDisplayMode_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SetDisplayMode'
-type DisplaySinkMock_SetDisplayMode_Call struct {
+// DisplaySinkMock_SetDisplayFrameBufferProvider_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SetDisplayFrameBufferProvider'
+type DisplaySinkMock_SetDisplayFrameBufferProvider_Call struct {
 	*mock.Call
 }
 
-// SetDisplayMode is a helper method to define mock.On call
-//   - mode DisplayMode
-func (_e *DisplaySinkMock_Expecter) SetDisplayMode(mode interface{}) *DisplaySinkMock_SetDisplayMode_Call {
-	return &DisplaySinkMock_SetDisplayMode_Call{Call: _e.mock.On("SetDisplayMode", mode)}
+// SetDisplayFrameBufferProvider is a helper method to define mock.On call
+//   - provider DisplayFrameBufferProvider
+func (_e *DisplaySinkMock_Expecter) SetDisplayFrameBufferProvider(provider interface{}) *DisplaySinkMock_SetDisplayFrameBufferProvider_Call {
+	return &DisplaySinkMock_SetDisplayFrameBufferProvider_Call{Call: _e.mock.On("SetDisplayFrameBufferProvider", provider)}
 }
 
-func (_c *DisplaySinkMock_SetDisplayMode_Call) Run(run func(mode DisplayMode)) *DisplaySinkMock_SetDisplayMode_Call {
+func (_c *DisplaySinkMock_SetDisplayFrameBufferProvider_Call) Run(run func(provider DisplayFrameBufferProvider)) *DisplaySinkMock_SetDisplayFrameBufferProvider_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		var arg0 DisplayMode
+		var arg0 DisplayFrameBufferProvider
 		if args[0] != nil {
-			arg0 = args[0].(DisplayMode)
+			arg0 = args[0].(DisplayFrameBufferProvider)
 		}
 		run(
 			arg0,
@@ -323,12 +256,12 @@ func (_c *DisplaySinkMock_SetDisplayMode_Call) Run(run func(mode DisplayMode)) *
 	return _c
 }
 
-func (_c *DisplaySinkMock_SetDisplayMode_Call) Return(err error) *DisplaySinkMock_SetDisplayMode_Call {
+func (_c *DisplaySinkMock_SetDisplayFrameBufferProvider_Call) Return(err error) *DisplaySinkMock_SetDisplayFrameBufferProvider_Call {
 	_c.Call.Return(err)
 	return _c
 }
 
-func (_c *DisplaySinkMock_SetDisplayMode_Call) RunAndReturn(run func(mode DisplayMode) error) *DisplaySinkMock_SetDisplayMode_Call {
+func (_c *DisplaySinkMock_SetDisplayFrameBufferProvider_Call) RunAndReturn(run func(provider DisplayFrameBufferProvider) error) *DisplaySinkMock_SetDisplayFrameBufferProvider_Call {
 	_c.Call.Return(run)
 	return _c
 }

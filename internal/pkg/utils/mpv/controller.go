@@ -202,7 +202,10 @@ func (controller *Controller) controlLoop(ctx context.Context) {
 			slog.Any("args", args),
 		)
 
-		mpvCmd := cmd.NewCmd(controller.mpvPath, args...)
+		mpvCmd := cmd.NewCmdOptions(cmd.Options{
+			Buffered:  false,
+			Streaming: true,
+		}, controller.mpvPath, args...)
 		statusChan := mpvCmd.Start()
 		controller.mpvCmd = mpvCmd
 

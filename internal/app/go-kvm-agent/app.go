@@ -3,45 +3,45 @@ package go_kvm_agent
 import (
 	"context"
 	"fmt"
-	"log/slog"
 	"sync"
 
-	"github.com/szymonpodeszwa/go-kvm-agent/internal/pkg/api/control/handler"
+	"github.com/szymonpodeszwa/go-kvm-agent/internal/pkg/api/handler"
 	"github.com/szymonpodeszwa/go-kvm-agent/internal/pkg/http"
-	"github.com/szymonpodeszwa/go-kvm-agent/internal/pkg/machine"
+	internalMachine "github.com/szymonpodeszwa/go-kvm-agent/internal/pkg/machine"
+	"github.com/szymonpodeszwa/go-kvm-agent/internal/pkg/memory"
 )
 
 func Start(ctx context.Context, wg *sync.WaitGroup, config Config) error {
-	var machines []*machine.Machine
+	memoryPool, err := memory.NewHeapPool(1024*1024*16, 32)
+	if err != nil {
+		return fmt.Errorf("create heap pool: %w", err)
+	}
+
+	err = memory.SetDefaultMemoryPool(memoryPool)
+	if err != nil {
+		return fmt.Errorf("set default memory pool: %w", err)
+	}
+
+	var machineRepositoryOpts []internalMachine.LocalRepositoryOpt
 
 	for _, machineConfig := range config.Machines {
-		newMachine, err := machine.CreateMachineFromConfig(ctx, machineConfig)
+		machine, err := internalMachine.CreateMachineFromConfig(ctx, machineConfig)
 		if err != nil {
-			return fmt.Errorf("create machine: %s: %w", machineConfig.Name, err)
+			return fmt.Errorf("create machine: %w", err)
 		}
 
-		peripherals := newMachine.GetPeripherals()
-
-		slog.Info("Machine created.",
-			slog.String("machineName", string(machineConfig.Name)),
-			slog.Int("peripheralsCount", len(peripherals)),
-		)
-
-		machines = append(machines, newMachine)
+		machineRepositoryOpts = append(machineRepositoryOpts, internalMachine.WithLocalRepositoryMachines(machine))
 	}
 
-	peripheralRepository, err := createPeripheralRepositoryFromMachines(machines)
-	if err != nil {
-		return fmt.Errorf("create peripheral repository: %w", err)
-	}
+	machinesRepository := internalMachine.NewLocalRepository(machineRepositoryOpts...)
 
-	displayRouter, err := createLocalDisplayRouterFromPeripheralRepository(peripheralRepository)
+	displayRouter, err := createLocalDisplayRouterFromMachineRepository(ctx, machinesRepository)
 	if err != nil {
 		return fmt.Errorf("create display routing: %w", err)
 	}
 
 	err = http.Listen(ctx, config.Api.ControlApi.Server,
-		http.WithHandler(handler.NewDisplayRouterHandler(displayRouter)),
+		http.WithHandler(handler.NewDisplayRouterConnect(displayRouter, machinesRepository)),
 	)
 	if err != nil {
 		return fmt.Errorf("control api: http server: listen: %w", err)

@@ -2,4 +2,13 @@
 POST http://127.0.0.1:8080/router/display/connect
 Content-Type: application/json
 
-{"displaySinkId": "mpv-window-4241e39f-519f-4b0c-9082-edd83d3d9aa5", "displaySourceId": "ffmpeg-display-source-1123edcd-9402-4301-953e-f05c68abc7bd"}
+{
+  "displaySource": {
+    "machineName": "ffmpeg-display-source",
+    "peripheralName": "ffmpeg-display-source"
+  },
+  "displaySink": {
+    "machineName": "ffmpeg-display-sink",
+    "peripheralName": "ffmpeg-display-sink"
+  }
+}

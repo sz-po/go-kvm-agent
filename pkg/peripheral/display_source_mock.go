@@ -37,12 +37,12 @@ func (_m *DisplaySourceMock) EXPECT() *DisplaySourceMock_Expecter {
 	return &DisplaySourceMock_Expecter{mock: &_m.Mock}
 }
 
-// Capabilities provides a mock function for the type DisplaySourceMock
-func (_mock *DisplaySourceMock) Capabilities() []PeripheralCapability {
+// GetCapabilities provides a mock function for the type DisplaySourceMock
+func (_mock *DisplaySourceMock) GetCapabilities() []PeripheralCapability {
 	ret := _mock.Called()
 
 	if len(ret) == 0 {
-		panic("no return value specified for Capabilities")
+		panic("no return value specified for GetCapabilities")
 	}
 
 	var r0 []PeripheralCapability
@@ -56,145 +56,94 @@ func (_mock *DisplaySourceMock) Capabilities() []PeripheralCapability {
 	return r0
 }
 
-// DisplaySourceMock_Capabilities_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Capabilities'
-type DisplaySourceMock_Capabilities_Call struct {
+// DisplaySourceMock_GetCapabilities_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetCapabilities'
+type DisplaySourceMock_GetCapabilities_Call struct {
 	*mock.Call
 }
 
-// Capabilities is a helper method to define mock.On call
-func (_e *DisplaySourceMock_Expecter) Capabilities() *DisplaySourceMock_Capabilities_Call {
-	return &DisplaySourceMock_Capabilities_Call{Call: _e.mock.On("Capabilities")}
+// GetCapabilities is a helper method to define mock.On call
+func (_e *DisplaySourceMock_Expecter) GetCapabilities() *DisplaySourceMock_GetCapabilities_Call {
+	return &DisplaySourceMock_GetCapabilities_Call{Call: _e.mock.On("GetCapabilities")}
 }
 
-func (_c *DisplaySourceMock_Capabilities_Call) Run(run func()) *DisplaySourceMock_Capabilities_Call {
+func (_c *DisplaySourceMock_GetCapabilities_Call) Run(run func()) *DisplaySourceMock_GetCapabilities_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run()
 	})
 	return _c
 }
 
-func (_c *DisplaySourceMock_Capabilities_Call) Return(peripheralCapabilitys []PeripheralCapability) *DisplaySourceMock_Capabilities_Call {
+func (_c *DisplaySourceMock_GetCapabilities_Call) Return(peripheralCapabilitys []PeripheralCapability) *DisplaySourceMock_GetCapabilities_Call {
 	_c.Call.Return(peripheralCapabilitys)
 	return _c
 }
 
-func (_c *DisplaySourceMock_Capabilities_Call) RunAndReturn(run func() []PeripheralCapability) *DisplaySourceMock_Capabilities_Call {
+func (_c *DisplaySourceMock_GetCapabilities_Call) RunAndReturn(run func() []PeripheralCapability) *DisplaySourceMock_GetCapabilities_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// DisplayControlChannel provides a mock function for the type DisplaySourceMock
-func (_mock *DisplaySourceMock) DisplayControlChannel(ctx context.Context) <-chan DisplayControlEvent {
-	ret := _mock.Called(ctx)
-
-	if len(ret) == 0 {
-		panic("no return value specified for DisplayControlChannel")
-	}
-
-	var r0 <-chan DisplayControlEvent
-	if returnFunc, ok := ret.Get(0).(func(context.Context) <-chan DisplayControlEvent); ok {
-		r0 = returnFunc(ctx)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(<-chan DisplayControlEvent)
-		}
-	}
-	return r0
-}
-
-// DisplaySourceMock_DisplayControlChannel_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DisplayControlChannel'
-type DisplaySourceMock_DisplayControlChannel_Call struct {
-	*mock.Call
-}
-
-// DisplayControlChannel is a helper method to define mock.On call
-//   - ctx context.Context
-func (_e *DisplaySourceMock_Expecter) DisplayControlChannel(ctx interface{}) *DisplaySourceMock_DisplayControlChannel_Call {
-	return &DisplaySourceMock_DisplayControlChannel_Call{Call: _e.mock.On("DisplayControlChannel", ctx)}
-}
-
-func (_c *DisplaySourceMock_DisplayControlChannel_Call) Run(run func(ctx context.Context)) *DisplaySourceMock_DisplayControlChannel_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		var arg0 context.Context
-		if args[0] != nil {
-			arg0 = args[0].(context.Context)
-		}
-		run(
-			arg0,
-		)
-	})
-	return _c
-}
-
-func (_c *DisplaySourceMock_DisplayControlChannel_Call) Return(displayControlEventCh <-chan DisplayControlEvent) *DisplaySourceMock_DisplayControlChannel_Call {
-	_c.Call.Return(displayControlEventCh)
-	return _c
-}
-
-func (_c *DisplaySourceMock_DisplayControlChannel_Call) RunAndReturn(run func(ctx context.Context) <-chan DisplayControlEvent) *DisplaySourceMock_DisplayControlChannel_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// DisplayDataChannel provides a mock function for the type DisplaySourceMock
-func (_mock *DisplaySourceMock) DisplayDataChannel(ctx context.Context) <-chan DisplayDataEvent {
-	ret := _mock.Called(ctx)
-
-	if len(ret) == 0 {
-		panic("no return value specified for DisplayDataChannel")
-	}
-
-	var r0 <-chan DisplayDataEvent
-	if returnFunc, ok := ret.Get(0).(func(context.Context) <-chan DisplayDataEvent); ok {
-		r0 = returnFunc(ctx)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(<-chan DisplayDataEvent)
-		}
-	}
-	return r0
-}
-
-// DisplaySourceMock_DisplayDataChannel_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DisplayDataChannel'
-type DisplaySourceMock_DisplayDataChannel_Call struct {
-	*mock.Call
-}
-
-// DisplayDataChannel is a helper method to define mock.On call
-//   - ctx context.Context
-func (_e *DisplaySourceMock_Expecter) DisplayDataChannel(ctx interface{}) *DisplaySourceMock_DisplayDataChannel_Call {
-	return &DisplaySourceMock_DisplayDataChannel_Call{Call: _e.mock.On("DisplayDataChannel", ctx)}
-}
-
-func (_c *DisplaySourceMock_DisplayDataChannel_Call) Run(run func(ctx context.Context)) *DisplaySourceMock_DisplayDataChannel_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		var arg0 context.Context
-		if args[0] != nil {
-			arg0 = args[0].(context.Context)
-		}
-		run(
-			arg0,
-		)
-	})
-	return _c
-}
-
-func (_c *DisplaySourceMock_DisplayDataChannel_Call) Return(displayDataEventCh <-chan DisplayDataEvent) *DisplaySourceMock_DisplayDataChannel_Call {
-	_c.Call.Return(displayDataEventCh)
-	return _c
-}
-
-func (_c *DisplaySourceMock_DisplayDataChannel_Call) RunAndReturn(run func(ctx context.Context) <-chan DisplayDataEvent) *DisplaySourceMock_DisplayDataChannel_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// GetCurrentDisplayMode provides a mock function for the type DisplaySourceMock
-func (_mock *DisplaySourceMock) GetCurrentDisplayMode() (*DisplayMode, error) {
+// GetDisplayFrameBuffer provides a mock function for the type DisplaySourceMock
+func (_mock *DisplaySourceMock) GetDisplayFrameBuffer() (*DisplayFrameBuffer, error) {
 	ret := _mock.Called()
 
 	if len(ret) == 0 {
-		panic("no return value specified for GetCurrentDisplayMode")
+		panic("no return value specified for GetDisplayFrameBuffer")
+	}
+
+	var r0 *DisplayFrameBuffer
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func() (*DisplayFrameBuffer, error)); ok {
+		return returnFunc()
+	}
+	if returnFunc, ok := ret.Get(0).(func() *DisplayFrameBuffer); ok {
+		r0 = returnFunc()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*DisplayFrameBuffer)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func() error); ok {
+		r1 = returnFunc()
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// DisplaySourceMock_GetDisplayFrameBuffer_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetDisplayFrameBuffer'
+type DisplaySourceMock_GetDisplayFrameBuffer_Call struct {
+	*mock.Call
+}
+
+// GetDisplayFrameBuffer is a helper method to define mock.On call
+func (_e *DisplaySourceMock_Expecter) GetDisplayFrameBuffer() *DisplaySourceMock_GetDisplayFrameBuffer_Call {
+	return &DisplaySourceMock_GetDisplayFrameBuffer_Call{Call: _e.mock.On("GetDisplayFrameBuffer")}
+}
+
+func (_c *DisplaySourceMock_GetDisplayFrameBuffer_Call) Run(run func()) *DisplaySourceMock_GetDisplayFrameBuffer_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *DisplaySourceMock_GetDisplayFrameBuffer_Call) Return(displayFrameBuffer *DisplayFrameBuffer, err error) *DisplaySourceMock_GetDisplayFrameBuffer_Call {
+	_c.Call.Return(displayFrameBuffer, err)
+	return _c
+}
+
+func (_c *DisplaySourceMock_GetDisplayFrameBuffer_Call) RunAndReturn(run func() (*DisplayFrameBuffer, error)) *DisplaySourceMock_GetDisplayFrameBuffer_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetDisplayMode provides a mock function for the type DisplaySourceMock
+func (_mock *DisplaySourceMock) GetDisplayMode() (*DisplayMode, error) {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetDisplayMode")
 	}
 
 	var r0 *DisplayMode
@@ -217,29 +166,73 @@ func (_mock *DisplaySourceMock) GetCurrentDisplayMode() (*DisplayMode, error) {
 	return r0, r1
 }
 
-// DisplaySourceMock_GetCurrentDisplayMode_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetCurrentDisplayMode'
-type DisplaySourceMock_GetCurrentDisplayMode_Call struct {
+// DisplaySourceMock_GetDisplayMode_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetDisplayMode'
+type DisplaySourceMock_GetDisplayMode_Call struct {
 	*mock.Call
 }
 
-// GetCurrentDisplayMode is a helper method to define mock.On call
-func (_e *DisplaySourceMock_Expecter) GetCurrentDisplayMode() *DisplaySourceMock_GetCurrentDisplayMode_Call {
-	return &DisplaySourceMock_GetCurrentDisplayMode_Call{Call: _e.mock.On("GetCurrentDisplayMode")}
+// GetDisplayMode is a helper method to define mock.On call
+func (_e *DisplaySourceMock_Expecter) GetDisplayMode() *DisplaySourceMock_GetDisplayMode_Call {
+	return &DisplaySourceMock_GetDisplayMode_Call{Call: _e.mock.On("GetDisplayMode")}
 }
 
-func (_c *DisplaySourceMock_GetCurrentDisplayMode_Call) Run(run func()) *DisplaySourceMock_GetCurrentDisplayMode_Call {
+func (_c *DisplaySourceMock_GetDisplayMode_Call) Run(run func()) *DisplaySourceMock_GetDisplayMode_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run()
 	})
 	return _c
 }
 
-func (_c *DisplaySourceMock_GetCurrentDisplayMode_Call) Return(displayMode *DisplayMode, err error) *DisplaySourceMock_GetCurrentDisplayMode_Call {
+func (_c *DisplaySourceMock_GetDisplayMode_Call) Return(displayMode *DisplayMode, err error) *DisplaySourceMock_GetDisplayMode_Call {
 	_c.Call.Return(displayMode, err)
 	return _c
 }
 
-func (_c *DisplaySourceMock_GetCurrentDisplayMode_Call) RunAndReturn(run func() (*DisplayMode, error)) *DisplaySourceMock_GetCurrentDisplayMode_Call {
+func (_c *DisplaySourceMock_GetDisplayMode_Call) RunAndReturn(run func() (*DisplayMode, error)) *DisplaySourceMock_GetDisplayMode_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetDisplayPixelFormat provides a mock function for the type DisplaySourceMock
+func (_mock *DisplaySourceMock) GetDisplayPixelFormat() DisplayPixelFormat {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetDisplayPixelFormat")
+	}
+
+	var r0 DisplayPixelFormat
+	if returnFunc, ok := ret.Get(0).(func() DisplayPixelFormat); ok {
+		r0 = returnFunc()
+	} else {
+		r0 = ret.Get(0).(DisplayPixelFormat)
+	}
+	return r0
+}
+
+// DisplaySourceMock_GetDisplayPixelFormat_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetDisplayPixelFormat'
+type DisplaySourceMock_GetDisplayPixelFormat_Call struct {
+	*mock.Call
+}
+
+// GetDisplayPixelFormat is a helper method to define mock.On call
+func (_e *DisplaySourceMock_Expecter) GetDisplayPixelFormat() *DisplaySourceMock_GetDisplayPixelFormat_Call {
+	return &DisplaySourceMock_GetDisplayPixelFormat_Call{Call: _e.mock.On("GetDisplayPixelFormat")}
+}
+
+func (_c *DisplaySourceMock_GetDisplayPixelFormat_Call) Run(run func()) *DisplaySourceMock_GetDisplayPixelFormat_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *DisplaySourceMock_GetDisplayPixelFormat_Call) Return(displayPixelFormat DisplayPixelFormat) *DisplaySourceMock_GetDisplayPixelFormat_Call {
+	_c.Call.Return(displayPixelFormat)
+	return _c
+}
+
+func (_c *DisplaySourceMock_GetDisplayPixelFormat_Call) RunAndReturn(run func() DisplayPixelFormat) *DisplaySourceMock_GetDisplayPixelFormat_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -288,12 +281,12 @@ func (_c *DisplaySourceMock_GetDisplaySourceMetrics_Call) RunAndReturn(run func(
 	return _c
 }
 
-// Id provides a mock function for the type DisplaySourceMock
-func (_mock *DisplaySourceMock) Id() PeripheralId {
+// GetId provides a mock function for the type DisplaySourceMock
+func (_mock *DisplaySourceMock) GetId() PeripheralId {
 	ret := _mock.Called()
 
 	if len(ret) == 0 {
-		panic("no return value specified for Id")
+		panic("no return value specified for GetId")
 	}
 
 	var r0 PeripheralId
@@ -305,29 +298,73 @@ func (_mock *DisplaySourceMock) Id() PeripheralId {
 	return r0
 }
 
-// DisplaySourceMock_Id_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Id'
-type DisplaySourceMock_Id_Call struct {
+// DisplaySourceMock_GetId_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetId'
+type DisplaySourceMock_GetId_Call struct {
 	*mock.Call
 }
 
-// Id is a helper method to define mock.On call
-func (_e *DisplaySourceMock_Expecter) Id() *DisplaySourceMock_Id_Call {
-	return &DisplaySourceMock_Id_Call{Call: _e.mock.On("Id")}
+// GetId is a helper method to define mock.On call
+func (_e *DisplaySourceMock_Expecter) GetId() *DisplaySourceMock_GetId_Call {
+	return &DisplaySourceMock_GetId_Call{Call: _e.mock.On("GetId")}
 }
 
-func (_c *DisplaySourceMock_Id_Call) Run(run func()) *DisplaySourceMock_Id_Call {
+func (_c *DisplaySourceMock_GetId_Call) Run(run func()) *DisplaySourceMock_GetId_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run()
 	})
 	return _c
 }
 
-func (_c *DisplaySourceMock_Id_Call) Return(peripheralId PeripheralId) *DisplaySourceMock_Id_Call {
+func (_c *DisplaySourceMock_GetId_Call) Return(peripheralId PeripheralId) *DisplaySourceMock_GetId_Call {
 	_c.Call.Return(peripheralId)
 	return _c
 }
 
-func (_c *DisplaySourceMock_Id_Call) RunAndReturn(run func() PeripheralId) *DisplaySourceMock_Id_Call {
+func (_c *DisplaySourceMock_GetId_Call) RunAndReturn(run func() PeripheralId) *DisplaySourceMock_GetId_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetName provides a mock function for the type DisplaySourceMock
+func (_mock *DisplaySourceMock) GetName() PeripheralName {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetName")
+	}
+
+	var r0 PeripheralName
+	if returnFunc, ok := ret.Get(0).(func() PeripheralName); ok {
+		r0 = returnFunc()
+	} else {
+		r0 = ret.Get(0).(PeripheralName)
+	}
+	return r0
+}
+
+// DisplaySourceMock_GetName_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetName'
+type DisplaySourceMock_GetName_Call struct {
+	*mock.Call
+}
+
+// GetName is a helper method to define mock.On call
+func (_e *DisplaySourceMock_Expecter) GetName() *DisplaySourceMock_GetName_Call {
+	return &DisplaySourceMock_GetName_Call{Call: _e.mock.On("GetName")}
+}
+
+func (_c *DisplaySourceMock_GetName_Call) Run(run func()) *DisplaySourceMock_GetName_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *DisplaySourceMock_GetName_Call) Return(peripheralName PeripheralName) *DisplaySourceMock_GetName_Call {
+	_c.Call.Return(peripheralName)
+	return _c
+}
+
+func (_c *DisplaySourceMock_GetName_Call) RunAndReturn(run func() PeripheralName) *DisplaySourceMock_GetName_Call {
 	_c.Call.Return(run)
 	return _c
 }

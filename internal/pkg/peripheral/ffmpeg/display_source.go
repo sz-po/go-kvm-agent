@@ -7,25 +7,25 @@ import (
 	"log/slog"
 	"sync"
 
-	"github.com/szymonpodeszwa/go-kvm-agent/internal/pkg/utils"
 	"github.com/szymonpodeszwa/go-kvm-agent/internal/pkg/utils/ffmpeg"
-	"github.com/szymonpodeszwa/go-kvm-agent/internal/pkg/utils/stream"
+	"github.com/szymonpodeszwa/go-kvm-agent/internal/pkg/utils/formats/ppm"
 	peripheralSDK "github.com/szymonpodeszwa/go-kvm-agent/pkg/peripheral"
 )
 
 // TODO: refine coments in this file
+// TODO: change ffmpeg output read to new (not implemented yet) output_reader
 
 // DisplaySourceDriver is the peripheral driver identifier for FFMPEG-based display sources.
 const DisplaySourceDriver = peripheralSDK.PeripheralDriver("ffmpeg/display-source")
 
 type DisplaySourceInputConfig struct {
-	TestPattern *DisplaySourceTestPatternInputConfig `json:"testPattern"`
+	MessageBoard *DisplaySourceMessageBoardInputConfig `json:"messageBoard"`
 }
 
 type DisplaySourceInput interface {
 	ffmpeg.Input
-	GetCurrentPixelFormat() peripheralSDK.DisplayPixelFormat
-	GetCurrentDisplayMode() peripheralSDK.DisplayMode
+	GetPixelFormat() peripheralSDK.DisplayPixelFormat
+	GetDisplayMode() (peripheralSDK.DisplayMode, error)
 }
 
 // DisplaySourceConfig holds configuration for creating an FFMPEG display source.
@@ -34,14 +34,12 @@ type DisplaySourceConfig struct {
 }
 
 type DisplaySourceOptions struct {
-	chunkSize int
-	logger    *slog.Logger
+	logger *slog.Logger
 }
 
-func defaultDisplaySourceOptions(chunkSize int) *DisplaySourceOptions {
+func defaultDisplaySourceOptions() *DisplaySourceOptions {
 	return &DisplaySourceOptions{
-		chunkSize: chunkSize,
-		logger:    slog.New(slog.DiscardHandler),
+		logger: slog.New(slog.DiscardHandler),
 	}
 }
 
@@ -49,19 +47,21 @@ type DisplaySourceOpt func(options *DisplaySourceOptions)
 
 // DisplaySource is a mpv implementation of a display source using FFMPEG.
 type DisplaySource struct {
-	id               peripheralSDK.PeripheralId
-	ffmpegController *ffmpeg.Controller
-	frameParser      *stream.PPMFrameParser
+	id   peripheralSDK.PeripheralId
+	name peripheralSDK.PeripheralName
 
-	pipeStop context.CancelFunc
-	pipeCtx  context.Context
+	lifecycleCtx    context.Context
+	lifecycleCancel context.CancelFunc
+
+	ffmpegController *ffmpeg.FFmpegController
+
+	frameBuffer     *peripheralSDK.DisplayFrameBuffer
+	frameBufferLock sync.RWMutex
+
+	displayMode peripheralSDK.DisplayMode
+	pixelFormat peripheralSDK.DisplayPixelFormat
 
 	input DisplaySourceInput
-
-	dataEventQueue    *utils.EventEmitter[peripheralSDK.DisplayDataEvent]
-	controlEventQueue *utils.EventEmitter[peripheralSDK.DisplayControlEvent]
-
-	chunkSize int
 
 	metrics     *peripheralSDK.DisplaySourceMetrics
 	metricsLock sync.RWMutex
@@ -71,12 +71,6 @@ type DisplaySource struct {
 
 var _ peripheralSDK.DisplaySource = (*DisplaySource)(nil)
 
-func WithDisplaySourceChunkSize(chunkSize int) DisplaySourceOpt {
-	return func(options *DisplaySourceOptions) {
-		options.chunkSize = chunkSize
-	}
-}
-
 func WithDisplaySourceLogger(logger *slog.Logger) DisplaySourceOpt {
 	return func(options *DisplaySourceOptions) {
 		options.logger = logger
@@ -84,46 +78,32 @@ func WithDisplaySourceLogger(logger *slog.Logger) DisplaySourceOpt {
 }
 
 // NewDisplaySource creates a new FFMPEG display source from the provided configuration.
-func NewDisplaySource(ctx context.Context, config DisplaySourceConfig, opts ...DisplaySourceOpt) (*DisplaySource, error) {
-	id := peripheralSDK.CreatePeripheralRandomId("ffmpeg-display-source")
-
-	var input DisplaySourceInput
-
-	if config.Input.TestPattern != nil {
-		input = NewDisplaySourceTestPatternInput(*config.Input.TestPattern)
-	} else {
-		return nil, ErrDisplaySourceMissingInput
-	}
-
-	lineSize := input.GetCurrentPixelFormat().BytesPerPixel() * int(input.GetCurrentDisplayMode().Width)
-
-	options := defaultDisplaySourceOptions(lineSize * 16)
+func NewDisplaySource(ctx context.Context, config DisplaySourceConfig, name peripheralSDK.PeripheralName, opts ...DisplaySourceOpt) (*DisplaySource, error) {
+	options := defaultDisplaySourceOptions()
 	for _, opt := range opts {
 		opt(options)
 	}
 
-	if options.chunkSize <= 0 {
-		return nil, fmt.Errorf("%w: chunk size must be greater than zero", ErrDisplaySourceInvalidChunkSize)
-	}
-
-	if options.chunkSize%lineSize != 0 {
-		return nil, fmt.Errorf("%w: chunk size must be a multiple of line size", ErrDisplaySourceInvalidChunkSize)
-	}
-
-	frameParser, err := stream.NewPPMFrameParser(options.chunkSize)
-	if err != nil {
-		return nil, fmt.Errorf("error creating PPM frame parser: %w", err)
-	}
+	id := peripheralSDK.CreatePeripheralRandomId("ffmpeg-display-source")
 
 	logger := options.logger.With(slog.String("peripheralId", id.String()))
 
-	pipeCtx, pipeStop := context.WithCancel(context.Background())
+	var ffmpegInput DisplaySourceInput
 
-	ffmpegOutput, err := ffmpeg.NewGolangChannelOutput(pipeCtx, ffmpeg.GolangChannelOutputModeUnixSocket)
-	if err != nil {
-		pipeStop()
-		return nil, fmt.Errorf("create output pipe: %w", err)
+	if config.Input.MessageBoard != nil {
+		ffmpegInput = NewDisplaySourceMessageBoardInput(*config.Input.MessageBoard)
+	} else {
+		return nil, ErrDisplaySourceMissingInput
 	}
+
+	displayMode, err := ffmpegInput.GetDisplayMode()
+	if err != nil {
+		return nil, fmt.Errorf("error getting display mode from input: %w", err)
+	}
+
+	pixelFormat := ffmpegInput.GetPixelFormat()
+
+	ffmpegOutput := ffmpeg.NewOutputStdout()
 
 	ffmpegConfig := ffmpeg.RawConfiguration{
 		"-f",
@@ -132,27 +112,26 @@ func NewDisplaySource(ctx context.Context, config DisplaySourceConfig, opts ...D
 		"ppm",
 	}
 
-	ffmpegController, err := ffmpeg.NewController(input, ffmpegOutput, ffmpegConfig, ffmpeg.WithLogger(logger))
+	ffmpegController, err := ffmpeg.NewFFmpegController(ffmpegInput, ffmpegOutput, ffmpegConfig, ffmpeg.WithFFmpegLogger(logger))
 	if err != nil {
-		pipeStop()
 		return nil, fmt.Errorf("error creating ffmpeg controller: %w", err)
 	}
 
+	lifecycleCtx, lifecycleCancel := context.WithCancel(ctx)
+
 	source := &DisplaySource{
-		id: id,
+		id:   id,
+		name: name,
 
 		ffmpegController: ffmpegController,
-		frameParser:      frameParser,
 
-		pipeStop: pipeStop,
-		pipeCtx:  pipeCtx,
+		lifecycleCancel: lifecycleCancel,
+		lifecycleCtx:    lifecycleCtx,
 
-		input: input,
+		displayMode: displayMode,
+		pixelFormat: pixelFormat,
 
-		dataEventQueue:    utils.NewEventEmitter[peripheralSDK.DisplayDataEvent](),
-		controlEventQueue: utils.NewEventEmitter[peripheralSDK.DisplayControlEvent](),
-
-		chunkSize: options.chunkSize,
+		input: ffmpegInput,
 
 		metrics:     &peripheralSDK.DisplaySourceMetrics{},
 		metricsLock: sync.RWMutex{},
@@ -162,58 +141,68 @@ func NewDisplaySource(ctx context.Context, config DisplaySourceConfig, opts ...D
 
 	err = ffmpegController.Start(ctx)
 	if err != nil {
-		pipeStop()
+		lifecycleCancel()
 		return nil, fmt.Errorf("start ffmpeg controller: %w", err)
 	}
 
-	go source.ffmpegDataReadLoop(ffmpegOutput.Channel(ctx))
+	go source.ffmpegDataReadLoop(lifecycleCtx)
 
-	source.logger.Debug("FFmpeg display source created.",
-		slog.Int("chunkSize", options.chunkSize),
-	)
+	source.logger.Debug("FFmpeg display source created.")
 
 	return source, nil
 }
 
 // Capabilities returns the list of peripheral capabilities supported by this display source.
-func (source *DisplaySource) Capabilities() []peripheralSDK.PeripheralCapability {
+func (source *DisplaySource) GetCapabilities() []peripheralSDK.PeripheralCapability {
 	return []peripheralSDK.PeripheralCapability{
 		peripheralSDK.DisplaySourceCapability,
 	}
 }
 
 // Id returns the unique identifier of this peripheral.
-func (source *DisplaySource) Id() peripheralSDK.PeripheralId {
+func (source *DisplaySource) GetId() peripheralSDK.PeripheralId {
 	return source.id
+}
+
+func (source *DisplaySource) GetName() peripheralSDK.PeripheralName {
+	return source.name
 }
 
 // Terminate shuts down the display source.
 func (source *DisplaySource) Terminate(ctx context.Context) error {
+	source.lifecycleCancel()
+
 	err := source.ffmpegController.Stop(ctx)
 	if err != nil {
 		return fmt.Errorf("error stopping ffmpeg controller: %w", err)
 	}
 
-	source.pipeStop()
-
 	return nil
 }
 
-// DisplayDataChannel returns a channel that emits display events containing frame data.
-func (source *DisplaySource) DisplayDataChannel(ctx context.Context) <-chan peripheralSDK.DisplayDataEvent {
-	return source.dataEventQueue.Listen(ctx)
+// GetDisplayMode returns the current display mode configuration.
+func (source *DisplaySource) GetDisplayMode() (*peripheralSDK.DisplayMode, error) {
+	return &source.displayMode, nil
 }
 
-// DisplayControlChannel returns a channel that emits display control events.
-func (source *DisplaySource) DisplayControlChannel(ctx context.Context) <-chan peripheralSDK.DisplayControlEvent {
-	return source.controlEventQueue.Listen(ctx)
+func (source *DisplaySource) GetDisplayPixelFormat() peripheralSDK.DisplayPixelFormat {
+	return source.pixelFormat
 }
 
-// GetCurrentDisplayMode returns the current display mode configuration.
-func (source *DisplaySource) GetCurrentDisplayMode() (*peripheralSDK.DisplayMode, error) {
-	displayMode := source.input.GetCurrentDisplayMode()
+func (source *DisplaySource) GetDisplayFrameBuffer() (*peripheralSDK.DisplayFrameBuffer, error) {
+	source.frameBufferLock.RLock()
+	defer source.frameBufferLock.RUnlock()
 
-	return &displayMode, nil
+	if source.frameBuffer == nil {
+		return nil, peripheralSDK.ErrDisplayFrameBufferNotReady
+	}
+
+	err := source.frameBuffer.Retain()
+	if err != nil {
+		return nil, fmt.Errorf("retainin frame buffer: %w", err)
+	}
+
+	return source.frameBuffer, nil
 }
 
 func (source *DisplaySource) GetDisplaySourceMetrics() peripheralSDK.DisplaySourceMetrics {
@@ -228,45 +217,27 @@ func (source *DisplaySource) updateMetrics(updateFn func(metrics *peripheralSDK.
 	updateFn(source.metrics)
 }
 
-func (source *DisplaySource) emitDisplayDataEvent(event peripheralSDK.DisplayDataEvent) {
-	source.dataEventQueue.Emit(event)
-}
-
-func (source *DisplaySource) ffmpegDataReadLoop(dataChannel <-chan []byte) {
-	for dataChunk := range dataChannel {
-		source.updateMetrics(func(metrics *peripheralSDK.DisplaySourceMetrics) {
-			metrics.InputProcessedBytes += uint64(len(dataChunk))
-			metrics.InputProcessedReadCalls += 1
-		})
-
-		var emittedDisplayFrameEndEventCount uint64
-		var emittedDisplayFrameChunkEventCount uint64
-		var emittedDisplayFrameStartEventCount uint64
-
-		events, err := source.frameParser.Ingest(dataChunk)
-		if err != nil {
-			source.logger.Warn("Error while parsing PPM frame data.", slog.String("error", err.Error()))
-		}
-
-		for _, event := range events {
-			switch event.(type) {
-			case peripheralSDK.DisplayFrameStartEvent:
-				emittedDisplayFrameStartEventCount += 1
-			case peripheralSDK.DisplayFrameEndEvent:
-				emittedDisplayFrameEndEventCount += 1
-			case peripheralSDK.DisplayFrameChunkEvent:
-				emittedDisplayFrameChunkEventCount += 1
-			}
-			source.emitDisplayDataEvent(event)
-		}
-
-		source.updateMetrics(func(metrics *peripheralSDK.DisplaySourceMetrics) {
-			metrics.EmittedDisplayFrameStartEventCount += emittedDisplayFrameStartEventCount
-			metrics.EmittedDisplayFrameEndEventCount += emittedDisplayFrameEndEventCount
-			metrics.EmittedDisplayFrameChunkEventCount += emittedDisplayFrameChunkEventCount
-		})
+func (source *DisplaySource) ffmpegDataReadLoop(ctx context.Context) {
+	err := ppm.ParseStream(ctx, source.ffmpegController.GetStdout(), source.frameBufferHandler)
+	if err != nil {
+		source.logger.Warn("Error parsing ffmpeg pipe data stream.")
 	}
 }
 
+func (source *DisplaySource) frameBufferHandler(frameBuffer *peripheralSDK.DisplayFrameBuffer) error {
+	source.frameBufferLock.Lock()
+	defer source.frameBufferLock.Unlock()
+
+	if source.frameBuffer != nil {
+		err := source.frameBuffer.Release()
+		if err != nil {
+			return fmt.Errorf("error releasing old frame buffer to pool: %w", err)
+		}
+	}
+
+	source.frameBuffer = frameBuffer
+
+	return nil
+}
+
 var ErrDisplaySourceMissingInput = errors.New("display source missing input")
-var ErrDisplaySourceInvalidChunkSize = errors.New("display source invalid chunk size")

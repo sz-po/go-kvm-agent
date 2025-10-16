@@ -37,12 +37,12 @@ func (_m *PeripheralMock) EXPECT() *PeripheralMock_Expecter {
 	return &PeripheralMock_Expecter{mock: &_m.Mock}
 }
 
-// Capabilities provides a mock function for the type PeripheralMock
-func (_mock *PeripheralMock) Capabilities() []PeripheralCapability {
+// GetCapabilities provides a mock function for the type PeripheralMock
+func (_mock *PeripheralMock) GetCapabilities() []PeripheralCapability {
 	ret := _mock.Called()
 
 	if len(ret) == 0 {
-		panic("no return value specified for Capabilities")
+		panic("no return value specified for GetCapabilities")
 	}
 
 	var r0 []PeripheralCapability
@@ -56,39 +56,39 @@ func (_mock *PeripheralMock) Capabilities() []PeripheralCapability {
 	return r0
 }
 
-// PeripheralMock_Capabilities_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Capabilities'
-type PeripheralMock_Capabilities_Call struct {
+// PeripheralMock_GetCapabilities_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetCapabilities'
+type PeripheralMock_GetCapabilities_Call struct {
 	*mock.Call
 }
 
-// Capabilities is a helper method to define mock.On call
-func (_e *PeripheralMock_Expecter) Capabilities() *PeripheralMock_Capabilities_Call {
-	return &PeripheralMock_Capabilities_Call{Call: _e.mock.On("Capabilities")}
+// GetCapabilities is a helper method to define mock.On call
+func (_e *PeripheralMock_Expecter) GetCapabilities() *PeripheralMock_GetCapabilities_Call {
+	return &PeripheralMock_GetCapabilities_Call{Call: _e.mock.On("GetCapabilities")}
 }
 
-func (_c *PeripheralMock_Capabilities_Call) Run(run func()) *PeripheralMock_Capabilities_Call {
+func (_c *PeripheralMock_GetCapabilities_Call) Run(run func()) *PeripheralMock_GetCapabilities_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run()
 	})
 	return _c
 }
 
-func (_c *PeripheralMock_Capabilities_Call) Return(peripheralCapabilitys []PeripheralCapability) *PeripheralMock_Capabilities_Call {
+func (_c *PeripheralMock_GetCapabilities_Call) Return(peripheralCapabilitys []PeripheralCapability) *PeripheralMock_GetCapabilities_Call {
 	_c.Call.Return(peripheralCapabilitys)
 	return _c
 }
 
-func (_c *PeripheralMock_Capabilities_Call) RunAndReturn(run func() []PeripheralCapability) *PeripheralMock_Capabilities_Call {
+func (_c *PeripheralMock_GetCapabilities_Call) RunAndReturn(run func() []PeripheralCapability) *PeripheralMock_GetCapabilities_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// Id provides a mock function for the type PeripheralMock
-func (_mock *PeripheralMock) Id() PeripheralId {
+// GetId provides a mock function for the type PeripheralMock
+func (_mock *PeripheralMock) GetId() PeripheralId {
 	ret := _mock.Called()
 
 	if len(ret) == 0 {
-		panic("no return value specified for Id")
+		panic("no return value specified for GetId")
 	}
 
 	var r0 PeripheralId
@@ -100,29 +100,73 @@ func (_mock *PeripheralMock) Id() PeripheralId {
 	return r0
 }
 
-// PeripheralMock_Id_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Id'
-type PeripheralMock_Id_Call struct {
+// PeripheralMock_GetId_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetId'
+type PeripheralMock_GetId_Call struct {
 	*mock.Call
 }
 
-// Id is a helper method to define mock.On call
-func (_e *PeripheralMock_Expecter) Id() *PeripheralMock_Id_Call {
-	return &PeripheralMock_Id_Call{Call: _e.mock.On("Id")}
+// GetId is a helper method to define mock.On call
+func (_e *PeripheralMock_Expecter) GetId() *PeripheralMock_GetId_Call {
+	return &PeripheralMock_GetId_Call{Call: _e.mock.On("GetId")}
 }
 
-func (_c *PeripheralMock_Id_Call) Run(run func()) *PeripheralMock_Id_Call {
+func (_c *PeripheralMock_GetId_Call) Run(run func()) *PeripheralMock_GetId_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run()
 	})
 	return _c
 }
 
-func (_c *PeripheralMock_Id_Call) Return(peripheralId PeripheralId) *PeripheralMock_Id_Call {
+func (_c *PeripheralMock_GetId_Call) Return(peripheralId PeripheralId) *PeripheralMock_GetId_Call {
 	_c.Call.Return(peripheralId)
 	return _c
 }
 
-func (_c *PeripheralMock_Id_Call) RunAndReturn(run func() PeripheralId) *PeripheralMock_Id_Call {
+func (_c *PeripheralMock_GetId_Call) RunAndReturn(run func() PeripheralId) *PeripheralMock_GetId_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetName provides a mock function for the type PeripheralMock
+func (_mock *PeripheralMock) GetName() PeripheralName {
+	ret := _mock.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetName")
+	}
+
+	var r0 PeripheralName
+	if returnFunc, ok := ret.Get(0).(func() PeripheralName); ok {
+		r0 = returnFunc()
+	} else {
+		r0 = ret.Get(0).(PeripheralName)
+	}
+	return r0
+}
+
+// PeripheralMock_GetName_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetName'
+type PeripheralMock_GetName_Call struct {
+	*mock.Call
+}
+
+// GetName is a helper method to define mock.On call
+func (_e *PeripheralMock_Expecter) GetName() *PeripheralMock_GetName_Call {
+	return &PeripheralMock_GetName_Call{Call: _e.mock.On("GetName")}
+}
+
+func (_c *PeripheralMock_GetName_Call) Run(run func()) *PeripheralMock_GetName_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *PeripheralMock_GetName_Call) Return(peripheralName PeripheralName) *PeripheralMock_GetName_Call {
+	_c.Call.Return(peripheralName)
+	return _c
+}
+
+func (_c *PeripheralMock_GetName_Call) RunAndReturn(run func() PeripheralName) *PeripheralMock_GetName_Call {
 	_c.Call.Return(run)
 	return _c
 }

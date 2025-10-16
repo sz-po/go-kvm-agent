@@ -1,9 +1,0 @@
-name: mpv-mpv-window
-peripherals:
-  - driver: mpv/window
-    config:
-      title: elo
-      supportedDisplayModes:
-        - width: 800
-          height: 600
-          refreshRate: 30

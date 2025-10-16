@@ -18,14 +18,23 @@ type ServerConfig struct {
 }
 
 type ServerHandler interface {
-	PathPrefix() string
-	ServeHTTP(http.ResponseWriter, *http.Request)
+	Register(router chi.Router)
+}
+
+type ServerMiddleware interface {
+	Handle(http.Handler) http.Handler
 }
 
 func WithHandler(handler ServerHandler) ServerOpt {
 	return func(router chi.Router) {
-		router.Mount(handler.PathPrefix(), handler)
-		slog.Debug("Registered HTTP server handler.", slog.String("pathPrefix", handler.PathPrefix()))
+		handler.Register(router)
+		slog.Debug("Registered HTTP server handler.")
+	}
+}
+
+func WithMiddleware(middleware ServerMiddleware) ServerOpt {
+	return func(router chi.Router) {
+		router.Use(middleware.Handle)
 	}
 }
 
@@ -45,7 +54,7 @@ func Listen(ctx context.Context, config ServerConfig, opts ...ServerOpt) error {
 
 	go http.Serve(listener, router)
 
-	slog.Info("Control API HTTP server listening.",
+	slog.Info("API HTTP server listening.",
 		slog.String("listenHost", config.ListenHost),
 		slog.Int("listenPort", config.ListenPort),
 	)

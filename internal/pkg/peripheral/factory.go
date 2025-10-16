@@ -8,8 +8,6 @@ import (
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/szymonpodeszwa/go-kvm-agent/internal/pkg/peripheral/ffmpeg"
-
-	"github.com/szymonpodeszwa/go-kvm-agent/internal/pkg/peripheral/mpv"
 	peripheralSDK "github.com/szymonpodeszwa/go-kvm-agent/pkg/peripheral"
 )
 
@@ -29,26 +27,26 @@ func CreatePeripheralFromConfig(ctx context.Context, config PeripheralConfig) (p
 			return nil, fmt.Errorf("decode ffmpeg-display-source config: %w", err)
 		}
 
-		ffmpegDisplaySource, err := ffmpeg.NewDisplaySource(ctx, ffmpegDisplaySourceConfig, ffmpeg.WithDisplaySourceLogger(logger))
+		ffmpegDisplaySource, err := ffmpeg.NewDisplaySource(ctx, ffmpegDisplaySourceConfig, config.Name, ffmpeg.WithDisplaySourceLogger(logger))
 		if err != nil {
 			return nil, fmt.Errorf("create ffmpeg-display-source peripheral: %w", err)
 		}
 
 		return ffmpegDisplaySource, nil
-	case mpv.WindowDriver:
-		gioWindowConfig := mpv.WindowConfig{}
+	case ffmpeg.DisplaySinkDriver:
+		ffmpegDisplaySinkConfig := ffmpeg.DisplaySinkConfig{}
 
-		err := mapstructure.Decode(config.Config, &gioWindowConfig)
+		err := mapstructure.Decode(config.Config, &ffmpegDisplaySinkConfig)
 		if err != nil {
-			return nil, fmt.Errorf("decode gio-window config: %w", err)
+			return nil, fmt.Errorf("decode ffmpeg-display-sink config: %w", err)
 		}
 
-		gioWindow, err := mpv.NewMPVWindow(ctx, gioWindowConfig)
+		ffmpegDisplaySink, err := ffmpeg.NewDisplaySink(ctx, ffmpegDisplaySinkConfig, config.Name, ffmpeg.WithDisplaySinkLogger(logger))
 		if err != nil {
-			return nil, fmt.Errorf("create gio-window peripheral: %w", err)
+			return nil, fmt.Errorf("create ffmpeg-display-sink peripheral: %w", err)
 		}
 
-		return gioWindow, nil
+		return ffmpegDisplaySink, nil
 	default:
 		return nil, fmt.Errorf("%w: %s", ErrUnsupportedPeripheralDriver, config.Driver)
 	}

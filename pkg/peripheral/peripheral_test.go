@@ -209,6 +209,66 @@ func TestValidatePeripheralCapabilities(t *testing.T) {
 		assert.NoError(t, err)
 	})
 
+	t.Run("validates keyboard source capability", func(t *testing.T) {
+		keyboardSource := NewKeyboardSourceMock(t)
+		keyboardSource.EXPECT().Capabilities().Return([]PeripheralCapability{KeyboardSourceCapability})
+
+		err := ValidatePeripheralCapabilities(keyboardSource)
+		assert.NoError(t, err)
+	})
+
+	t.Run("returns error when keyboard source capability validation fails", func(t *testing.T) {
+		keyboardSourceID := PeripheralId("keyboard-source")
+		capability := NewCapability[KeyboardSource](PeripheralKindKeyboard, PeripheralRoleSource)
+
+		mockedPeripheral := NewPeripheralMock(t)
+		mockedPeripheral.EXPECT().Id().Return(keyboardSourceID)
+		mockedPeripheral.EXPECT().Capabilities().Return([]PeripheralCapability{capability})
+
+		err := ValidatePeripheralCapabilities(mockedPeripheral)
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "keyboard-source")
+		assert.Contains(t, err.Error(), capability.String())
+	})
+
+	t.Run("validates keyboard sink capability", func(t *testing.T) {
+		keyboardSink := NewKeyboardSinkMock(t)
+		keyboardSink.EXPECT().Capabilities().Return([]PeripheralCapability{KeyboardSinkCapability})
+
+		err := ValidatePeripheralCapabilities(keyboardSink)
+		assert.NoError(t, err)
+	})
+
+	t.Run("returns error when keyboard sink capability validation fails", func(t *testing.T) {
+		keyboardSinkID := PeripheralId("keyboard-sink")
+		capability := NewCapability[KeyboardSink](PeripheralKindKeyboard, PeripheralRoleSink)
+
+		mockedPeripheral := NewPeripheralMock(t)
+		mockedPeripheral.EXPECT().Id().Return(keyboardSinkID)
+		mockedPeripheral.EXPECT().Capabilities().Return([]PeripheralCapability{capability})
+
+		err := ValidatePeripheralCapabilities(mockedPeripheral)
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "keyboard-sink")
+		assert.Contains(t, err.Error(), capability.String())
+	})
+
+	t.Run("validates mouse source capability", func(t *testing.T) {
+		mouseSource := NewMouseSourceMock(t)
+		mouseSource.EXPECT().Capabilities().Return([]PeripheralCapability{MouseSourceCapability})
+
+		err := ValidatePeripheralCapabilities(mouseSource)
+		assert.NoError(t, err)
+	})
+
+	t.Run("validates mouse sink capability", func(t *testing.T) {
+		mouseSink := NewMouseSinkMock(t)
+		mouseSink.EXPECT().Capabilities().Return([]PeripheralCapability{MouseSinkCapability})
+
+		err := ValidatePeripheralCapabilities(mouseSink)
+		assert.NoError(t, err)
+	})
+
 	t.Run("returns error when capability validation fails", func(t *testing.T) {
 		id := PeripheralId("mpv-sink")
 
@@ -235,8 +295,3 @@ func TestValidatePeripheralCapabilities(t *testing.T) {
 		assert.NoError(t, err)
 	})
 }
-
-// TODO: Add tests for keyboard source capability validation when KeyboardSource interface is stable
-// TODO: Add tests for keyboard sink capability validation when KeyboardSink interface is stable
-// TODO: Add tests for mouse source capability validation when MouseSource interface is stable
-// TODO: Add tests for mouse sink capability validation when MouseSink interface is stable

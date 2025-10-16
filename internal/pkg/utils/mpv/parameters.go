@@ -13,6 +13,8 @@ var (
 	NoTerminal              = newParameter[Flag]("no-terminal")
 	Title                   = newParameter[String]("title")
 	MsgLevel                = newParameter[MsgLevel_]("msg-level")
+	OpenGLEarlyFlush        = newParameter[Boolean]("opengl-early-flush")
+	SwapChainDepth          = newParameter[Integer]("swapchain-depth")
 	DemuxerRawVideoWidth    = newParameter[Integer]("demuxer-rawvideo-w")
 	DemuxerRawVideoHeight   = newParameter[Integer]("demuxer-rawvideo-h")
 	DemuxerRawVideoFps      = newParameter[Integer]("demuxer-rawvideo-fps")
@@ -48,7 +50,14 @@ func newParameter[T ParameterValue](key ParameterKey) TypedParameter[T] {
 }
 
 func (parameter TypedParameter[T]) Render(value T) RenderedParameter {
-	rendered := fmt.Sprintf("--%s=%s", parameter.key, value.String())
+	var rendered string
+
+	if len(value.String()) == 0 {
+		rendered = fmt.Sprintf("--%s", parameter.key)
+	} else {
+		rendered = fmt.Sprintf("--%s=%s", parameter.key, value.String())
+	}
+
 	return RenderedParameter{
 		key:      parameter.key,
 		rendered: rendered,

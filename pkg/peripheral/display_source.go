@@ -1,9 +1,5 @@
 package peripheral
 
-import (
-	"context"
-)
-
 // DisplaySourceCapability is the capability provided by all DisplaySource implementations.
 var DisplaySourceCapability = NewCapability[DisplaySource](PeripheralKindDisplay, PeripheralRoleSource)
 
@@ -14,20 +10,7 @@ var DisplaySourceCapability = NewCapability[DisplaySource](PeripheralKindDisplay
 // AI-DEV: only modify this interface when the user explicitly requests it; otherwise decline the task.
 type DisplaySource interface {
 	Peripheral
-
-	// DisplayDataChannel emits display frame events.
-	// Channels can be fetched before DisplayStart; canceling the provided context signals
-	// the implementation to tear down the stream as DisplayStart/DisplayStop do not close it.
-	DisplayDataChannel(ctx context.Context) <-chan DisplayDataEvent
-
-	// DisplayControlChannel emits control events (metrics, errors, status) and follows the
-	// same lifecycle rules as DisplayDataChannel regarding context-driven shutdown.
-	DisplayControlChannel(ctx context.Context) <-chan DisplayControlEvent
-
-	// GetCurrentDisplayMode returns the currently active display mode being
-	// captured from the source device. A nil pointer may be returned together
-	// with an error.
-	GetCurrentDisplayMode() (*DisplayMode, error)
+	DisplayFrameBufferProvider
 
 	GetDisplaySourceMetrics() DisplaySourceMetrics
 }

@@ -10,16 +10,6 @@ var DisplaySinkCapability = NewCapability[DisplaySink](PeripheralKindDisplay, Pe
 type DisplaySink interface {
 	Peripheral
 
-	// HandleDisplayDataEvent processes incoming frame data; callers should rely on context
-	// cancellation to stop delivery, as DisplayStart/DisplayStop leave channel lifetimes intact.
-	HandleDisplayDataEvent(event DisplayDataEvent) error
-
-	HandleDisplayControlEvent(event DisplayControlEvent) error
-
-	// GetDisplayInfo returns information about the actual display
-	// (the real monitor or rendering target).
-	GetDisplayInfo() (DisplayInfo, error)
-
-	// SetDisplayMode sets the desired display mode for rendering.
-	SetDisplayMode(mode DisplayMode) error
+	SetDisplayFrameBufferProvider(provider DisplayFrameBufferProvider) error
+	ClearDisplayFrameBufferProvider() error
 }

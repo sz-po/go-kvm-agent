@@ -6,56 +6,61 @@ import (
 	"sync"
 
 	peripheralSDK "github.com/szymonpodeszwa/go-kvm-agent/pkg/peripheral"
-	routing2 "github.com/szymonpodeszwa/go-kvm-agent/pkg/routing"
+	routingSDK "github.com/szymonpodeszwa/go-kvm-agent/pkg/routing"
 )
 
 type LocalDisplayRouterOpt func(*LocalDisplayRouter) error
 
 type LocalDisplayRouter struct {
-	sink     map[peripheralSDK.PeripheralId]peripheralSDK.DisplaySink
-	sinkLock sync.RWMutex
+	sinkIdIndex map[peripheralSDK.PeripheralId]peripheralSDK.DisplaySink
+	sinkLock    *sync.RWMutex
 
-	source     map[peripheralSDK.PeripheralId]peripheralSDK.DisplaySource
-	sourceLock sync.RWMutex
+	sourceIdIndex map[peripheralSDK.PeripheralId]peripheralSDK.DisplaySource
+	sourceLock    *sync.RWMutex
 
-	connectionSource map[peripheralSDK.DisplaySink]peripheralSDK.DisplaySource
-	connectionCancel map[peripheralSDK.DisplaySink]context.CancelCauseFunc
-	connectionLock   sync.RWMutex
+	sinkConnection       map[peripheralSDK.DisplaySink]peripheralSDK.DisplaySource
+	sinkConnectionCancel map[peripheralSDK.DisplaySink]context.CancelCauseFunc
+	sinkConnectionLock   *sync.RWMutex
 }
 
 func WithDisplaySink(displaySink peripheralSDK.DisplaySink) LocalDisplayRouterOpt {
 	return func(router *LocalDisplayRouter) error {
-		if _, exists := router.sink[displaySink.Id()]; exists {
-			return routing2.ErrDisplaySinkAlreadyRegistered
+		displaySinkId := displaySink.GetId()
+
+		if _, exists := router.sinkIdIndex[displaySinkId]; exists {
+			return fmt.Errorf("%w: duplicate sink id: %s", routingSDK.ErrDisplaySinkAlreadyRegistered, displaySinkId)
 		}
 
-		router.sink[displaySink.Id()] = displaySink
+		router.sinkIdIndex[displaySinkId] = displaySink
+
 		return nil
 	}
 }
 
 func WithDisplaySource(displaySource peripheralSDK.DisplaySource) LocalDisplayRouterOpt {
 	return func(router *LocalDisplayRouter) error {
-		if _, exists := router.source[displaySource.Id()]; exists {
-			return routing2.ErrDisplaySourceAlreadyRegistered
+		displaySourceId := displaySource.GetId()
+
+		if _, exists := router.sourceIdIndex[displaySourceId]; exists {
+			return fmt.Errorf("%w: duplicate source id: %s", routingSDK.ErrDisplaySourceAlreadyRegistered, displaySourceId)
 		}
 
-		router.source[displaySource.Id()] = displaySource
+		router.sourceIdIndex[displaySourceId] = displaySource
+
 		return nil
 	}
 }
 
 func NewLocalDisplayRouter(opts ...LocalDisplayRouterOpt) (*LocalDisplayRouter, error) {
 	router := &LocalDisplayRouter{
-		sink:     make(map[peripheralSDK.PeripheralId]peripheralSDK.DisplaySink),
-		sinkLock: sync.RWMutex{},
+		sinkIdIndex: make(map[peripheralSDK.PeripheralId]peripheralSDK.DisplaySink),
+		sinkLock:    &sync.RWMutex{},
 
-		source:     make(map[peripheralSDK.PeripheralId]peripheralSDK.DisplaySource),
-		sourceLock: sync.RWMutex{},
+		sourceIdIndex: make(map[peripheralSDK.PeripheralId]peripheralSDK.DisplaySource),
+		sourceLock:    &sync.RWMutex{},
 
-		connectionSource: make(map[peripheralSDK.DisplaySink]peripheralSDK.DisplaySource),
-		connectionCancel: make(map[peripheralSDK.DisplaySink]context.CancelCauseFunc),
-		connectionLock:   sync.RWMutex{},
+		sinkConnection:     make(map[peripheralSDK.DisplaySink]peripheralSDK.DisplaySource),
+		sinkConnectionLock: &sync.RWMutex{},
 	}
 
 	for _, opt := range opts {
@@ -67,35 +72,30 @@ func NewLocalDisplayRouter(opts ...LocalDisplayRouterOpt) (*LocalDisplayRouter, 
 	return router, nil
 }
 
-func (router *LocalDisplayRouter) Connect(sourceId peripheralSDK.PeripheralId, sinkId peripheralSDK.PeripheralId) error {
+func (router *LocalDisplayRouter) Connect(ctx context.Context, sourceId peripheralSDK.PeripheralId, sinkId peripheralSDK.PeripheralId) error {
 	displaySink, err := router.getDisplaySinkById(sinkId)
 	if err != nil {
-		return fmt.Errorf("get display sink: %w", err)
+		return fmt.Errorf("get display sinkIdIndex: %w", err)
 	}
 
 	displaySource, err := router.getDisplaySourceById(sourceId)
 	if err != nil {
-		return fmt.Errorf("get display source: %w", err)
-	}
-
-	if router.hasConnectedDisplaySourceSource(displaySink) {
-		return routing2.ErrDisplaySourceAlreadyConnected
+		return fmt.Errorf("get display sourceIdIndex: %w", err)
 	}
 
 	err = router.connectDisplaySource(displaySink, displaySource)
 	if err != nil {
-		return fmt.Errorf("connect display source: %w", err)
+		return fmt.Errorf("connect display sourceIdIndex: %w", err)
 	}
 
 	return nil
 }
 
-func (router *LocalDisplayRouter) DisconnectSink(sinkId peripheralSDK.PeripheralId) error {
-	//TODO implement me
+func (router *LocalDisplayRouter) DisconnectSink(ctx context.Context, sinkId peripheralSDK.PeripheralId) error {
 	panic("implement me")
 }
 
-func (router *LocalDisplayRouter) DisconnectSource(sourceId peripheralSDK.PeripheralId) error {
+func (router *LocalDisplayRouter) DisconnectSource(ctx context.Context, sourceId peripheralSDK.PeripheralId) error {
 	//TODO implement me
 	panic("implement me")
 }
@@ -104,9 +104,9 @@ func (router *LocalDisplayRouter) getDisplaySinkById(sinkId peripheralSDK.Periph
 	router.sinkLock.RLock()
 	defer router.sinkLock.RUnlock()
 
-	displaySink, exists := router.sink[sinkId]
+	displaySink, exists := router.sinkIdIndex[sinkId]
 	if !exists {
-		return nil, routing2.ErrDisplaySinkNotRegistered
+		return nil, routingSDK.ErrDisplaySinkNotRegistered
 	}
 
 	return displaySink, nil
@@ -116,75 +116,40 @@ func (router *LocalDisplayRouter) getDisplaySourceById(sourceId peripheralSDK.Pe
 	router.sourceLock.RLock()
 	defer router.sourceLock.RUnlock()
 
-	displaySource, exists := router.source[sourceId]
+	displaySource, exists := router.sourceIdIndex[sourceId]
 	if !exists {
-		return nil, routing2.ErrDisplaySourceNotRegistered
+		return nil, routingSDK.ErrDisplaySourceNotRegistered
 	}
 
 	return displaySource, nil
 }
 
-func (router *LocalDisplayRouter) hasConnectedDisplaySourceSource(displaySink peripheralSDK.DisplaySink) bool {
-	router.connectionLock.RLock()
-	defer router.connectionLock.RUnlock()
-
-	_, connected := router.source[displaySink.Id()]
-	return connected
-}
-
 func (router *LocalDisplayRouter) getConnectedDisplaySource(displaySink peripheralSDK.DisplaySink) (peripheralSDK.DisplaySource, error) {
-	router.connectionLock.RLock()
-	defer router.connectionLock.RUnlock()
+	router.sinkConnectionLock.RLock()
+	defer router.sinkConnectionLock.RUnlock()
 
-	displaySource, connected := router.connectionSource[displaySink]
+	displaySource, connected := router.sinkConnection[displaySink]
 	if !connected {
-		return nil, routing2.ErrDisplaySourceNotConnected
+		return nil, routingSDK.ErrDisplaySourceNotConnected
 	}
 
 	return displaySource, nil
 }
 
 func (router *LocalDisplayRouter) connectDisplaySource(displaySink peripheralSDK.DisplaySink, displaySource peripheralSDK.DisplaySource) error {
-	initialDisplayMode, err := displaySource.GetCurrentDisplayMode()
-	if err != nil {
-		return fmt.Errorf("display source: get display mode: %w", err)
+	router.sinkConnectionLock.Lock()
+	defer router.sinkConnectionLock.Unlock()
+
+	if _, isConnected := router.sinkConnection[displaySink]; isConnected {
+		return routingSDK.ErrDisplaySinkAlreadyConnectedToSource
 	}
 
-	err = displaySink.SetDisplayMode(*initialDisplayMode)
+	err := displaySink.SetDisplayFrameBufferProvider(displaySource)
 	if err != nil {
-		return fmt.Errorf("display sink: set display mode: %w", err)
+		return fmt.Errorf("set sink display frame buffer provider: %w", err)
 	}
 
-	router.connectionLock.Lock()
-	defer router.connectionLock.Unlock()
-
-	ctx, cancel := context.WithCancelCause(context.Background())
-	router.connectionCancel[displaySink] = cancel
-
-	displayDataChannel := displaySource.DisplayDataChannel(ctx)
-	displayControlChannel := displaySource.DisplayControlChannel(ctx)
-
-	go func() {
-		for {
-			select {
-			case <-ctx.Done():
-				router.connectionLock.Lock()
-				delete(router.connectionCancel, displaySink)
-				router.connectionLock.Unlock()
-				return
-			case dataEvent := <-displayDataChannel:
-				err = displaySink.HandleDisplayDataEvent(dataEvent)
-				if err != nil {
-					fmt.Println("error handling display data event: ", err)
-				}
-			case controlEvent := <-displayControlChannel:
-				err = displaySink.HandleDisplayControlEvent(controlEvent)
-				if err != nil {
-					fmt.Println("error handling display control event: ", err)
-				}
-			}
-		}
-	}()
+	router.sinkConnection[displaySink] = displaySource
 
 	return nil
 }

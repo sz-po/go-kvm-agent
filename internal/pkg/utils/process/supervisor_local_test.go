@@ -796,7 +796,8 @@ func TestReload_NewProcessExitsBeforeStability(t *testing.T) {
 	err = supervisor.Reload(ctx, 100*time.Millisecond)
 	assert.Error(t, err)
 	assert.ErrorIs(t, err, ErrFailedToStart)
-	assert.Contains(t, err.Error(), "new process exited")
+	assert.Contains(t, err.Error(), "new process")
+	assert.Contains(t, err.Error(), "exited")
 
 	// Verify supervisor is in idle state
 	status := supervisor.Status()

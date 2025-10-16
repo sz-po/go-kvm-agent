@@ -35,17 +35,21 @@ func main() {
 
 	config, err := loadConfigFromPath(parameters.ConfigPath)
 	if err != nil {
-		slog.Error("Failed to load config from path.", slog.String("configPath", parameters.ConfigPath))
+		slog.Error("Failed to load config from path.",
+			slog.String("configPath", parameters.ConfigPath),
+			slog.String("error", err.Error()),
+		)
 		os.Exit(ExitErrorConfigLoad)
 	}
 
 	if parameters.Machine.ConfigPath != nil {
 		machinesConfig, err := loadMachineConfigFromPath(*parameters.Machine.ConfigPath)
 		if err != nil {
-			slog.Error("Failed to load machine config from path.",
+			slog.Error("Failed to load config from path.",
 				slog.String("configPath", *parameters.Machine.ConfigPath),
 				slog.String("error", err.Error()),
 			)
+			os.Exit(ExitErrorConfigLoad)
 		}
 		for _, machineConfig := range machinesConfig {
 			config.Machines = append(config.Machines, machineConfig)
