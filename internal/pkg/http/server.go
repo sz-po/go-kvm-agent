@@ -17,9 +17,7 @@ type ServerConfig struct {
 	ListenPort int    `json:"listenPort" default:"8080"`
 }
 
-type ServerHandler interface {
-	Register(router chi.Router)
-}
+type ServerHandler func(router chi.Router)
 
 type ServerMiddleware interface {
 	Handle(http.Handler) http.Handler
@@ -27,7 +25,7 @@ type ServerMiddleware interface {
 
 func WithHandler(handler ServerHandler) ServerOpt {
 	return func(router chi.Router) {
-		handler.Register(router)
+		handler(router)
 		slog.Debug("Registered HTTP server handler.")
 	}
 }

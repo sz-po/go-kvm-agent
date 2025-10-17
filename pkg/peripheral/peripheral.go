@@ -55,8 +55,8 @@ type PeripheralValidationFn func(peripheral Peripheral) error
 
 // PeripheralCapability describes what a peripheral can do.
 type PeripheralCapability struct {
-	Kind         PeripheralKind
-	Role         PeripheralRole
+	Kind         PeripheralKind `json:"kind"`
+	Role         PeripheralRole `json:"role"`
 	validationFn PeripheralValidationFn
 }
 

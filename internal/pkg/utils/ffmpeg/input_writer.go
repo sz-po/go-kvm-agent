@@ -164,4 +164,4 @@ func (input *InputWriter) controlLoop(ctx context.Context) {
 	}
 }
 
-var ErrInputWriterNotConnected = errors.New("input writer is not connected")
+var ErrInputWriterNotConnected = errors.New("input writer not connected")

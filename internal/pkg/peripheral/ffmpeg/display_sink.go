@@ -164,7 +164,7 @@ func (sink *DisplaySink) GetDisplayInfo() (peripheralSDK.DisplayInfo, error) {
 }
 
 func (sink *DisplaySink) SetDisplayFrameBufferProvider(provider peripheralSDK.DisplayFrameBufferProvider) error {
-	providerDisplayMode, err := provider.GetDisplayMode()
+	providerDisplayMode, err := provider.GetDisplayMode(sink.lifecycleCtx)
 	if err != nil {
 		return fmt.Errorf("get display mode from provider: %w", err)
 	}
@@ -178,7 +178,7 @@ func (sink *DisplaySink) SetDisplayFrameBufferProvider(provider peripheralSDK.Di
 		return ErrDisplayUnsupportedDisplayMode
 	}
 
-	if provider.GetDisplayPixelFormat() != peripheralSDK.DisplayPixelFormatRGB24 {
+	if provider.GetDisplayPixelFormat(sink.lifecycleCtx) != peripheralSDK.DisplayPixelFormatRGB24 {
 		return ErrDisplayPixelFormatUnsupported
 	}
 
@@ -246,7 +246,7 @@ func (sink *DisplaySink) writeFrameFromProvider() error {
 		return nil
 	}
 
-	frameBuffer, err := sink.frameBufferProvider.GetDisplayFrameBuffer()
+	frameBuffer, err := sink.frameBufferProvider.GetDisplayFrameBuffer(sink.lifecycleCtx)
 	sink.frameBufferProviderLock.RUnlock()
 
 	if err != nil {

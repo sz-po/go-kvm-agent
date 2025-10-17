@@ -24,7 +24,11 @@ func NewDisplaySourceMessageBoardInput(config DisplaySourceMessageBoardInputConf
 }
 
 func (input *DisplaySourceMessageBoardInput) Parameters() []string {
-	return input.messageBoard.Parameters()
+	parameters := input.messageBoard.Parameters()
+
+	parameters = append([]string{"-re"}, parameters...)
+
+	return parameters
 }
 
 func (input *DisplaySourceMessageBoardInput) GetDisplayMode() (peripheralSDK.DisplayMode, error) {

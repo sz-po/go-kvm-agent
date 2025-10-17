@@ -1,6 +1,7 @@
 package peripheral
 
 import (
+	"context"
 	"errors"
 	"io"
 
@@ -43,14 +44,14 @@ type DisplayFrameBufferProvider interface {
 	// GetDisplayFrameBuffer returns buffer with current frame. Caller is responsible for
 	// releasing buffer to the pool. It may return ErrDisplayFrameBufferNotReady if no frame buffer
 	// is available.
-	GetDisplayFrameBuffer() (*DisplayFrameBuffer, error)
+	GetDisplayFrameBuffer(ctx context.Context) (*DisplayFrameBuffer, error)
 
 	// GetDisplayMode returns current display mode, or error if for some reason is not possible
 	// to read current display mode.
-	GetDisplayMode() (*DisplayMode, error)
+	GetDisplayMode(ctx context.Context) (*DisplayMode, error)
 
 	// GetDisplayPixelFormat returns pixel format used in frame buffer.
-	GetDisplayPixelFormat() DisplayPixelFormat
+	GetDisplayPixelFormat(ctx context.Context) DisplayPixelFormat
 }
 
-var ErrDisplayFrameBufferNotReady = errors.New("display frame buffer is not ready")
+var ErrDisplayFrameBufferNotReady = errors.New("display frame buffer not ready")

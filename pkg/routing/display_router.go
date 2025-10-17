@@ -23,5 +23,5 @@ var ErrDisplaySourceAlreadyRegistered = errors.New("display source already regis
 var ErrDisplaySinkNotRegistered = errors.New("display sink not registered")
 var ErrDisplaySinkAlreadyRegistered = errors.New("display sink already registered")
 var ErrDisplaySinkNotConnected = errors.New("display sink not connected")
-var ErrDisplaySourceNotConnected = errors.New("display source not linked")
+var ErrDisplaySourceNotConnected = errors.New("display source not connected")
 var ErrDisplaySinkAlreadyConnectedToSource = errors.New("display sink already connected to source")

@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/szymonpodeszwa/go-kvm-agent/internal/pkg/api/handler"
+	"github.com/szymonpodeszwa/go-kvm-agent/internal/pkg/api/handler/machine"
+	"github.com/szymonpodeszwa/go-kvm-agent/internal/pkg/api/handler/router"
 	"github.com/szymonpodeszwa/go-kvm-agent/internal/pkg/http"
 	internalMachine "github.com/szymonpodeszwa/go-kvm-agent/internal/pkg/machine"
 	"github.com/szymonpodeszwa/go-kvm-agent/internal/pkg/memory"
@@ -41,7 +42,8 @@ func Start(ctx context.Context, wg *sync.WaitGroup, config Config) error {
 	}
 
 	err = http.Listen(ctx, config.Api.ControlApi.Server,
-		http.WithHandler(handler.NewDisplayRouterConnect(displayRouter, machinesRepository)),
+		http.WithHandler(router.HandlerProvider(displayRouter, machinesRepository)),
+		http.WithHandler(machine.HandlerProvider(machinesRepository)),
 	)
 	if err != nil {
 		return fmt.Errorf("control api: http server: listen: %w", err)

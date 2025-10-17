@@ -1,0 +1,2 @@
+### Get machine peripheral lsit by machine name and peripheral name
+GET http://127.0.0.1:8080/machine/name:ffmpeg-display-sink/peripheral/name:ffmpeg-display-sink

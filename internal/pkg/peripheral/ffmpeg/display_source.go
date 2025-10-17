@@ -181,15 +181,15 @@ func (source *DisplaySource) Terminate(ctx context.Context) error {
 }
 
 // GetDisplayMode returns the current display mode configuration.
-func (source *DisplaySource) GetDisplayMode() (*peripheralSDK.DisplayMode, error) {
+func (source *DisplaySource) GetDisplayMode(ctx context.Context) (*peripheralSDK.DisplayMode, error) {
 	return &source.displayMode, nil
 }
 
-func (source *DisplaySource) GetDisplayPixelFormat() peripheralSDK.DisplayPixelFormat {
+func (source *DisplaySource) GetDisplayPixelFormat(ctx context.Context) peripheralSDK.DisplayPixelFormat {
 	return source.pixelFormat
 }
 
-func (source *DisplaySource) GetDisplayFrameBuffer() (*peripheralSDK.DisplayFrameBuffer, error) {
+func (source *DisplaySource) GetDisplayFrameBuffer(ctx context.Context) (*peripheralSDK.DisplayFrameBuffer, error) {
 	source.frameBufferLock.RLock()
 	defer source.frameBufferLock.RUnlock()
 
