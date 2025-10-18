@@ -14,7 +14,7 @@ func TestParsePath(t *testing.T) {
 	t.Run("returns empty path when no route context", func(t *testing.T) {
 		request := httptest.NewRequest(http.MethodGet, "/test", nil)
 
-		result := parsePath(request)
+		result := parsePathParams(request)
 
 		assert.Empty(t, result)
 	})
@@ -29,7 +29,7 @@ func TestParsePath(t *testing.T) {
 		ctx := context.WithValue(request.Context(), chi.RouteCtxKey, routeContext)
 		request = request.WithContext(ctx)
 
-		result := parsePath(request)
+		result := parsePathParams(request)
 
 		assert.Equal(t, "value1", result["key1"])
 		assert.Equal(t, "value2", result["key2"])

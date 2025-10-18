@@ -178,7 +178,12 @@ func (sink *DisplaySink) SetDisplayFrameBufferProvider(provider peripheralSDK.Di
 		return ErrDisplayUnsupportedDisplayMode
 	}
 
-	if provider.GetDisplayPixelFormat(sink.lifecycleCtx) != peripheralSDK.DisplayPixelFormatRGB24 {
+	pixelFormat, err := provider.GetDisplayPixelFormat(sink.lifecycleCtx)
+	if err != nil {
+		return fmt.Errorf("get display pixel format: %w", err)
+	}
+
+	if *pixelFormat != peripheralSDK.DisplayPixelFormatRGB24 {
 		return ErrDisplayPixelFormatUnsupported
 	}
 

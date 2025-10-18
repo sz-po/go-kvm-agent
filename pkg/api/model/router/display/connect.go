@@ -11,6 +11,10 @@ import (
 	"github.com/szymonpodeszwa/go-kvm-agent/pkg/api/transport"
 )
 
+const (
+	ConnectEndpointName = "connect"
+)
+
 type ConnectRequestBody struct {
 	DisplaySource struct {
 		MachineIdentifier    machine.MachineIdentifier       `json:"machineIdentifier"`

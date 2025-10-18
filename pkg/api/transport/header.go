@@ -3,18 +3,38 @@ package transport
 import (
 	"errors"
 	"fmt"
+	"strings"
 )
 
 type Header map[string]string
 
+func (header Header) Get(key string) string {
+	normalizedKey := strings.ToLower(key)
+	return header[normalizedKey]
+}
+
 func (header Header) Require(keys ...string) error {
 	for _, key := range keys {
-		if _, ok := header[key]; !ok {
+		normalizedKey := strings.ToLower(key)
+		if _, ok := header[normalizedKey]; !ok {
 			return fmt.Errorf("%w: %s", ErrMissingHeaderKey, key)
 		}
 	}
 
 	return nil
+}
+
+func (header Header) Clone() Header {
+	if header == nil {
+		return nil
+	}
+
+	clone := make(Header, len(header))
+	for key, value := range header {
+		clone[key] = value
+	}
+
+	return clone
 }
 
 var ErrMissingHeaderKey = errors.New("missing header key")

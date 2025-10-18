@@ -25,13 +25,13 @@ func TestParseGetDisplayModeRequestPath(t *testing.T) {
 
 	testCases := []struct {
 		name    string
-		path    transport.Path
+		path    transport.PathParams
 		want    *GetDisplayModeRequestPath
 		wantErr string
 	}{
 		{
 			name: "machine and peripheral by id",
-			path: transport.Path{
+			path: transport.PathParams{
 				"machineIdentifier":    "id:machine-1",
 				"peripheralIdentifier": "id:peripheral-1",
 			},
@@ -42,7 +42,7 @@ func TestParseGetDisplayModeRequestPath(t *testing.T) {
 		},
 		{
 			name: "machine and peripheral by name",
-			path: transport.Path{
+			path: transport.PathParams{
 				"machineIdentifier":    "name:machine-name",
 				"peripheralIdentifier": "name:peripheral-name",
 			},
@@ -53,21 +53,21 @@ func TestParseGetDisplayModeRequestPath(t *testing.T) {
 		},
 		{
 			name: "missing machine identifier",
-			path: transport.Path{
+			path: transport.PathParams{
 				"peripheralIdentifier": "id:peripheral-1",
 			},
-			wantErr: "missing path key: machineIdentifier",
+			wantErr: "missing path param key: machineIdentifier",
 		},
 		{
 			name: "missing peripheral identifier",
-			path: transport.Path{
+			path: transport.PathParams{
 				"machineIdentifier": "id:machine-1",
 			},
-			wantErr: "missing path key: peripheralIdentifier",
+			wantErr: "missing path param key: peripheralIdentifier",
 		},
 		{
 			name: "invalid machine identifier prefix",
-			path: transport.Path{
+			path: transport.PathParams{
 				"machineIdentifier":    "uuid:machine-1",
 				"peripheralIdentifier": "id:peripheral-1",
 			},
@@ -75,7 +75,7 @@ func TestParseGetDisplayModeRequestPath(t *testing.T) {
 		},
 		{
 			name: "invalid peripheral identifier prefix",
-			path: transport.Path{
+			path: transport.PathParams{
 				"machineIdentifier":    "id:machine-1",
 				"peripheralIdentifier": "uuid:peripheral-1",
 			},
@@ -118,7 +118,7 @@ func TestParseGetDisplayModeRequest(t *testing.T) {
 		{
 			name: "valid request with machine and peripheral by id",
 			request: transport.Request{
-				Path: transport.Path{
+				PathParam: transport.PathParams{
 					"machineIdentifier":    "id:machine-1",
 					"peripheralIdentifier": "id:peripheral-1",
 				},
@@ -133,25 +133,25 @@ func TestParseGetDisplayModeRequest(t *testing.T) {
 		{
 			name: "invalid request with missing machine identifier",
 			request: transport.Request{
-				Path: transport.Path{
+				PathParam: transport.PathParams{
 					"peripheralIdentifier": "id:peripheral-1",
 				},
 			},
-			wantErr: "parse path: missing path key: machineIdentifier",
+			wantErr: "parse path: missing path param key: machineIdentifier",
 		},
 		{
 			name: "invalid request with missing peripheral identifier",
 			request: transport.Request{
-				Path: transport.Path{
+				PathParam: transport.PathParams{
 					"machineIdentifier": "id:machine-1",
 				},
 			},
-			wantErr: "parse path: missing path key: peripheralIdentifier",
+			wantErr: "parse path: missing path param key: peripheralIdentifier",
 		},
 		{
 			name: "invalid request with invalid machine identifier",
 			request: transport.Request{
-				Path: transport.Path{
+				PathParam: transport.PathParams{
 					"machineIdentifier":    "invalid",
 					"peripheralIdentifier": "id:peripheral-1",
 				},
@@ -161,7 +161,7 @@ func TestParseGetDisplayModeRequest(t *testing.T) {
 		{
 			name: "invalid request with invalid peripheral identifier",
 			request: transport.Request{
-				Path: transport.Path{
+				PathParam: transport.PathParams{
 					"machineIdentifier":    "id:machine-1",
 					"peripheralIdentifier": "invalid",
 				},

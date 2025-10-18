@@ -4,6 +4,9 @@ filename: "{{.InterfaceName | snakecase}}_mock.go"
 structname: '{{.InterfaceName}}Mock'
 inpackage: true
 packages:
+  github.com/szymonpodeszwa/go-kvm-agent/pkg/api/client:
+    interfaces:
+      RoundTripper:
   github.com/szymonpodeszwa/go-kvm-agent/pkg/peripheral:
     interfaces:
       Peripheral:

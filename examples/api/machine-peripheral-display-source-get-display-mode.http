@@ -1,2 +1,2 @@
 ### Get display source display mode
-GET http://127.0.0.1:8080/machine/name:ffmpeg-display-source/peripheral/name:ffmpeg-display-source/display-source/display-mode
+GET http://{{ipAddress}}:8080/machine/name:local/peripheral/name:display-source/display-source/display-mode

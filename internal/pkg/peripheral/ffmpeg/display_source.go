@@ -30,6 +30,9 @@ type DisplaySourceInput interface {
 
 // DisplaySourceConfig holds configuration for creating an FFMPEG display source.
 type DisplaySourceConfig struct {
+	Executable struct {
+		Path *string `json:"path"`
+	} `json:"executable"`
 	Input DisplaySourceInputConfig `json:"input"`
 }
 
@@ -112,7 +115,15 @@ func NewDisplaySource(ctx context.Context, config DisplaySourceConfig, name peri
 		"ppm",
 	}
 
-	ffmpegController, err := ffmpeg.NewFFmpegController(ffmpegInput, ffmpegOutput, ffmpegConfig, ffmpeg.WithFFmpegLogger(logger))
+	ffmpegControllerOpts := []ffmpeg.FFmpegControlerOpt{
+		ffmpeg.WithFFmpegLogger(logger),
+	}
+
+	if config.Executable.Path != nil {
+		ffmpegControllerOpts = append(ffmpegControllerOpts, ffmpeg.WithFFmpegExecutablePath(*config.Executable.Path))
+	}
+
+	ffmpegController, err := ffmpeg.NewFFmpegController(ffmpegInput, ffmpegOutput, ffmpegConfig, ffmpegControllerOpts...)
 	if err != nil {
 		return nil, fmt.Errorf("error creating ffmpeg controller: %w", err)
 	}
@@ -185,8 +196,8 @@ func (source *DisplaySource) GetDisplayMode(ctx context.Context) (*peripheralSDK
 	return &source.displayMode, nil
 }
 
-func (source *DisplaySource) GetDisplayPixelFormat(ctx context.Context) peripheralSDK.DisplayPixelFormat {
-	return source.pixelFormat
+func (source *DisplaySource) GetDisplayPixelFormat(ctx context.Context) (*peripheralSDK.DisplayPixelFormat, error) {
+	return &source.pixelFormat, nil
 }
 
 func (source *DisplaySource) GetDisplayFrameBuffer(ctx context.Context) (*peripheralSDK.DisplayFrameBuffer, error) {

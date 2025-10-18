@@ -86,6 +86,10 @@ func (pc PeripheralCapability) Validate(peripheral Peripheral) error {
 	return pc.validationFn(peripheral)
 }
 
+func (pc PeripheralCapability) Equals(test PeripheralCapability) bool {
+	return pc.Kind == test.Kind && pc.Role == test.Role
+}
+
 // PeripheralName uniquely identifies a peripheral device.
 type PeripheralName string
 

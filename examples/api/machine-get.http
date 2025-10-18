@@ -1,5 +1,2 @@
 ### Get machine by name
-GET http://127.0.0.1:8080/machine/name:ffmpeg-display-sink
-
-### Get machine by id
-GET http://127.0.0.1:8080/machine/id:4145fb0f-c86b-4647-b09e-45a2c7a57cbc
+GET http://{{ipAddress}}:8080/machine/name:local

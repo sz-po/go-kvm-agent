@@ -44,7 +44,7 @@ func listHandler(machineRepository machineSDK.Repository) http.HandlerFunc {
 
 		transport.WriteResponse(w, r, &machineAPI.ListResponse{
 			Body: machineAPI.ListResponseBody{
-				Result:     result,
+				Machines:   result,
 				TotalCount: len(result),
 			},
 		})

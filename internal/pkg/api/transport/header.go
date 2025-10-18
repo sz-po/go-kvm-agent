@@ -1,13 +1,16 @@
 package transport
 
-import "net/http"
+import (
+	"net/http"
+	"strings"
+)
 
-func parseHeader(request *http.Request) map[string]string {
+func parseHeaders(request *http.Request) map[string]string {
 	header := make(map[string]string)
 
 	for key, values := range request.Header {
 		if len(values) > 0 {
-			header[key] = values[0]
+			header[strings.ToLower(key)] = values[0]
 		}
 	}
 

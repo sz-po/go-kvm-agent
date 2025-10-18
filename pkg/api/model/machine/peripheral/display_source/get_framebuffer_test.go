@@ -1,8 +1,11 @@
 package display_source
 
 import (
+	"bytes"
+	"io"
 	"testing"
 
+	"github.com/elnormous/contenttype"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/szymonpodeszwa/go-kvm-agent/pkg/api/model/machine"
@@ -25,13 +28,13 @@ func TestParseGetFramebufferRequestPath(t *testing.T) {
 
 	testCases := []struct {
 		name    string
-		path    transport.Path
+		path    transport.PathParams
 		want    *GetFramebufferRequestPath
 		wantErr string
 	}{
 		{
 			name: "machine and peripheral by id",
-			path: transport.Path{
+			path: transport.PathParams{
 				"machineIdentifier":    "id:machine-1",
 				"peripheralIdentifier": "id:peripheral-1",
 			},
@@ -42,7 +45,7 @@ func TestParseGetFramebufferRequestPath(t *testing.T) {
 		},
 		{
 			name: "machine and peripheral by name",
-			path: transport.Path{
+			path: transport.PathParams{
 				"machineIdentifier":    "name:machine-name",
 				"peripheralIdentifier": "name:peripheral-name",
 			},
@@ -53,21 +56,21 @@ func TestParseGetFramebufferRequestPath(t *testing.T) {
 		},
 		{
 			name: "missing machine identifier",
-			path: transport.Path{
+			path: transport.PathParams{
 				"peripheralIdentifier": "id:peripheral-1",
 			},
-			wantErr: "missing path key: machineIdentifier",
+			wantErr: "missing path param key: machineIdentifier",
 		},
 		{
 			name: "missing peripheral identifier",
-			path: transport.Path{
+			path: transport.PathParams{
 				"machineIdentifier": "id:machine-1",
 			},
-			wantErr: "missing path key: peripheralIdentifier",
+			wantErr: "missing path param key: peripheralIdentifier",
 		},
 		{
 			name: "invalid machine identifier prefix",
-			path: transport.Path{
+			path: transport.PathParams{
 				"machineIdentifier":    "uuid:machine-1",
 				"peripheralIdentifier": "id:peripheral-1",
 			},
@@ -75,7 +78,7 @@ func TestParseGetFramebufferRequestPath(t *testing.T) {
 		},
 		{
 			name: "invalid peripheral identifier prefix",
-			path: transport.Path{
+			path: transport.PathParams{
 				"machineIdentifier":    "id:machine-1",
 				"peripheralIdentifier": "uuid:peripheral-1",
 			},
@@ -118,9 +121,12 @@ func TestParseGetFramebufferRequest(t *testing.T) {
 		{
 			name: "valid request with machine and peripheral by id",
 			request: transport.Request{
-				Path: transport.Path{
+				PathParam: transport.PathParams{
 					"machineIdentifier":    "id:machine-1",
 					"peripheralIdentifier": "id:peripheral-1",
+				},
+				Header: transport.Header{
+					transport.HeaderAccept: "application/x-rgb24",
 				},
 			},
 			want: &GetFramebufferRequest{
@@ -128,32 +134,45 @@ func TestParseGetFramebufferRequest(t *testing.T) {
 					MachineIdentifier:    machine.MachineIdentifier{Id: &machineId},
 					PeripheralIdentifier: peripheral.PeripheralIdentifier{Id: &peripheralId},
 				},
+				Headers: GetFramebufferRequestHeaders{
+					Accept: "application/x-rgb24",
+				},
+				MediaType: FramebufferMediaTypeRGB24,
 			},
 		},
 		{
 			name: "invalid request with missing machine identifier",
 			request: transport.Request{
-				Path: transport.Path{
+				PathParam: transport.PathParams{
 					"peripheralIdentifier": "id:peripheral-1",
 				},
+				Header: transport.Header{
+					transport.HeaderAccept: "application/x-rgb24",
+				},
 			},
-			wantErr: "parse path: missing path key: machineIdentifier",
+			wantErr: "parse path: missing path param key: machineIdentifier",
 		},
 		{
 			name: "invalid request with missing peripheral identifier",
 			request: transport.Request{
-				Path: transport.Path{
+				PathParam: transport.PathParams{
 					"machineIdentifier": "id:machine-1",
 				},
+				Header: transport.Header{
+					transport.HeaderAccept: "application/x-rgb24",
+				},
 			},
-			wantErr: "parse path: missing path key: peripheralIdentifier",
+			wantErr: "parse path: missing path param key: peripheralIdentifier",
 		},
 		{
 			name: "invalid request with invalid machine identifier",
 			request: transport.Request{
-				Path: transport.Path{
+				PathParam: transport.PathParams{
 					"machineIdentifier":    "invalid",
 					"peripheralIdentifier": "id:peripheral-1",
+				},
+				Header: transport.Header{
+					transport.HeaderAccept: "application/x-rgb24",
 				},
 			},
 			wantErr: "parse path: parse machine identifier: missing identifier type",
@@ -161,9 +180,12 @@ func TestParseGetFramebufferRequest(t *testing.T) {
 		{
 			name: "invalid request with invalid peripheral identifier",
 			request: transport.Request{
-				Path: transport.Path{
+				PathParam: transport.PathParams{
 					"machineIdentifier":    "id:machine-1",
 					"peripheralIdentifier": "invalid",
+				},
+				Header: transport.Header{
+					transport.HeaderAccept: "application/x-rgb24",
 				},
 			},
 			wantErr: "parse path: parse peripheral identifier: missing identifier type",
@@ -172,7 +194,7 @@ func TestParseGetFramebufferRequest(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
-			request, err := ParseGetFramebufferRequest(testCase.request)
+			request, err := ParseGetFramebufferRequest(testCase.request, []contenttype.MediaType{FramebufferMediaTypeRGB24})
 
 			if testCase.wantErr != "" {
 				assert.Error(t, err)
@@ -185,7 +207,119 @@ func TestParseGetFramebufferRequest(t *testing.T) {
 			if assert.NotNil(t, request) {
 				assert.Equal(t, testCase.want.Path.MachineIdentifier, request.Path.MachineIdentifier)
 				assert.Equal(t, testCase.want.Path.PeripheralIdentifier, request.Path.PeripheralIdentifier)
+				assert.Equal(t, testCase.want.Headers.Accept, request.Headers.Accept)
+				assert.Equal(t, testCase.want.MediaType, request.MediaType)
 			}
 		})
 	}
+}
+
+type mockWriterTo struct {
+	data []byte
+}
+
+func (mock *mockWriterTo) WriteTo(writer io.Writer) (int64, error) {
+	bytesWritten, err := writer.Write(mock.data)
+	return int64(bytesWritten), err
+}
+
+type mockReadCloser struct {
+	reader *bytes.Reader
+}
+
+func (mock *mockReadCloser) Read(p []byte) (n int, err error) {
+	return mock.reader.Read(p)
+}
+
+func (mock *mockReadCloser) Close() error {
+	return nil
+}
+
+func TestParseGetFramebufferResponse(t *testing.T) {
+	t.Run("with io.WriterTo body", func(t *testing.T) {
+		testData := []byte("test framebuffer data")
+		mockWriter := &mockWriterTo{data: testData}
+
+		response := transport.Response{
+			StatusCode: 200,
+			Header: transport.Header{
+				"content-type": "application/x-rgb24",
+			},
+			Body: mockWriter,
+		}
+
+		parsed, err := ParseGetFramebufferResponse(response)
+
+		assert.NoError(t, err)
+		assert.NotNil(t, parsed)
+		assert.Equal(t, mockWriter, parsed.Body)
+		assert.Equal(t, "application", parsed.Headers.ContentType.Type)
+		assert.Equal(t, "x-rgb24", parsed.Headers.ContentType.Subtype)
+
+		buffer := &bytes.Buffer{}
+		bytesWritten, err := parsed.Body.WriteTo(buffer)
+		assert.NoError(t, err)
+		assert.Equal(t, int64(len(testData)), bytesWritten)
+		assert.Equal(t, testData, buffer.Bytes())
+	})
+
+	t.Run("with io.ReadCloser body", func(t *testing.T) {
+		testData := []byte("framebuffer data from reader")
+		readCloser := &mockReadCloser{reader: bytes.NewReader(testData)}
+
+		response := transport.Response{
+			StatusCode: 200,
+			Header: transport.Header{
+				"content-type": "application/x-rgb24",
+			},
+			Body: readCloser,
+		}
+
+		parsed, err := ParseGetFramebufferResponse(response)
+
+		assert.NoError(t, err)
+		assert.NotNil(t, parsed)
+		assert.IsType(t, transport.ResponseWriterTo{}, parsed.Body)
+		assert.Equal(t, "application", parsed.Headers.ContentType.Type)
+		assert.Equal(t, "x-rgb24", parsed.Headers.ContentType.Subtype)
+
+		buffer := &bytes.Buffer{}
+		bytesWritten, err := parsed.Body.WriteTo(buffer)
+		assert.NoError(t, err)
+		assert.Equal(t, int64(len(testData)), bytesWritten)
+		assert.Equal(t, testData, buffer.Bytes())
+	})
+
+	t.Run("with unsupported body type", func(t *testing.T) {
+		response := transport.Response{
+			StatusCode: 200,
+			Header: transport.Header{
+				"content-type": "application/x-rgb24",
+			},
+			Body: "invalid body type",
+		}
+
+		parsed, err := ParseGetFramebufferResponse(response)
+
+		assert.Error(t, err)
+		assert.ErrorContains(t, err, "unsupported response body type:")
+		assert.Nil(t, parsed)
+	})
+
+	t.Run("with missing content-type header", func(t *testing.T) {
+		testData := []byte("test data")
+		mockWriter := &mockWriterTo{data: testData}
+
+		response := transport.Response{
+			StatusCode: 200,
+			Header:     transport.Header{},
+			Body:       mockWriter,
+		}
+
+		parsed, err := ParseGetFramebufferResponse(response)
+
+		assert.Error(t, err)
+		assert.ErrorContains(t, err, "parse headers:")
+		assert.Nil(t, parsed)
+	})
 }

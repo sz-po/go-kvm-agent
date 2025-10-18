@@ -7,6 +7,10 @@ import (
 	machineSDK "github.com/szymonpodeszwa/go-kvm-agent/pkg/machine"
 )
 
+const (
+	MachineIdentifierPathFieldName = "machineIdentifier"
+)
+
 // MachineIdentifier represents a machine reference that can be provided either
 // by id or by name. Only one of the fields is expected to be non-nil for a
 // given identifier instance.
@@ -19,21 +23,40 @@ type MachineIdentifier struct {
 // returns an error if neither or both of the fields are set.
 func (machineIdentifier *MachineIdentifier) Validate() error {
 	if machineIdentifier == nil {
-		return fmt.Errorf("machine identifier: identifier is nil")
+		return fmt.Errorf("identifier is nil")
 	}
 
 	hasId := machineIdentifier.Id != nil
 	hasName := machineIdentifier.Name != nil
 
 	if !hasId && !hasName {
-		return fmt.Errorf("machine identifier: either id or name must be provided")
+		return fmt.Errorf("either id or name must be provided")
 	}
 
 	if hasId && hasName {
-		return fmt.Errorf("machine identifier: id and name are mutually exclusive")
+		return fmt.Errorf("id and name are mutually exclusive")
 	}
 
 	return nil
+}
+
+func (machineIdentifier *MachineIdentifier) String() (*string, error) {
+	if err := machineIdentifier.Validate(); err != nil {
+		return nil, err
+	}
+
+	var result string
+
+	switch {
+	case machineIdentifier.Id != nil:
+		result = fmt.Sprintf("id:%s", *machineIdentifier.Id)
+	case machineIdentifier.Name != nil:
+		result = fmt.Sprintf("name:%s", *machineIdentifier.Name)
+	default:
+		return nil, fmt.Errorf("machine identifier: either id or name must be provided")
+	}
+
+	return &result, nil
 }
 
 type Machine struct {

@@ -54,6 +54,13 @@ func WithFFmpegLogger(logger *slog.Logger) FFmpegControlerOpt {
 	}
 }
 
+func WithFFmpegExecutablePath(executablePath string) FFmpegControlerOpt {
+	return func(options *ffmpegControllerOptions) error {
+		options.executablePath = executablePath
+		return nil
+	}
+}
+
 func NewFFmpegController(input Input, output Output, configuration Configuration, opts ...FFmpegControlerOpt) (*FFmpegController, error) {
 	options := defaultFFmpegControllerOptions()
 	for _, opt := range opts {
@@ -82,8 +89,8 @@ func NewFFmpegController(input Input, output Output, configuration Configuration
 			MaxAttempts:  10,
 			Strategy:     process.StrategyExponential,
 			InitialDelay: time.Second,
-			MaxDelay:     time.Second * 10,
-			ResetWindow:  time.Second * 5,
+			MaxDelay:     time.Second * 5,
+			ResetWindow:  time.Second * 2,
 		}),
 		currentStatus:     &FFmpegStatus{},
 		currentStatusLock: sync.RWMutex{},

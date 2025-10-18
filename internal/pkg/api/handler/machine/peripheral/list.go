@@ -42,16 +42,16 @@ func listHandler(machineRepository machineSDK.Repository) http.HandlerFunc {
 
 		for _, peripheral := range peripherals {
 			result = append(result, peripheralAPI.Peripheral{
-				Id:         peripheral.GetId(),
-				Name:       peripheral.GetName(),
-				Capability: peripheral.GetCapabilities(),
+				Id:           peripheral.GetId(),
+				Name:         peripheral.GetName(),
+				Capabilities: peripheral.GetCapabilities(),
 			})
 		}
 
 		response := &peripheralAPI.ListResponse{
 			Body: peripheralAPI.ListResponseBody{
-				Result:     result,
-				TotalCount: len(result),
+				Peripherals: result,
+				TotalCount:  len(result),
 			},
 		}
 

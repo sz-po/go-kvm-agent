@@ -4,7 +4,9 @@ go 1.24.0
 
 require (
 	github.com/alecthomas/kong v1.12.1
+	github.com/elnormous/contenttype v1.0.4
 	github.com/go-chi/chi/v5 v5.2.3
+	github.com/go-chi/httplog/v3 v3.3.0
 	github.com/go-cmd/cmd v1.4.3
 	github.com/google/uuid v1.6.0
 	github.com/iancoleman/strcase v0.3.0
@@ -12,7 +14,6 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/reactivex/rxgo/v2 v2.5.0
 	github.com/stretchr/testify v1.11.1
-	github.com/timewasted/go-accept-headers v0.0.0-20130320203746-c78f304b1b09
 	github.com/vektra/mockery/v3 v3.5.5
 	golang.org/x/sys v0.36.0
 	sigs.k8s.io/yaml v1.6.0

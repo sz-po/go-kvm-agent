@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/httplog/v3"
 )
 
 type ServerOpt func(router chi.Router)
@@ -45,6 +46,11 @@ func Listen(ctx context.Context, config ServerConfig, opts ...ServerOpt) error {
 	}
 
 	router := chi.NewRouter()
+	router.Use(httplog.RequestLogger(slog.Default(), &httplog.Options{
+		Level:         slog.LevelDebug,
+		Schema:        httplog.SchemaECS,
+		RecoverPanics: true,
+	}))
 
 	for _, opt := range opts {
 		opt(router)

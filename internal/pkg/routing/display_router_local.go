@@ -75,17 +75,17 @@ func NewLocalDisplayRouter(opts ...LocalDisplayRouterOpt) (*LocalDisplayRouter, 
 func (router *LocalDisplayRouter) Connect(ctx context.Context, sourceId peripheralSDK.PeripheralId, sinkId peripheralSDK.PeripheralId) error {
 	displaySink, err := router.getDisplaySinkById(sinkId)
 	if err != nil {
-		return fmt.Errorf("get display sinkIdIndex: %w", err)
+		return fmt.Errorf("get display sink by id: %s: %w", sinkId, err)
 	}
 
 	displaySource, err := router.getDisplaySourceById(sourceId)
 	if err != nil {
-		return fmt.Errorf("get display sourceIdIndex: %w", err)
+		return fmt.Errorf("get display source by id: %s: %w", sourceId, err)
 	}
 
 	err = router.connectDisplaySource(displaySink, displaySource)
 	if err != nil {
-		return fmt.Errorf("connect display sourceIdIndex: %w", err)
+		return fmt.Errorf("connect display source: %w", err)
 	}
 
 	return nil

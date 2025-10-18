@@ -1,5 +1,5 @@
 api:
   control:
     server:
-      listenHost: 127.0.0.1
+      listenHost: 0.0.0.0
       listenPort: 8080

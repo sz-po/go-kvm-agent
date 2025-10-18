@@ -1,22 +1,22 @@
 ### Connect display sink to display source
-POST http://127.0.0.1:8080/router/display/connect
+POST http://{{ipAddress}}:8080/router/display/connect
 Content-Type: application/json
 
 {
   "displaySource": {
     "machineIdentifier": {
-      "name": "ffmpeg-display-source"
+      "name": "remote"
     },
     "peripheralIdentifier": {
-      "name": "ffmpeg-display-source"
+      "name": "display-source"
     }
   },
   "displaySink": {
     "machineIdentifier": {
-      "name": "ffmpeg-display-sink"
+      "name": "local"
     },
     "peripheralIdentifier": {
-      "name": "ffmpeg-display-sink"
+      "name": "display-sink"
     }
   }
 }

@@ -5,16 +5,29 @@ import (
 	"fmt"
 )
 
-type Path map[string]string
+type PathParams map[string]string
 
-func (path Path) Require(keys ...string) error {
+func (path PathParams) Require(keys ...string) error {
 	for _, key := range keys {
 		if _, ok := path[key]; !ok {
-			return fmt.Errorf("%w: %s", ErrMissingPathKey, key)
+			return fmt.Errorf("%w: %s", ErrMissingPathParamKey, key)
 		}
 	}
 
 	return nil
 }
 
-var ErrMissingPathKey = errors.New("missing path key")
+func (path PathParams) Clone() PathParams {
+	if path == nil {
+		return nil
+	}
+
+	clone := make(PathParams, len(path))
+	for key, value := range path {
+		clone[key] = value
+	}
+
+	return clone
+}
+
+var ErrMissingPathParamKey = errors.New("missing path param key")

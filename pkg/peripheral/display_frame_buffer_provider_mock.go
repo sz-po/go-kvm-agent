@@ -5,6 +5,8 @@
 package peripheral
 
 import (
+	"context"
+
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -36,8 +38,8 @@ func (_m *DisplayFrameBufferProviderMock) EXPECT() *DisplayFrameBufferProviderMo
 }
 
 // GetDisplayFrameBuffer provides a mock function for the type DisplayFrameBufferProviderMock
-func (_mock *DisplayFrameBufferProviderMock) GetDisplayFrameBuffer() (*DisplayFrameBuffer, error) {
-	ret := _mock.Called()
+func (_mock *DisplayFrameBufferProviderMock) GetDisplayFrameBuffer(ctx context.Context) (*DisplayFrameBuffer, error) {
+	ret := _mock.Called(ctx)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetDisplayFrameBuffer")
@@ -45,18 +47,18 @@ func (_mock *DisplayFrameBufferProviderMock) GetDisplayFrameBuffer() (*DisplayFr
 
 	var r0 *DisplayFrameBuffer
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func() (*DisplayFrameBuffer, error)); ok {
-		return returnFunc()
+	if returnFunc, ok := ret.Get(0).(func(context.Context) (*DisplayFrameBuffer, error)); ok {
+		return returnFunc(ctx)
 	}
-	if returnFunc, ok := ret.Get(0).(func() *DisplayFrameBuffer); ok {
-		r0 = returnFunc()
+	if returnFunc, ok := ret.Get(0).(func(context.Context) *DisplayFrameBuffer); ok {
+		r0 = returnFunc(ctx)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*DisplayFrameBuffer)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func() error); ok {
-		r1 = returnFunc()
+	if returnFunc, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = returnFunc(ctx)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -69,13 +71,20 @@ type DisplayFrameBufferProviderMock_GetDisplayFrameBuffer_Call struct {
 }
 
 // GetDisplayFrameBuffer is a helper method to define mock.On call
-func (_e *DisplayFrameBufferProviderMock_Expecter) GetDisplayFrameBuffer() *DisplayFrameBufferProviderMock_GetDisplayFrameBuffer_Call {
-	return &DisplayFrameBufferProviderMock_GetDisplayFrameBuffer_Call{Call: _e.mock.On("GetDisplayFrameBuffer")}
+//   - ctx context.Context
+func (_e *DisplayFrameBufferProviderMock_Expecter) GetDisplayFrameBuffer(ctx interface{}) *DisplayFrameBufferProviderMock_GetDisplayFrameBuffer_Call {
+	return &DisplayFrameBufferProviderMock_GetDisplayFrameBuffer_Call{Call: _e.mock.On("GetDisplayFrameBuffer", ctx)}
 }
 
-func (_c *DisplayFrameBufferProviderMock_GetDisplayFrameBuffer_Call) Run(run func()) *DisplayFrameBufferProviderMock_GetDisplayFrameBuffer_Call {
+func (_c *DisplayFrameBufferProviderMock_GetDisplayFrameBuffer_Call) Run(run func(ctx context.Context)) *DisplayFrameBufferProviderMock_GetDisplayFrameBuffer_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run()
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		run(
+			arg0,
+		)
 	})
 	return _c
 }
@@ -85,14 +94,14 @@ func (_c *DisplayFrameBufferProviderMock_GetDisplayFrameBuffer_Call) Return(disp
 	return _c
 }
 
-func (_c *DisplayFrameBufferProviderMock_GetDisplayFrameBuffer_Call) RunAndReturn(run func() (*DisplayFrameBuffer, error)) *DisplayFrameBufferProviderMock_GetDisplayFrameBuffer_Call {
+func (_c *DisplayFrameBufferProviderMock_GetDisplayFrameBuffer_Call) RunAndReturn(run func(ctx context.Context) (*DisplayFrameBuffer, error)) *DisplayFrameBufferProviderMock_GetDisplayFrameBuffer_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // GetDisplayMode provides a mock function for the type DisplayFrameBufferProviderMock
-func (_mock *DisplayFrameBufferProviderMock) GetDisplayMode() (*DisplayMode, error) {
-	ret := _mock.Called()
+func (_mock *DisplayFrameBufferProviderMock) GetDisplayMode(ctx context.Context) (*DisplayMode, error) {
+	ret := _mock.Called(ctx)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetDisplayMode")
@@ -100,18 +109,18 @@ func (_mock *DisplayFrameBufferProviderMock) GetDisplayMode() (*DisplayMode, err
 
 	var r0 *DisplayMode
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func() (*DisplayMode, error)); ok {
-		return returnFunc()
+	if returnFunc, ok := ret.Get(0).(func(context.Context) (*DisplayMode, error)); ok {
+		return returnFunc(ctx)
 	}
-	if returnFunc, ok := ret.Get(0).(func() *DisplayMode); ok {
-		r0 = returnFunc()
+	if returnFunc, ok := ret.Get(0).(func(context.Context) *DisplayMode); ok {
+		r0 = returnFunc(ctx)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*DisplayMode)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func() error); ok {
-		r1 = returnFunc()
+	if returnFunc, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = returnFunc(ctx)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -124,13 +133,20 @@ type DisplayFrameBufferProviderMock_GetDisplayMode_Call struct {
 }
 
 // GetDisplayMode is a helper method to define mock.On call
-func (_e *DisplayFrameBufferProviderMock_Expecter) GetDisplayMode() *DisplayFrameBufferProviderMock_GetDisplayMode_Call {
-	return &DisplayFrameBufferProviderMock_GetDisplayMode_Call{Call: _e.mock.On("GetDisplayMode")}
+//   - ctx context.Context
+func (_e *DisplayFrameBufferProviderMock_Expecter) GetDisplayMode(ctx interface{}) *DisplayFrameBufferProviderMock_GetDisplayMode_Call {
+	return &DisplayFrameBufferProviderMock_GetDisplayMode_Call{Call: _e.mock.On("GetDisplayMode", ctx)}
 }
 
-func (_c *DisplayFrameBufferProviderMock_GetDisplayMode_Call) Run(run func()) *DisplayFrameBufferProviderMock_GetDisplayMode_Call {
+func (_c *DisplayFrameBufferProviderMock_GetDisplayMode_Call) Run(run func(ctx context.Context)) *DisplayFrameBufferProviderMock_GetDisplayMode_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run()
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		run(
+			arg0,
+		)
 	})
 	return _c
 }
@@ -140,22 +156,22 @@ func (_c *DisplayFrameBufferProviderMock_GetDisplayMode_Call) Return(displayMode
 	return _c
 }
 
-func (_c *DisplayFrameBufferProviderMock_GetDisplayMode_Call) RunAndReturn(run func() (*DisplayMode, error)) *DisplayFrameBufferProviderMock_GetDisplayMode_Call {
+func (_c *DisplayFrameBufferProviderMock_GetDisplayMode_Call) RunAndReturn(run func(ctx context.Context) (*DisplayMode, error)) *DisplayFrameBufferProviderMock_GetDisplayMode_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // GetDisplayPixelFormat provides a mock function for the type DisplayFrameBufferProviderMock
-func (_mock *DisplayFrameBufferProviderMock) GetDisplayPixelFormat() DisplayPixelFormat {
-	ret := _mock.Called()
+func (_mock *DisplayFrameBufferProviderMock) GetDisplayPixelFormat(ctx context.Context) DisplayPixelFormat {
+	ret := _mock.Called(ctx)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetDisplayPixelFormat")
 	}
 
 	var r0 DisplayPixelFormat
-	if returnFunc, ok := ret.Get(0).(func() DisplayPixelFormat); ok {
-		r0 = returnFunc()
+	if returnFunc, ok := ret.Get(0).(func(context.Context) DisplayPixelFormat); ok {
+		r0 = returnFunc(ctx)
 	} else {
 		r0 = ret.Get(0).(DisplayPixelFormat)
 	}
@@ -168,13 +184,20 @@ type DisplayFrameBufferProviderMock_GetDisplayPixelFormat_Call struct {
 }
 
 // GetDisplayPixelFormat is a helper method to define mock.On call
-func (_e *DisplayFrameBufferProviderMock_Expecter) GetDisplayPixelFormat() *DisplayFrameBufferProviderMock_GetDisplayPixelFormat_Call {
-	return &DisplayFrameBufferProviderMock_GetDisplayPixelFormat_Call{Call: _e.mock.On("GetDisplayPixelFormat")}
+//   - ctx context.Context
+func (_e *DisplayFrameBufferProviderMock_Expecter) GetDisplayPixelFormat(ctx interface{}) *DisplayFrameBufferProviderMock_GetDisplayPixelFormat_Call {
+	return &DisplayFrameBufferProviderMock_GetDisplayPixelFormat_Call{Call: _e.mock.On("GetDisplayPixelFormat", ctx)}
 }
 
-func (_c *DisplayFrameBufferProviderMock_GetDisplayPixelFormat_Call) Run(run func()) *DisplayFrameBufferProviderMock_GetDisplayPixelFormat_Call {
+func (_c *DisplayFrameBufferProviderMock_GetDisplayPixelFormat_Call) Run(run func(ctx context.Context)) *DisplayFrameBufferProviderMock_GetDisplayPixelFormat_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run()
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		run(
+			arg0,
+		)
 	})
 	return _c
 }
@@ -184,7 +207,7 @@ func (_c *DisplayFrameBufferProviderMock_GetDisplayPixelFormat_Call) Return(disp
 	return _c
 }
 
-func (_c *DisplayFrameBufferProviderMock_GetDisplayPixelFormat_Call) RunAndReturn(run func() DisplayPixelFormat) *DisplayFrameBufferProviderMock_GetDisplayPixelFormat_Call {
+func (_c *DisplayFrameBufferProviderMock_GetDisplayPixelFormat_Call) RunAndReturn(run func(ctx context.Context) DisplayPixelFormat) *DisplayFrameBufferProviderMock_GetDisplayPixelFormat_Call {
 	_c.Call.Return(run)
 	return _c
 }

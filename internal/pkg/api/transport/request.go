@@ -8,9 +8,11 @@ import (
 
 func ParseRequest(request *http.Request) transport.Request {
 	return transport.Request{
-		Path:   parsePath(request),
-		Query:  parseQuery(request),
-		Header: parseHeader(request),
-		Body:   request.Body,
+		Method:    request.Method,
+		Path:      request.URL.Path,
+		PathParam: parsePathParams(request),
+		Query:     parseQuery(request),
+		Header:    parseHeaders(request),
+		Body:      request.Body,
 	}
 }

@@ -27,7 +27,7 @@ var _ machineSDK.Machine = (*LocalMachine)(nil)
 func newLocalMachine(name machineSDK.MachineName, peripherals []peripheralSDK.Peripheral) (*LocalMachine, error) {
 	id := machineSDK.MachineId(uuid.NewString())
 
-	peripheralRepository, err := peripheralInternal.NewLocalPeripheralRepository(peripheralInternal.WithPeripherals(peripherals...))
+	peripheralRepository, err := peripheralInternal.NewLocalRepository(peripheralInternal.WithPeripherals(peripherals...))
 	if err != nil {
 		return nil, fmt.Errorf("create local peripheral repository: %w", err)
 	}

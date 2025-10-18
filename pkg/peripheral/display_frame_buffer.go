@@ -51,7 +51,7 @@ type DisplayFrameBufferProvider interface {
 	GetDisplayMode(ctx context.Context) (*DisplayMode, error)
 
 	// GetDisplayPixelFormat returns pixel format used in frame buffer.
-	GetDisplayPixelFormat(ctx context.Context) DisplayPixelFormat
+	GetDisplayPixelFormat(ctx context.Context) (*DisplayPixelFormat, error)
 }
 
 var ErrDisplayFrameBufferNotReady = errors.New("display frame buffer not ready")

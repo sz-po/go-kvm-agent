@@ -17,4 +17,17 @@ func (query Query) Require(keys ...string) error {
 	return nil
 }
 
+func (query Query) Clone() Query {
+	if query == nil {
+		return nil
+	}
+
+	clone := make(Query, len(query))
+	for key, value := range query {
+		clone[key] = value
+	}
+
+	return clone
+}
+
 var ErrMissingQueryKey = errors.New("missing query key")

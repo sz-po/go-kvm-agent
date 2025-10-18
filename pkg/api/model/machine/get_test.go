@@ -18,13 +18,13 @@ func TestParseGetRequestPath(t *testing.T) {
 
 	testCases := []struct {
 		name    string
-		path    transport.Path
+		path    transport.PathParams
 		want    *GetRequestPath
 		wantErr string
 	}{
 		{
 			name: "machine by id",
-			path: transport.Path{
+			path: transport.PathParams{
 				"machineIdentifier": "id:machine-1",
 			},
 			want: &GetRequestPath{
@@ -33,7 +33,7 @@ func TestParseGetRequestPath(t *testing.T) {
 		},
 		{
 			name: "machine by name",
-			path: transport.Path{
+			path: transport.PathParams{
 				"machineIdentifier": "name:machine-name",
 			},
 			want: &GetRequestPath{
@@ -42,33 +42,33 @@ func TestParseGetRequestPath(t *testing.T) {
 		},
 		{
 			name:    "missing machine identifier",
-			path:    transport.Path{},
-			wantErr: "missing path key: machineIdentifier",
+			path:    transport.PathParams{},
+			wantErr: "missing path param key: machineIdentifier",
 		},
 		{
 			name: "invalid machine identifier prefix",
-			path: transport.Path{
+			path: transport.PathParams{
 				"machineIdentifier": "uuid:machine-1",
 			},
 			wantErr: "parse machine identifier: unknown machine type: uuid",
 		},
 		{
 			name: "invalid machine identifier format",
-			path: transport.Path{
+			path: transport.PathParams{
 				"machineIdentifier": "invalid",
 			},
 			wantErr: "parse machine identifier: missing identifier type",
 		},
 		{
 			name: "invalid machine id value",
-			path: transport.Path{
+			path: transport.PathParams{
 				"machineIdentifier": "id:INVALID_UPPER",
 			},
 			wantErr: "parse machine identifier: invalid machine id",
 		},
 		{
 			name: "invalid machine name value",
-			path: transport.Path{
+			path: transport.PathParams{
 				"machineIdentifier": "name:INVALID_UPPER",
 			},
 			wantErr: "parse machine identifier: invalid machine name",
@@ -107,7 +107,7 @@ func TestParseGetRequest(t *testing.T) {
 		{
 			name: "valid request with machine by id",
 			request: transport.Request{
-				Path: transport.Path{
+				PathParam: transport.PathParams{
 					"machineIdentifier": "id:machine-1",
 				},
 			},
@@ -120,14 +120,14 @@ func TestParseGetRequest(t *testing.T) {
 		{
 			name: "invalid request with missing machine identifier",
 			request: transport.Request{
-				Path: transport.Path{},
+				PathParam: transport.PathParams{},
 			},
-			wantErr: "parse path: missing path key: machineIdentifier",
+			wantErr: "parse path: missing path param key: machineIdentifier",
 		},
 		{
 			name: "invalid request with invalid machine identifier",
 			request: transport.Request{
-				Path: transport.Path{
+				PathParam: transport.PathParams{
 					"machineIdentifier": "invalid",
 				},
 			},
@@ -136,7 +136,7 @@ func TestParseGetRequest(t *testing.T) {
 		{
 			name: "invalid request with unknown prefix",
 			request: transport.Request{
-				Path: transport.Path{
+				PathParam: transport.PathParams{
 					"machineIdentifier": "uuid:machine-1",
 				},
 			},
@@ -182,6 +182,6 @@ func TestGetResponse_Response(t *testing.T) {
 	response := getResponse.Response()
 
 	assert.Equal(t, http.StatusOK, response.StatusCode)
-	assert.Equal(t, "application/json", response.Header["Content-Type"])
+	assert.Equal(t, "application/json", response.Header[transport.HeaderContentType])
 	assert.Equal(t, getResponse.Body, response.Body)
 }

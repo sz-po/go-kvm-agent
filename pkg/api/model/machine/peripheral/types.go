@@ -7,6 +7,10 @@ import (
 	peripheralSDK "github.com/szymonpodeszwa/go-kvm-agent/pkg/peripheral"
 )
 
+const (
+	PeripheralIdentifierPathFieldName = "peripheralIdentifier"
+)
+
 // PeripheralIdentifier represents a peripheral reference that can be provided
 // either by id or by name. Only one of the fields should be defined for a given
 // identifier instance.
@@ -34,6 +38,25 @@ func (peripheralIdentifier *PeripheralIdentifier) Validate() error {
 	}
 
 	return nil
+}
+
+func (peripheralIdentifier *PeripheralIdentifier) String() (*string, error) {
+	if err := peripheralIdentifier.Validate(); err != nil {
+		return nil, err
+	}
+
+	var result string
+
+	switch {
+	case peripheralIdentifier.Id != nil:
+		result = fmt.Sprintf("id:%s", *peripheralIdentifier.Id)
+	case peripheralIdentifier.Name != nil:
+		result = fmt.Sprintf("name:%s", *peripheralIdentifier.Name)
+	default:
+		return nil, fmt.Errorf("peripheral identifier: either id or name must be provided")
+	}
+
+	return &result, nil
 }
 
 // ParsePeripheralIdentifier converts a path segment formatted as
@@ -73,7 +96,7 @@ func ParsePeripheralIdentifier(peripheralIdentifier string) (*PeripheralIdentifi
 }
 
 type Peripheral struct {
-	Id         peripheralSDK.PeripheralId           `json:"id"`
-	Name       peripheralSDK.PeripheralName         `json:"name"`
-	Capability []peripheralSDK.PeripheralCapability `json:"capability"`
+	Id           peripheralSDK.PeripheralId           `json:"id"`
+	Name         peripheralSDK.PeripheralName         `json:"name"`
+	Capabilities []peripheralSDK.PeripheralCapability `json:"capabilities"`
 }

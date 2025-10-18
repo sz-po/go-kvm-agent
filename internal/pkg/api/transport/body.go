@@ -19,6 +19,8 @@ func writeBody(responseWriter http.ResponseWriter, body any) {
 		_, err = responseWriter.Write([]byte(typedBody.Error()))
 	case io.Reader:
 		_, err = io.Copy(responseWriter, typedBody)
+	case io.WriterTo:
+		_, err = typedBody.WriteTo(responseWriter)
 	case string:
 		_, err = responseWriter.Write([]byte(typedBody))
 	default:

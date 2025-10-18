@@ -1,6 +1,7 @@
 package peripheral
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -12,7 +13,7 @@ import (
 
 func getHandlerProvider(machineRepository machineSDK.Repository) func(router chi.Router) {
 	return func(router chi.Router) {
-		router.Get("/{peripheralIdentifier}", getHandler(machineRepository))
+		router.Get(fmt.Sprintf("/{%s}", peripheralAPI.PeripheralIdentifierPathFieldName), getHandler(machineRepository))
 	}
 }
 
@@ -26,13 +27,7 @@ func getHandler(machineRepository machineSDK.Repository) http.HandlerFunc {
 			return
 		}
 
-		machine, err := helper.GetMachineByIdentifier(ctx, machineRepository, request.Path.MachineIdentifier)
-		if err != nil {
-			transport.HandleError(w, r, err)
-			return
-		}
-
-		peripheral, err := helper.GetPeripheralByIdentifier(ctx, machine.Peripherals(), request.Path.PeripheralIdentifier)
+		peripheral, err := helper.GetMachinePeripheralByIdentifier(ctx, machineRepository, request.Path.MachineIdentifier, request.Path.PeripheralIdentifier)
 		if err != nil {
 			transport.HandleError(w, r, err)
 			return
@@ -40,9 +35,11 @@ func getHandler(machineRepository machineSDK.Repository) http.HandlerFunc {
 
 		response := &peripheralAPI.GetResponse{
 			Body: peripheralAPI.GetResponseBody{
-				Id:         peripheral.GetId(),
-				Name:       peripheral.GetName(),
-				Capability: peripheral.GetCapabilities(),
+				Peripheral: peripheralAPI.Peripheral{
+					Id:           peripheral.GetId(),
+					Name:         peripheral.GetName(),
+					Capabilities: peripheral.GetCapabilities(),
+				},
 			},
 		}
 

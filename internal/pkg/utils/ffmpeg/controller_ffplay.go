@@ -95,8 +95,8 @@ func NewFFplayController(input Input, configuration Configuration, opts ...FFpla
 		MaxAttempts:  10,
 		Strategy:     process.StrategyExponential,
 		InitialDelay: time.Second,
-		MaxDelay:     time.Second * 10,
-		ResetWindow:  time.Second * 5,
+		MaxDelay:     time.Second * 5,
+		ResetWindow:  time.Second * 2,
 	})
 
 	controller.logger.Debug("FFplay prepared for start.",

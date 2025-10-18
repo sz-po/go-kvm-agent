@@ -8,21 +8,21 @@ import (
 	peripheralSDK "github.com/szymonpodeszwa/go-kvm-agent/pkg/peripheral"
 )
 
-// LocalRepositoryOpt is a functional option for configuring a LocalPeripheralRepository during creation.
-type LocalRepositoryOpt func(*LocalPeripheralRepository) error
+// LocalRepositoryOpt is a functional option for configuring a LocalRepository during creation.
+type LocalRepositoryOpt func(*LocalRepository) error
 
-// LocalPeripheralRepository stores and provides access to peripheral devices.
-type LocalPeripheralRepository struct {
+// LocalRepository stores and provides access to peripheral devices.
+type LocalRepository struct {
 	peripheralIdIndex   map[peripheralSDK.PeripheralId]peripheralSDK.Peripheral
 	peripheralNameIndex map[peripheralSDK.PeripheralName]peripheralSDK.Peripheral
 	peripheralLock      *sync.RWMutex
 }
 
-var _ peripheralSDK.Repository = (*LocalPeripheralRepository)(nil)
+var _ peripheralSDK.Repository = (*LocalRepository)(nil)
 
 // WithPeripherals returns a LocalRepositoryOpt that adds a single peripheral to the repository.
 func WithPeripherals(peripherals ...peripheralSDK.Peripheral) LocalRepositoryOpt {
-	return func(repository *LocalPeripheralRepository) error {
+	return func(repository *LocalRepository) error {
 		for _, peripheral := range peripherals {
 			peripheralId := peripheral.GetId()
 			peripheralName := peripheral.GetName()
@@ -37,7 +37,7 @@ func WithPeripherals(peripherals ...peripheralSDK.Peripheral) LocalRepositoryOpt
 
 // WithPeripheralsFromProvider returns a LocalRepositoryOpt that adds all peripherals from a source to the repository.
 func WithPeripheralsFromProvider(ctx context.Context, provider peripheralSDK.PeripheralProvider) LocalRepositoryOpt {
-	return func(repository *LocalPeripheralRepository) error {
+	return func(repository *LocalRepository) error {
 		peripherals, err := provider.GetAllPeripherals(ctx)
 		if err != nil {
 			return fmt.Errorf("get all peripherals: %w", err)
@@ -55,9 +55,9 @@ func WithPeripheralsFromProvider(ctx context.Context, provider peripheralSDK.Per
 	}
 }
 
-// NewLocalPeripheralRepository creates a new LocalPeripheralRepository instance with the given options.
-func NewLocalPeripheralRepository(opts ...LocalRepositoryOpt) (*LocalPeripheralRepository, error) {
-	repository := &LocalPeripheralRepository{
+// NewLocalRepository creates a new LocalRepository instance with the given options.
+func NewLocalRepository(opts ...LocalRepositoryOpt) (*LocalRepository, error) {
+	repository := &LocalRepository{
 		peripheralIdIndex:   make(map[peripheralSDK.PeripheralId]peripheralSDK.Peripheral),
 		peripheralNameIndex: make(map[peripheralSDK.PeripheralName]peripheralSDK.Peripheral),
 		peripheralLock:      &sync.RWMutex{},
@@ -73,7 +73,7 @@ func NewLocalPeripheralRepository(opts ...LocalRepositoryOpt) (*LocalPeripheralR
 	return repository, nil
 }
 
-func (repository *LocalPeripheralRepository) GetPeripheralById(ctx context.Context, id peripheralSDK.PeripheralId) (peripheralSDK.Peripheral, error) {
+func (repository *LocalRepository) GetPeripheralById(ctx context.Context, id peripheralSDK.PeripheralId) (peripheralSDK.Peripheral, error) {
 	repository.peripheralLock.RLock()
 	defer repository.peripheralLock.RUnlock()
 
@@ -85,7 +85,7 @@ func (repository *LocalPeripheralRepository) GetPeripheralById(ctx context.Conte
 	return peripheral, nil
 }
 
-func (repository *LocalPeripheralRepository) GetPeripheralByName(ctx context.Context, name peripheralSDK.PeripheralName) (peripheralSDK.Peripheral, error) {
+func (repository *LocalRepository) GetPeripheralByName(ctx context.Context, name peripheralSDK.PeripheralName) (peripheralSDK.Peripheral, error) {
 	repository.peripheralLock.RLock()
 	defer repository.peripheralLock.RUnlock()
 
@@ -97,7 +97,7 @@ func (repository *LocalPeripheralRepository) GetPeripheralByName(ctx context.Con
 	return peripheral, nil
 }
 
-func (repository *LocalPeripheralRepository) GetAllPeripherals(ctx context.Context) ([]peripheralSDK.Peripheral, error) {
+func (repository *LocalRepository) GetAllPeripherals(ctx context.Context) ([]peripheralSDK.Peripheral, error) {
 	repository.peripheralLock.RLock()
 	defer repository.peripheralLock.RUnlock()
 
@@ -110,7 +110,7 @@ func (repository *LocalPeripheralRepository) GetAllPeripherals(ctx context.Conte
 	return peripherals, nil
 }
 
-func (repository *LocalPeripheralRepository) GetAllDisplaySources(ctx context.Context) ([]peripheralSDK.DisplaySource, error) {
+func (repository *LocalRepository) GetAllDisplaySources(ctx context.Context) ([]peripheralSDK.DisplaySource, error) {
 	repository.peripheralLock.RLock()
 	defer repository.peripheralLock.RUnlock()
 
@@ -128,7 +128,7 @@ func (repository *LocalPeripheralRepository) GetAllDisplaySources(ctx context.Co
 	return displaySources, nil
 }
 
-func (repository *LocalPeripheralRepository) GetAllDisplaySinks(ctx context.Context) ([]peripheralSDK.DisplaySink, error) {
+func (repository *LocalRepository) GetAllDisplaySinks(ctx context.Context) ([]peripheralSDK.DisplaySink, error) {
 	repository.peripheralLock.RLock()
 	defer repository.peripheralLock.RUnlock()
 

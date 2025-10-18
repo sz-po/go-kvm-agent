@@ -1,0 +1,14 @@
+name: local
+local:
+  peripherals:
+    - driver: ffmpeg/display-source
+      name: display-source
+      config:
+        executable:
+          path: /usr/bin/ffmpeg
+        input:
+          messageBoard:
+            displayMode:
+              width: 1920
+              height: 1080
+              refreshRate: 30

@@ -1,6 +1,7 @@
 package machine
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -12,7 +13,7 @@ import (
 
 func getHandlerProvider(machineRepository machineSDK.Repository) func(router chi.Router) {
 	return func(router chi.Router) {
-		router.Get("/{machineIdentifier}", getHandler(machineRepository))
+		router.Get(fmt.Sprintf("/{%s}", machineAPI.MachineIdentifierPathFieldName), getHandler(machineRepository))
 	}
 }
 

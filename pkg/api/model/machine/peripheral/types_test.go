@@ -143,3 +143,69 @@ func TestPeripheralIdentifierUnmarshalJSONInvalidName(t *testing.T) {
 
 	assert.Contains(t, err.Error(), "unmarshal peripheral name")
 }
+
+func TestPeripheralIdentifierStringWithId(t *testing.T) {
+	t.Parallel()
+
+	peripheralId := peripheralSDK.PeripheralId("test-peripheral")
+	identifier := apiPeripheral.PeripheralIdentifier{Id: &peripheralId}
+
+	result, err := identifier.String()
+
+	assert.NoError(t, err)
+	if assert.NotNil(t, result) {
+		assert.Equal(t, "id:test-peripheral", *result)
+	}
+}
+
+func TestPeripheralIdentifierStringWithName(t *testing.T) {
+	t.Parallel()
+
+	peripheralName := peripheralSDK.PeripheralName("test-peripheral")
+	identifier := apiPeripheral.PeripheralIdentifier{Name: &peripheralName}
+
+	result, err := identifier.String()
+
+	assert.NoError(t, err)
+	if assert.NotNil(t, result) {
+		assert.Equal(t, "name:test-peripheral", *result)
+	}
+}
+
+func TestPeripheralIdentifierStringWithNilIdentifier(t *testing.T) {
+	t.Parallel()
+
+	var identifier *apiPeripheral.PeripheralIdentifier
+
+	result, err := identifier.String()
+
+	assert.Error(t, err)
+	assert.Nil(t, result)
+	assert.EqualError(t, err, "peripheral identifier: identifier is nil")
+}
+
+func TestPeripheralIdentifierStringWithEmptyIdentifier(t *testing.T) {
+	t.Parallel()
+
+	identifier := apiPeripheral.PeripheralIdentifier{}
+
+	result, err := identifier.String()
+
+	assert.Error(t, err)
+	assert.Nil(t, result)
+	assert.EqualError(t, err, "peripheral identifier: either id or name must be provided")
+}
+
+func TestPeripheralIdentifierStringWithBothFields(t *testing.T) {
+	t.Parallel()
+
+	peripheralId := peripheralSDK.PeripheralId("test-peripheral")
+	peripheralName := peripheralSDK.PeripheralName("test-peripheral")
+	identifier := apiPeripheral.PeripheralIdentifier{Id: &peripheralId, Name: &peripheralName}
+
+	result, err := identifier.String()
+
+	assert.Error(t, err)
+	assert.Nil(t, result)
+	assert.EqualError(t, err, "peripheral identifier: id and name are mutually exclusive")
+}

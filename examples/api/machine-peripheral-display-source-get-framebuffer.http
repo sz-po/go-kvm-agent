@@ -1,0 +1,2 @@
+### Get display source framebuffer
+GET http://{{ipAddress}}:8080/machine/name:local/peripheral/name:display-source/display-source/framebuffer

@@ -2,6 +2,7 @@ package peripheral
 
 import (
 	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -10,6 +11,112 @@ import (
 	machineSDK "github.com/szymonpodeszwa/go-kvm-agent/pkg/machine"
 	peripheralSDK "github.com/szymonpodeszwa/go-kvm-agent/pkg/peripheral"
 )
+
+func TestListRequestPath_String(t *testing.T) {
+	machineId, err := machineSDK.NewMachineId("machine-1")
+	assert.NoError(t, err)
+
+	requestPath := ListRequestPath{
+		MachineIdentifier: machineAPI.MachineIdentifier{Id: &machineId},
+	}
+
+	path, err := requestPath.String()
+
+	assert.NoError(t, err)
+	if assert.NotNil(t, path) {
+		assert.Equal(t, "/machine/id:machine-1/peripheral", *path)
+	}
+}
+
+func TestListRequestPath_StringInvalid(t *testing.T) {
+	requestPath := ListRequestPath{}
+
+	path, err := requestPath.String()
+
+	assert.Error(t, err)
+	assert.Nil(t, path)
+}
+
+func TestListRequestPath_Params(t *testing.T) {
+	machineId, err := machineSDK.NewMachineId("machine-1")
+	assert.NoError(t, err)
+
+	requestPath := ListRequestPath{
+		MachineIdentifier: machineAPI.MachineIdentifier{Id: &machineId},
+	}
+
+	params, err := requestPath.Params()
+
+	assert.NoError(t, err)
+	if assert.NotNil(t, params) {
+		assert.Equal(t, transport.PathParams{
+			machineAPI.MachineIdentifierPathFieldName: "id:machine-1",
+		}, *params)
+	}
+}
+
+func TestListRequestPath_ParamsInvalid(t *testing.T) {
+	requestPath := ListRequestPath{}
+
+	params, err := requestPath.Params()
+
+	assert.Error(t, err)
+	assert.Nil(t, params)
+}
+
+func TestListRequest_Request(t *testing.T) {
+	machineId, err := machineSDK.NewMachineId("machine-1")
+	assert.NoError(t, err)
+
+	request := &ListRequest{
+		Path: ListRequestPath{
+			MachineIdentifier: machineAPI.MachineIdentifier{Id: &machineId},
+		},
+	}
+
+	transportRequest, err := request.Request()
+
+	assert.NoError(t, err)
+	if assert.NotNil(t, transportRequest) {
+		assert.Equal(t, http.MethodGet, transportRequest.Method)
+		assert.Equal(t, "/machine/id:machine-1/peripheral", transportRequest.Path)
+		assert.Equal(t, transport.PathParams{
+			machineAPI.MachineIdentifierPathFieldName: "id:machine-1",
+		}, transportRequest.PathParam)
+	}
+}
+
+func TestListRequest_RequestInvalid(t *testing.T) {
+	request := &ListRequest{}
+
+	transportRequest, err := request.Request()
+
+	assert.Error(t, err)
+	assert.Nil(t, transportRequest)
+	assert.ErrorContains(t, err, "path")
+}
+
+func TestParseListResponseBody(t *testing.T) {
+	body, err := ParseListResponseBody(strings.NewReader("{\"result\":[],\"totalCount\":0}"))
+
+	assert.NoError(t, err)
+	if assert.NotNil(t, body) {
+		assert.Empty(t, body.Peripherals)
+		assert.Equal(t, 0, body.TotalCount)
+	}
+}
+
+func TestParseListResponse(t *testing.T) {
+	responseBody := strings.NewReader("{\"peripherals\":[{\"id\":\"peripheral-1\",\"name\":\"peripheral-name\",\"capability\":[]}],\"totalCount\":1}")
+
+	response, err := ParseListResponse(transport.Response{Body: responseBody})
+
+	assert.NoError(t, err)
+	if assert.NotNil(t, response) {
+		assert.Len(t, response.Body.Peripherals, 1)
+		assert.Equal(t, 1, response.Body.TotalCount)
+	}
+}
 
 func TestParseListRequestPath(t *testing.T) {
 	machineId, err := machineSDK.NewMachineId("machine-1")
@@ -20,13 +127,13 @@ func TestParseListRequestPath(t *testing.T) {
 
 	testCases := []struct {
 		name    string
-		path    transport.Path
+		path    transport.PathParams
 		want    *ListRequestPath
 		wantErr string
 	}{
 		{
 			name: "machine by id",
-			path: transport.Path{
+			path: transport.PathParams{
 				"machineIdentifier": "id:machine-1",
 			},
 			want: &ListRequestPath{
@@ -35,7 +142,7 @@ func TestParseListRequestPath(t *testing.T) {
 		},
 		{
 			name: "machine by name",
-			path: transport.Path{
+			path: transport.PathParams{
 				"machineIdentifier": "name:machine-name",
 			},
 			want: &ListRequestPath{
@@ -44,33 +151,33 @@ func TestParseListRequestPath(t *testing.T) {
 		},
 		{
 			name:    "missing machine identifier",
-			path:    transport.Path{},
-			wantErr: "missing path key: machineIdentifier",
+			path:    transport.PathParams{},
+			wantErr: "missing path param key: machineIdentifier",
 		},
 		{
 			name: "invalid machine identifier prefix",
-			path: transport.Path{
+			path: transport.PathParams{
 				"machineIdentifier": "uuid:machine-1",
 			},
 			wantErr: "parse machine identifier: unknown machine type: uuid",
 		},
 		{
 			name: "invalid machine identifier format",
-			path: transport.Path{
+			path: transport.PathParams{
 				"machineIdentifier": "invalid",
 			},
 			wantErr: "parse machine identifier: missing identifier type",
 		},
 		{
 			name: "invalid machine id value",
-			path: transport.Path{
+			path: transport.PathParams{
 				"machineIdentifier": "id:INVALID_UPPER",
 			},
 			wantErr: "parse machine identifier: invalid machine id",
 		},
 		{
 			name: "invalid machine name value",
-			path: transport.Path{
+			path: transport.PathParams{
 				"machineIdentifier": "name:INVALID_UPPER",
 			},
 			wantErr: "parse machine identifier: invalid machine name",
@@ -109,7 +216,7 @@ func TestParseListRequest(t *testing.T) {
 		{
 			name: "valid request with machine by id",
 			request: transport.Request{
-				Path: transport.Path{
+				PathParam: transport.PathParams{
 					"machineIdentifier": "id:machine-1",
 				},
 			},
@@ -122,14 +229,14 @@ func TestParseListRequest(t *testing.T) {
 		{
 			name: "invalid request with missing machine identifier",
 			request: transport.Request{
-				Path: transport.Path{},
+				PathParam: transport.PathParams{},
 			},
-			wantErr: "parse path: missing path key: machineIdentifier",
+			wantErr: "parse path: missing path param key: machineIdentifier",
 		},
 		{
 			name: "invalid request with invalid machine identifier",
 			request: transport.Request{
-				Path: transport.Path{
+				PathParam: transport.PathParams{
 					"machineIdentifier": "invalid",
 				},
 			},
@@ -138,7 +245,7 @@ func TestParseListRequest(t *testing.T) {
 		{
 			name: "invalid request with unknown prefix",
 			request: transport.Request{
-				Path: transport.Path{
+				PathParam: transport.PathParams{
 					"machineIdentifier": "uuid:machine-1",
 				},
 			},
@@ -174,7 +281,7 @@ func TestListResponse_Response(t *testing.T) {
 
 	listResponse := ListResponse{
 		Body: ListResponseBody{
-			Result: []Peripheral{
+			Peripherals: []Peripheral{
 				{
 					Id:   peripheralId,
 					Name: peripheralName,
@@ -187,6 +294,6 @@ func TestListResponse_Response(t *testing.T) {
 	response := listResponse.Response()
 
 	assert.Equal(t, http.StatusOK, response.StatusCode)
-	assert.Equal(t, "application/json", response.Header["Content-Type"])
+	assert.Equal(t, "application/json", response.Header[transport.HeaderContentType])
 	assert.Equal(t, listResponse.Body, response.Body)
 }

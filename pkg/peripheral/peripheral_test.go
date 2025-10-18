@@ -172,7 +172,7 @@ func TestPeripheralCapability_Validate(t *testing.T) {
 		capability := NewCapability[DisplaySource](PeripheralKindDisplay, PeripheralRoleSource)
 		id := PeripheralId("mpv-sink")
 		displaySink := NewDisplaySinkMock(t)
-		displaySink.EXPECT().Id().Return(id)
+		displaySink.EXPECT().GetId().Return(id)
 
 		err := capability.Validate(displaySink)
 		assert.Error(t, err)
@@ -192,7 +192,7 @@ func TestPeripheralCapability_Validate(t *testing.T) {
 		capability := NewCapability[DisplaySource](PeripheralKindDisplay, PeripheralRoleSource)
 		id := PeripheralId("mpv-sink")
 		displaySink := NewDisplaySinkMock(t)
-		displaySink.EXPECT().Id().Return(id)
+		displaySink.EXPECT().GetId().Return(id)
 
 		err := capability.Validate(displaySink)
 		assert.Error(t, err)
@@ -203,7 +203,7 @@ func TestPeripheralCapability_Validate(t *testing.T) {
 func TestValidatePeripheralCapabilities(t *testing.T) {
 	t.Run("validates all capabilities successfully", func(t *testing.T) {
 		displaySource := NewDisplaySourceMock(t)
-		displaySource.EXPECT().Capabilities().Return([]PeripheralCapability{DisplaySourceCapability})
+		displaySource.EXPECT().GetCapabilities().Return([]PeripheralCapability{DisplaySourceCapability})
 
 		err := ValidatePeripheralCapabilities(displaySource)
 		assert.NoError(t, err)
@@ -211,7 +211,7 @@ func TestValidatePeripheralCapabilities(t *testing.T) {
 
 	t.Run("validates keyboard source capability", func(t *testing.T) {
 		keyboardSource := NewKeyboardSourceMock(t)
-		keyboardSource.EXPECT().Capabilities().Return([]PeripheralCapability{KeyboardSourceCapability})
+		keyboardSource.EXPECT().GetCapabilities().Return([]PeripheralCapability{KeyboardSourceCapability})
 
 		err := ValidatePeripheralCapabilities(keyboardSource)
 		assert.NoError(t, err)
@@ -222,8 +222,8 @@ func TestValidatePeripheralCapabilities(t *testing.T) {
 		capability := NewCapability[KeyboardSource](PeripheralKindKeyboard, PeripheralRoleSource)
 
 		mockedPeripheral := NewPeripheralMock(t)
-		mockedPeripheral.EXPECT().Id().Return(keyboardSourceID)
-		mockedPeripheral.EXPECT().Capabilities().Return([]PeripheralCapability{capability})
+		mockedPeripheral.EXPECT().GetId().Return(keyboardSourceID)
+		mockedPeripheral.EXPECT().GetCapabilities().Return([]PeripheralCapability{capability})
 
 		err := ValidatePeripheralCapabilities(mockedPeripheral)
 		assert.Error(t, err)
@@ -233,7 +233,7 @@ func TestValidatePeripheralCapabilities(t *testing.T) {
 
 	t.Run("validates keyboard sink capability", func(t *testing.T) {
 		keyboardSink := NewKeyboardSinkMock(t)
-		keyboardSink.EXPECT().Capabilities().Return([]PeripheralCapability{KeyboardSinkCapability})
+		keyboardSink.EXPECT().GetCapabilities().Return([]PeripheralCapability{KeyboardSinkCapability})
 
 		err := ValidatePeripheralCapabilities(keyboardSink)
 		assert.NoError(t, err)
@@ -244,8 +244,8 @@ func TestValidatePeripheralCapabilities(t *testing.T) {
 		capability := NewCapability[KeyboardSink](PeripheralKindKeyboard, PeripheralRoleSink)
 
 		mockedPeripheral := NewPeripheralMock(t)
-		mockedPeripheral.EXPECT().Id().Return(keyboardSinkID)
-		mockedPeripheral.EXPECT().Capabilities().Return([]PeripheralCapability{capability})
+		mockedPeripheral.EXPECT().GetId().Return(keyboardSinkID)
+		mockedPeripheral.EXPECT().GetCapabilities().Return([]PeripheralCapability{capability})
 
 		err := ValidatePeripheralCapabilities(mockedPeripheral)
 		assert.Error(t, err)
@@ -255,7 +255,7 @@ func TestValidatePeripheralCapabilities(t *testing.T) {
 
 	t.Run("validates mouse source capability", func(t *testing.T) {
 		mouseSource := NewMouseSourceMock(t)
-		mouseSource.EXPECT().Capabilities().Return([]PeripheralCapability{MouseSourceCapability})
+		mouseSource.EXPECT().GetCapabilities().Return([]PeripheralCapability{MouseSourceCapability})
 
 		err := ValidatePeripheralCapabilities(mouseSource)
 		assert.NoError(t, err)
@@ -263,7 +263,7 @@ func TestValidatePeripheralCapabilities(t *testing.T) {
 
 	t.Run("validates mouse sink capability", func(t *testing.T) {
 		mouseSink := NewMouseSinkMock(t)
-		mouseSink.EXPECT().Capabilities().Return([]PeripheralCapability{MouseSinkCapability})
+		mouseSink.EXPECT().GetCapabilities().Return([]PeripheralCapability{MouseSinkCapability})
 
 		err := ValidatePeripheralCapabilities(mouseSink)
 		assert.NoError(t, err)
@@ -277,8 +277,8 @@ func TestValidatePeripheralCapabilities(t *testing.T) {
 
 		// Create a mock peripheral that claims to have DisplaySource capability but is actually a DisplaySink
 		mockedPeripheral := NewPeripheralMock(t)
-		mockedPeripheral.EXPECT().Id().Return(id)
-		mockedPeripheral.EXPECT().Capabilities().Return([]PeripheralCapability{capability})
+		mockedPeripheral.EXPECT().GetId().Return(id)
+		mockedPeripheral.EXPECT().GetCapabilities().Return([]PeripheralCapability{capability})
 
 		err := ValidatePeripheralCapabilities(mockedPeripheral)
 		assert.Error(t, err)
@@ -289,7 +289,7 @@ func TestValidatePeripheralCapabilities(t *testing.T) {
 
 	t.Run("validates peripheral with no capabilities", func(t *testing.T) {
 		mockedPeripheral := NewPeripheralMock(t)
-		mockedPeripheral.EXPECT().Capabilities().Return([]PeripheralCapability{})
+		mockedPeripheral.EXPECT().GetCapabilities().Return([]PeripheralCapability{})
 
 		err := ValidatePeripheralCapabilities(mockedPeripheral)
 		assert.NoError(t, err)

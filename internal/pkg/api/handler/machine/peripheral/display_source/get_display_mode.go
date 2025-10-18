@@ -1,6 +1,7 @@
 package display_source
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -8,12 +9,11 @@ import (
 	"github.com/szymonpodeszwa/go-kvm-agent/internal/pkg/api/transport"
 	"github.com/szymonpodeszwa/go-kvm-agent/pkg/api/model/machine/peripheral/display_source"
 	machineSDK "github.com/szymonpodeszwa/go-kvm-agent/pkg/machine"
-	peripheralSDK "github.com/szymonpodeszwa/go-kvm-agent/pkg/peripheral"
 )
 
 func getDisplayModeHandlerProvider(machineRepository machineSDK.Repository) func(router chi.Router) {
 	return func(router chi.Router) {
-		router.Get("/display-mode", getDisplayModeHandler(machineRepository))
+		router.Get(fmt.Sprintf("/%s", display_source.DisplayModeEndpointName), getDisplayModeHandler(machineRepository))
 	}
 }
 
@@ -27,19 +27,7 @@ func getDisplayModeHandler(machineRepository machineSDK.Repository) http.Handler
 			return
 		}
 
-		machine, err := helper.GetMachineByIdentifier(ctx, machineRepository, request.Path.MachineIdentifier)
-		if err != nil {
-			transport.HandleError(w, r, err)
-			return
-		}
-
-		peripheral, err := helper.GetPeripheralByIdentifier(ctx, machine.Peripherals(), request.Path.PeripheralIdentifier)
-		if err != nil {
-			transport.HandleError(w, r, err)
-			return
-		}
-
-		displaySource, err := peripheralSDK.AsDisplaySource(peripheral)
+		displaySource, err := helper.GetMachineDisplaySourceByIdentifier(ctx, machineRepository, request.Path.MachineIdentifier, request.Path.PeripheralIdentifier)
 		if err != nil {
 			transport.HandleError(w, r, err)
 			return

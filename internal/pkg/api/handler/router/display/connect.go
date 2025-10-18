@@ -1,19 +1,20 @@
 package display
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/szymonpodeszwa/go-kvm-agent/internal/pkg/api/handler/helper"
 	"github.com/szymonpodeszwa/go-kvm-agent/internal/pkg/api/transport"
-	"github.com/szymonpodeszwa/go-kvm-agent/pkg/api/model/router/display"
+	displayAPI "github.com/szymonpodeszwa/go-kvm-agent/pkg/api/model/router/display"
 	machineSDK "github.com/szymonpodeszwa/go-kvm-agent/pkg/machine"
 	routingSDK "github.com/szymonpodeszwa/go-kvm-agent/pkg/routing"
 )
 
 func connectHandlerProvider(displayRouter routingSDK.DisplayRouter, machineRepository machineSDK.Repository) func(router chi.Router) {
 	return func(router chi.Router) {
-		router.Post("/connect", connectHandler(displayRouter, machineRepository))
+		router.Post(fmt.Sprintf("/%s", displayAPI.ConnectEndpointName), connectHandler(displayRouter, machineRepository))
 	}
 }
 
@@ -22,7 +23,7 @@ func connectHandler(displayRouter routingSDK.DisplayRouter, machineRepository ma
 		ctx := r.Context()
 		request := transport.ParseRequest(r)
 
-		connectRequest, err := display.ParseConnectRequest(request)
+		connectRequest, err := displayAPI.ParseConnectRequest(request)
 		if err != nil {
 			transport.HandleError(w, r, err)
 			return
@@ -58,7 +59,7 @@ func connectHandler(displayRouter routingSDK.DisplayRouter, machineRepository ma
 			return
 		}
 
-		response := &display.ConnectResponse{}
+		response := &displayAPI.ConnectResponse{}
 
 		transport.WriteResponse(w, r, response)
 	}

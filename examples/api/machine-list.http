@@ -1,2 +1,2 @@
 ### List all machines
-GET http://127.0.0.1:8080/machine
+GET http://{{ipAddress}}:8080/machine

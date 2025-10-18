@@ -10,7 +10,7 @@ import (
 )
 
 // CreateMachineFromConfig creates a new LocalMachine instance from the provided configuration.
-func CreateMachineFromConfig(ctx context.Context, config MachineConfig) (*LocalMachine, error) {
+func CreateMachineFromConfig(ctx context.Context, config MachineConfig) (machineSDK.Machine, error) {
 	if config.Local != nil {
 		return createLocalMachineFromConfig(ctx, config.Name, *config.Local)
 	} else if config.Remote != nil {
@@ -20,12 +20,12 @@ func CreateMachineFromConfig(ctx context.Context, config MachineConfig) (*LocalM
 	}
 }
 
-func createLocalMachineFromConfig(ctx context.Context, name machineSDK.MachineName, config LocalMachineConfig) (*LocalMachine, error) {
+func createLocalMachineFromConfig(ctx context.Context, name machineSDK.MachineName, config LocalMachineConfig) (machineSDK.Machine, error) {
 	var peripherals []peripheralSDK.Peripheral
 	for _, peripheralConfig := range config.Peripherals {
 		peripheral, err := peripheralInternal.CreatePeripheralFromConfig(ctx, peripheralConfig)
 		if err != nil {
-			return nil, fmt.Errorf("error creating peripheralInternal: %w", err)
+			return nil, fmt.Errorf("create peripheral: %w", err)
 		}
 
 		peripherals = append(peripherals, peripheral)
@@ -34,6 +34,11 @@ func createLocalMachineFromConfig(ctx context.Context, name machineSDK.MachineNa
 	return newLocalMachine(name, peripherals)
 }
 
-func createRemoteMachineFromConfig(ctx context.Context, name machineSDK.MachineName, config RemoteMachineConfig) (*LocalMachine, error) {
-	panic("implement me")
+func createRemoteMachineFromConfig(ctx context.Context, name machineSDK.MachineName, config RemoteMachineConfig) (machineSDK.Machine, error) {
+	remoteMachine, err := NewRemoteMachine(ctx, name, config)
+	if err != nil {
+		return nil, fmt.Errorf("create remote machine: %w", err)
+	}
+
+	return remoteMachine, nil
 }

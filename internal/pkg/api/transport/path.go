@@ -7,8 +7,8 @@ import (
 	"github.com/szymonpodeszwa/go-kvm-agent/pkg/api/transport"
 )
 
-func parsePath(request *http.Request) transport.Path {
-	path := make(transport.Path)
+func parsePathParams(request *http.Request) transport.PathParams {
+	path := make(transport.PathParams)
 
 	routeContext := chi.RouteContext(request.Context())
 	if routeContext == nil {
