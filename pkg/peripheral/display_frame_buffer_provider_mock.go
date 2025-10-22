@@ -162,20 +162,31 @@ func (_c *DisplayFrameBufferProviderMock_GetDisplayMode_Call) RunAndReturn(run f
 }
 
 // GetDisplayPixelFormat provides a mock function for the type DisplayFrameBufferProviderMock
-func (_mock *DisplayFrameBufferProviderMock) GetDisplayPixelFormat(ctx context.Context) DisplayPixelFormat {
+func (_mock *DisplayFrameBufferProviderMock) GetDisplayPixelFormat(ctx context.Context) (*DisplayPixelFormat, error) {
 	ret := _mock.Called(ctx)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetDisplayPixelFormat")
 	}
 
-	var r0 DisplayPixelFormat
-	if returnFunc, ok := ret.Get(0).(func(context.Context) DisplayPixelFormat); ok {
+	var r0 *DisplayPixelFormat
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context) (*DisplayPixelFormat, error)); ok {
+		return returnFunc(ctx)
+	}
+	if returnFunc, ok := ret.Get(0).(func(context.Context) *DisplayPixelFormat); ok {
 		r0 = returnFunc(ctx)
 	} else {
-		r0 = ret.Get(0).(DisplayPixelFormat)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*DisplayPixelFormat)
+		}
 	}
-	return r0
+	if returnFunc, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = returnFunc(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
 }
 
 // DisplayFrameBufferProviderMock_GetDisplayPixelFormat_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetDisplayPixelFormat'
@@ -202,12 +213,12 @@ func (_c *DisplayFrameBufferProviderMock_GetDisplayPixelFormat_Call) Run(run fun
 	return _c
 }
 
-func (_c *DisplayFrameBufferProviderMock_GetDisplayPixelFormat_Call) Return(displayPixelFormat DisplayPixelFormat) *DisplayFrameBufferProviderMock_GetDisplayPixelFormat_Call {
-	_c.Call.Return(displayPixelFormat)
+func (_c *DisplayFrameBufferProviderMock_GetDisplayPixelFormat_Call) Return(displayPixelFormat *DisplayPixelFormat, err error) *DisplayFrameBufferProviderMock_GetDisplayPixelFormat_Call {
+	_c.Call.Return(displayPixelFormat, err)
 	return _c
 }
 
-func (_c *DisplayFrameBufferProviderMock_GetDisplayPixelFormat_Call) RunAndReturn(run func(ctx context.Context) DisplayPixelFormat) *DisplayFrameBufferProviderMock_GetDisplayPixelFormat_Call {
+func (_c *DisplayFrameBufferProviderMock_GetDisplayPixelFormat_Call) RunAndReturn(run func(ctx context.Context) (*DisplayPixelFormat, error)) *DisplayFrameBufferProviderMock_GetDisplayPixelFormat_Call {
 	_c.Call.Return(run)
 	return _c
 }

@@ -17,8 +17,9 @@ import (
 )
 
 type ffplayControllerOptions struct {
-	executablePath string
-	logger         *slog.Logger
+	executablePath     string
+	logger             *slog.Logger
+	supervisorProvider SupervisorProvider
 }
 
 func defaultFFplayControllerOptions() ffplayControllerOptions {
@@ -61,6 +62,20 @@ func WithFFplayLogger(logger *slog.Logger) FFplayControlerOpt {
 	}
 }
 
+func WithFFplayExecutablePath(executablePath string) FFplayControlerOpt {
+	return func(options *ffplayControllerOptions) error {
+		options.executablePath = executablePath
+		return nil
+	}
+}
+
+func WithFFplaySupervisorProvider(provider SupervisorProvider) FFplayControlerOpt {
+	return func(options *ffplayControllerOptions) error {
+		options.supervisorProvider = provider
+		return nil
+	}
+}
+
 func NewFFplayController(input Input, configuration Configuration, opts ...FFplayControlerOpt) (*FFplayController, error) {
 	if input == nil {
 		return nil, fmt.Errorf("create ffplay controller: %w", ErrFFplayNilInput)
@@ -90,7 +105,12 @@ func NewFFplayController(input Input, configuration Configuration, opts ...FFpla
 
 	specification := controller.buildSpecification(controller.currentInput, controller.currentConfiguration)
 
-	controller.process = process.SuperviseLocal(specification, process.RestartPolicy{
+	supervisorProvider := options.supervisorProvider
+	if supervisorProvider == nil {
+		supervisorProvider = defaultSupervisorProvider(options.logger)
+	}
+
+	controller.process = supervisorProvider(specification, process.RestartPolicy{
 		Enabled:      true,
 		MaxAttempts:  10,
 		Strategy:     process.StrategyExponential,

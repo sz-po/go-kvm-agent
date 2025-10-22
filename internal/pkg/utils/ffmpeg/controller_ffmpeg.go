@@ -16,15 +16,29 @@ import (
 	"github.com/szymonpodeszwa/go-kvm-agent/internal/pkg/utils/process"
 )
 
+// SupervisorProvider is a function that creates a new process.Supervisor instance.
+// It accepts the same parameters as process.SuperviseLocal.
+type SupervisorProvider func(specification process.Specification, restartPolicy process.RestartPolicy) process.Supervisor
+
 type ffmpegControllerOptions struct {
-	executablePath string
-	logger         *slog.Logger
+	executablePath     string
+	logger             *slog.Logger
+	supervisorProvider SupervisorProvider
 }
 
 func defaultFFmpegControllerOptions() ffmpegControllerOptions {
 	return ffmpegControllerOptions{
-		executablePath: "/usr/local/bin/ffmpeg",
-		logger:         slog.New(slog.DiscardHandler),
+		executablePath:     "/usr/local/bin/ffmpeg",
+		logger:             slog.New(slog.DiscardHandler),
+		supervisorProvider: nil,
+	}
+}
+
+// defaultSupervisorProvider returns the default implementation of SupervisorProvider.
+// It creates a local supervisor with the provided logger.
+func defaultSupervisorProvider(logger *slog.Logger) SupervisorProvider {
+	return func(specification process.Specification, restartPolicy process.RestartPolicy) process.Supervisor {
+		return process.SuperviseLocal(specification, restartPolicy, process.WithLogger(logger))
 	}
 }
 
@@ -61,6 +75,13 @@ func WithFFmpegExecutablePath(executablePath string) FFmpegControlerOpt {
 	}
 }
 
+func WithSupervisorProvider(provider SupervisorProvider) FFmpegControlerOpt {
+	return func(options *ffmpegControllerOptions) error {
+		options.supervisorProvider = provider
+		return nil
+	}
+}
+
 func NewFFmpegController(input Input, output Output, configuration Configuration, opts ...FFmpegControlerOpt) (*FFmpegController, error) {
 	options := defaultFFmpegControllerOptions()
 	for _, opt := range opts {
@@ -79,9 +100,14 @@ func NewFFmpegController(input Input, output Output, configuration Configuration
 		output.Parameters(),
 	)
 
+	supervisorProvider := options.supervisorProvider
+	if supervisorProvider == nil {
+		supervisorProvider = defaultSupervisorProvider(options.logger)
+	}
+
 	controller := &FFmpegController{
 		options: &options,
-		process: process.SuperviseLocal(process.Specification{
+		process: supervisorProvider(process.Specification{
 			ExecutablePath: options.executablePath,
 			Arguments:      arguments,
 		}, process.RestartPolicy{

@@ -5,7 +5,6 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/elnormous/contenttype"
 	"github.com/szymonpodeszwa/go-kvm-agent/pkg/api/model/machine"
 	"github.com/szymonpodeszwa/go-kvm-agent/pkg/api/model/machine/peripheral"
 	"github.com/szymonpodeszwa/go-kvm-agent/pkg/api/transport"
@@ -13,13 +12,6 @@ import (
 
 const (
 	FramebufferEndpointName = "framebuffer"
-)
-
-var (
-	FramebufferMediaTypeRGB24 = contenttype.MediaType{
-		Type:    "application",
-		Subtype: "x-rgb24",
-	}
 )
 
 type GetFramebufferRequestPath struct {
@@ -67,7 +59,7 @@ type GetFramebufferRequestHeaders struct {
 type GetFramebufferRequest struct {
 	Path      GetFramebufferRequestPath
 	Headers   GetFramebufferRequestHeaders
-	MediaType contenttype.MediaType
+	MediaType transport.MediaType
 }
 
 func (request *GetFramebufferRequest) Request() (*transport.Request, error) {
@@ -91,7 +83,7 @@ func (request *GetFramebufferRequest) Request() (*transport.Request, error) {
 	}, nil
 }
 
-func ParseGetFramebufferRequest(request transport.Request, acceptedMediaTypes []contenttype.MediaType) (*GetFramebufferRequest, error) {
+func ParseGetFramebufferRequest(request transport.Request, acceptableMediaTypes []transport.MediaType) (*GetFramebufferRequest, error) {
 	path, err := ParseGetFramebufferRequestPath(request.PathParam)
 	if err != nil {
 		return nil, fmt.Errorf("parse path: %w", err)
@@ -102,7 +94,7 @@ func ParseGetFramebufferRequest(request transport.Request, acceptedMediaTypes []
 		return nil, fmt.Errorf("parse headers: %w", err)
 	}
 
-	acceptedMediaType, _, err := contenttype.GetAcceptableMediaTypeFromHeader(headers.Accept, acceptedMediaTypes)
+	acceptedMediaType, err := transport.NegotiateAcceptedMediaType(headers.Accept, acceptableMediaTypes)
 	if err != nil {
 		return nil, fmt.Errorf("get acceptable media type: %w", err)
 	}
@@ -148,7 +140,7 @@ func ParseGetFramebufferRequestPath(path transport.PathParams) (*GetFramebufferR
 }
 
 type GetFramebufferResponseHeaders struct {
-	ContentType contenttype.MediaType
+	ContentType transport.MediaType
 }
 
 func ParseGetFramebufferResponseHeaders(headers transport.Header) (*GetFramebufferResponseHeaders, error) {
@@ -157,13 +149,13 @@ func ParseGetFramebufferResponseHeaders(headers transport.Header) (*GetFramebuff
 		return nil, err
 	}
 
-	contentType, err := contenttype.ParseMediaType(headers.Get(transport.HeaderContentType))
+	contentType, err := transport.NewMediaType(headers.Get(transport.HeaderContentType))
 	if err != nil {
 		return nil, fmt.Errorf("parse content type: %w", err)
 	}
 
 	return &GetFramebufferResponseHeaders{
-		ContentType: contentType,
+		ContentType: *contentType,
 	}, nil
 }
 

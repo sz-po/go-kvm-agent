@@ -26,6 +26,9 @@ func UnmarshalResponseBody[T any](body any) (*T, error) {
 	var err error
 
 	switch typedBody := body.(type) {
+	case io.ReadCloser:
+		err = json.NewDecoder(typedBody).Decode(&responseBody)
+		_ = typedBody.Close()
 	case io.Reader:
 		err = json.NewDecoder(typedBody).Decode(&responseBody)
 	case []byte:

@@ -5,12 +5,11 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/elnormous/contenttype"
-
 	"github.com/go-chi/chi/v5"
 	"github.com/szymonpodeszwa/go-kvm-agent/internal/pkg/api/handler/helper"
 	"github.com/szymonpodeszwa/go-kvm-agent/internal/pkg/api/transport"
 	"github.com/szymonpodeszwa/go-kvm-agent/pkg/api/model/machine/peripheral/display_source"
+	transportSDK "github.com/szymonpodeszwa/go-kvm-agent/pkg/api/transport"
 	machineSDK "github.com/szymonpodeszwa/go-kvm-agent/pkg/machine"
 	peripheralSDK "github.com/szymonpodeszwa/go-kvm-agent/pkg/peripheral"
 )
@@ -25,8 +24,8 @@ func getFramebufferHandler(machineRepository machineSDK.Repository) http.Handler
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		allowedMediaTypes := []contenttype.MediaType{
-			display_source.FramebufferMediaTypeRGB24,
+		allowedMediaTypes := []transportSDK.MediaType{
+			transportSDK.ApplicationXRgb24MediaType,
 		}
 
 		request, err := display_source.ParseGetFramebufferRequest(transport.ParseRequest(r), allowedMediaTypes)
@@ -56,7 +55,7 @@ func getFramebufferHandler(machineRepository machineSDK.Repository) http.Handler
 		var response display_source.GetFramebufferResponse
 
 		switch request.MediaType.String() {
-		case display_source.FramebufferMediaTypeRGB24.String():
+		case transportSDK.ApplicationXRgb24MediaType.String():
 			response = getFramebufferAsRGB24(frameBuffer)
 		default:
 			transport.HandleError(w, r, fmt.Errorf("unsupported media type: %s", request.MediaType.String()))
@@ -70,7 +69,7 @@ func getFramebufferHandler(machineRepository machineSDK.Repository) http.Handler
 func getFramebufferAsRGB24(frameBuffer *peripheralSDK.DisplayFrameBuffer) display_source.GetFramebufferResponse {
 	return display_source.GetFramebufferResponse{
 		Headers: display_source.GetFramebufferResponseHeaders{
-			ContentType: display_source.FramebufferMediaTypeRGB24,
+			ContentType: transportSDK.ApplicationXRgb24MediaType,
 		},
 		Body: frameBuffer,
 	}

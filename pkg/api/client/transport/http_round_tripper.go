@@ -1,8 +1,10 @@
 package transport
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"net"
 	"net/http"
 	"net/url"
@@ -118,7 +120,7 @@ func (roundTripper *HTTPRoundTripper) composeURL(path string, query map[string]s
 }
 
 func (roundTripper *HTTPRoundTripper) buildTransportResponse(httpResponse *http.Response) (*transport.Response, error) {
-	header := make(map[string]string, len(httpResponse.Header))
+	header := make(transport.Header, len(httpResponse.Header))
 	for headerKey, headerValues := range httpResponse.Header {
 		if len(headerValues) == 0 {
 			continue
@@ -126,10 +128,24 @@ func (roundTripper *HTTPRoundTripper) buildTransportResponse(httpResponse *http.
 		header[strings.ToLower(headerKey)] = strings.Join(headerValues, ",")
 	}
 
+	var body any
+
+	switch header.Get(transport.HeaderContentType) {
+	case transport.ApplicationJsonMediaType.String():
+		if bodyBuffer, err := io.ReadAll(httpResponse.Body); err != nil {
+			return nil, fmt.Errorf("read response body: %w", err)
+		} else {
+			body = bytes.NewBuffer(bodyBuffer)
+		}
+		_ = httpResponse.Body.Close()
+	default:
+		body = httpResponse.Body
+	}
+	
 	return &transport.Response{
 		StatusCode: httpResponse.StatusCode,
 		Header:     header,
-		Body:       httpResponse.Body,
+		Body:       body,
 	}, nil
 }
 

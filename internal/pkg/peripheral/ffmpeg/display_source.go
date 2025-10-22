@@ -8,7 +8,7 @@ import (
 	"sync"
 
 	"github.com/szymonpodeszwa/go-kvm-agent/internal/pkg/utils/ffmpeg"
-	"github.com/szymonpodeszwa/go-kvm-agent/internal/pkg/utils/formats/ppm"
+	"github.com/szymonpodeszwa/go-kvm-agent/internal/pkg/utils/format/ppm"
 	peripheralSDK "github.com/szymonpodeszwa/go-kvm-agent/pkg/peripheral"
 )
 

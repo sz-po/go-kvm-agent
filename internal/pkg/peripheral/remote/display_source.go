@@ -6,7 +6,7 @@ import (
 
 	"github.com/szymonpodeszwa/go-kvm-agent/internal/pkg/memory"
 	displaySourceAPIService "github.com/szymonpodeszwa/go-kvm-agent/pkg/api/client/service/machine/peripheral/display_source"
-	displaySourceAPI "github.com/szymonpodeszwa/go-kvm-agent/pkg/api/model/machine/peripheral/display_source"
+	"github.com/szymonpodeszwa/go-kvm-agent/pkg/api/transport"
 	peripheralSDK "github.com/szymonpodeszwa/go-kvm-agent/pkg/peripheral"
 )
 
@@ -24,7 +24,7 @@ func (displaySource *DisplaySource) GetDisplayFrameBuffer(ctx context.Context) (
 		return nil, fmt.Errorf("get default memory pool: %w", err)
 	}
 
-	return displaySource.displaySourceService.GetFramebuffer(ctx, memoryPool, DisplaySourceFramebufferSize, displaySourceAPI.FramebufferMediaTypeRGB24)
+	return displaySource.displaySourceService.GetFramebuffer(ctx, memoryPool, DisplaySourceFramebufferSize, transport.ApplicationXRgb24MediaType)
 }
 
 func (displaySource *DisplaySource) GetDisplayMode(ctx context.Context) (*peripheralSDK.DisplayMode, error) {

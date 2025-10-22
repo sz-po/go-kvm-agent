@@ -1,11 +1,10 @@
 name: local
 local:
   peripherals:
-    - driver: ffmpeg/display-source
+    - driver: v4l2/display-source
       name: display-source
       config:
-        executable:
-          path: /usr/bin/ffmpeg
+        devicePath: /dev/video0
         input:
           messageBoard:
             displayMode:

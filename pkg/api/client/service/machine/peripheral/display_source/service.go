@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/elnormous/contenttype"
 	"github.com/szymonpodeszwa/go-kvm-agent/pkg/api/client/transport"
 	machineAPI "github.com/szymonpodeszwa/go-kvm-agent/pkg/api/model/machine"
 	peripheralAPI "github.com/szymonpodeszwa/go-kvm-agent/pkg/api/model/machine/peripheral"
 	displaySourceAPI "github.com/szymonpodeszwa/go-kvm-agent/pkg/api/model/machine/peripheral/display_source"
+	transportSDK "github.com/szymonpodeszwa/go-kvm-agent/pkg/api/transport"
 	memorySDK "github.com/szymonpodeszwa/go-kvm-agent/pkg/memory"
 	peripheralSDK "github.com/szymonpodeszwa/go-kvm-agent/pkg/peripheral"
 )
@@ -62,7 +62,7 @@ func (service *Service) GetPixelFormat(ctx context.Context) (*peripheralSDK.Disp
 	return &response.Body.PixelFormat, nil
 }
 
-func (service *Service) GetFramebuffer(ctx context.Context, memoryPool memorySDK.Pool, bufferSize int, mediaType contenttype.MediaType) (*peripheralSDK.DisplayFrameBuffer, error) {
+func (service *Service) GetFramebuffer(ctx context.Context, memoryPool memorySDK.Pool, bufferSize int, mediaType transportSDK.MediaType) (*peripheralSDK.DisplayFrameBuffer, error) {
 	request := displaySourceAPI.GetFramebufferRequest{
 		Path: displaySourceAPI.GetFramebufferRequestPath{
 			MachineIdentifier:    service.machineIdentifier,

@@ -1,6 +1,7 @@
 package transport
 
 import (
+	"bytes"
 	"context"
 	"io"
 	"net"
@@ -74,9 +75,56 @@ func TestHTTPRoundTripperCall(t *testing.T) {
 	assert.Equal(t, "application/json", transportResponse.Header["content-type"])
 	assert.Equal(t, "custom-value", transportResponse.Header["x-custom"])
 
-	responseBody, ok := transportResponse.Body.([]byte)
-	assert.True(t, ok)
-	assert.Equal(t, "{\"status\":\"ok\"}", string(responseBody))
+	responseBodyBuffer, ok := transportResponse.Body.(*bytes.Buffer)
+	assert.True(t, ok, "Body should be *bytes.Buffer when Content-Type is set")
+	assert.Equal(t, "{\"status\":\"ok\"}", responseBodyBuffer.String())
+}
+
+func TestHTTPRoundTripperCallWithoutContentType(t *testing.T) {
+	t.Parallel()
+
+	responsePayload := "plain text response"
+
+	httpServer := httptest.NewServer(http.HandlerFunc(func(responseWriter http.ResponseWriter, httpRequest *http.Request) {
+		responseWriter.WriteHeader(http.StatusOK)
+
+		_, writeErr := responseWriter.Write([]byte(responsePayload))
+		assert.NoError(t, writeErr)
+	}))
+	t.Cleanup(httpServer.Close)
+
+	httpServerURL, err := url.Parse(httpServer.URL)
+	assert.NoError(t, err)
+
+	host, portString, err := net.SplitHostPort(httpServerURL.Host)
+	assert.NoError(t, err)
+
+	port, err := strconv.Atoi(portString)
+	assert.NoError(t, err)
+
+	roundTripper, err := NewHTTPRoundTripper(httpServerURL.Scheme, host, port)
+	assert.NoError(t, err)
+
+	transportResponse, err := roundTripper.Call(
+		context.Background(),
+		transport.Request{
+			Method: http.MethodGet,
+			Path:   "/",
+		},
+	)
+	assert.NoError(t, err)
+
+	assert.Equal(t, http.StatusOK, transportResponse.StatusCode)
+
+	responseBodyReader, ok := transportResponse.Body.(io.ReadCloser)
+	assert.True(t, ok, "Body should be io.ReadCloser when Content-Type is not set")
+
+	responseBody, err := io.ReadAll(responseBodyReader)
+	assert.NoError(t, err)
+	assert.Equal(t, responsePayload, string(responseBody))
+
+	closeErr := responseBodyReader.Close()
+	assert.NoError(t, closeErr)
 }
 
 func TestNewHTTPRoundTripperUnsupportedScheme(t *testing.T) {

@@ -6,11 +6,24 @@ import (
 	"strings"
 )
 
+const (
+	HeaderAccept      = "accept"
+	HeaderContentType = "content-type"
+)
+
 type Header map[string]string
 
 func (header Header) Get(key string) string {
 	normalizedKey := strings.ToLower(key)
 	return header[normalizedKey]
+}
+
+func (header Header) Has(key string) bool {
+	normalizedKey := strings.ToLower(key)
+
+	_, exists := header[normalizedKey]
+
+	return exists
 }
 
 func (header Header) Require(keys ...string) error {

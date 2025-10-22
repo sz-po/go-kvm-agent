@@ -168,7 +168,7 @@ func TestGetFramebuffer_Success(t *testing.T) {
 			"peripheralIdentifier": "id:test-peripheral",
 		},
 		Header: transport.Header{
-			"accept": "",
+			"accept": "application/x-rgb24",
 		},
 	}).Return(&transport.Response{
 		StatusCode: 200,
@@ -184,7 +184,7 @@ func TestGetFramebuffer_Success(t *testing.T) {
 	service, err := NewService(roundTripper, machineIdentifier, peripheralIdentifier)
 	assert.NoError(t, err)
 
-	frameBuffer, err := service.GetFramebuffer(context.Background(), memoryPool, bufferSize)
+	frameBuffer, err := service.GetFramebuffer(context.Background(), memoryPool, bufferSize, transport.ApplicationXRgb24MediaType)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, frameBuffer)
@@ -216,14 +216,14 @@ func TestGetFramebuffer_TransportError(t *testing.T) {
 			"peripheralIdentifier": "id:test-peripheral",
 		},
 		Header: transport.Header{
-			"accept": "",
+			"accept": "application/x-rgb24",
 		},
 	}).Return(nil, expectedError).Once()
 
 	service, err := NewService(roundTripper, machineIdentifier, peripheralIdentifier)
 	assert.NoError(t, err)
 
-	frameBuffer, err := service.GetFramebuffer(context.Background(), memoryPool, bufferSize)
+	frameBuffer, err := service.GetFramebuffer(context.Background(), memoryPool, bufferSize, transport.ApplicationXRgb24MediaType)
 
 	assert.Error(t, err)
 	assert.ErrorContains(t, err, "call:")
@@ -259,7 +259,7 @@ func TestGetFramebuffer_BorrowError(t *testing.T) {
 			"peripheralIdentifier": "id:test-peripheral",
 		},
 		Header: transport.Header{
-			"accept": "",
+			"accept": "application/x-rgb24",
 		},
 	}).Return(&transport.Response{
 		StatusCode: 200,
@@ -275,7 +275,7 @@ func TestGetFramebuffer_BorrowError(t *testing.T) {
 	service, err := NewService(roundTripper, machineIdentifier, peripheralIdentifier)
 	assert.NoError(t, err)
 
-	frameBuffer, err := service.GetFramebuffer(context.Background(), memoryPool, bufferSize)
+	frameBuffer, err := service.GetFramebuffer(context.Background(), memoryPool, bufferSize, transport.ApplicationXRgb24MediaType)
 
 	assert.Error(t, err)
 	assert.ErrorContains(t, err, "borrow memory buffer:")
@@ -314,7 +314,7 @@ func TestGetFramebuffer_WriteToError_ReleaseSuccess(t *testing.T) {
 			"peripheralIdentifier": "id:test-peripheral",
 		},
 		Header: transport.Header{
-			"accept": "",
+			"accept": "application/x-rgb24",
 		},
 	}).Return(&transport.Response{
 		StatusCode: 200,
@@ -330,7 +330,7 @@ func TestGetFramebuffer_WriteToError_ReleaseSuccess(t *testing.T) {
 	service, err := NewService(roundTripper, machineIdentifier, peripheralIdentifier)
 	assert.NoError(t, err)
 
-	frameBuffer, err := service.GetFramebuffer(context.Background(), memoryPool, bufferSize)
+	frameBuffer, err := service.GetFramebuffer(context.Background(), memoryPool, bufferSize, transport.ApplicationXRgb24MediaType)
 
 	assert.Error(t, err)
 	assert.ErrorContains(t, err, "write data to memory buffer:")
@@ -370,7 +370,7 @@ func TestGetFramebuffer_WriteToError_ReleaseError(t *testing.T) {
 			"peripheralIdentifier": "id:test-peripheral",
 		},
 		Header: transport.Header{
-			"accept": "",
+			"accept": "application/x-rgb24",
 		},
 	}).Return(&transport.Response{
 		StatusCode: 200,
@@ -386,7 +386,7 @@ func TestGetFramebuffer_WriteToError_ReleaseError(t *testing.T) {
 	service, err := NewService(roundTripper, machineIdentifier, peripheralIdentifier)
 	assert.NoError(t, err)
 
-	frameBuffer, err := service.GetFramebuffer(context.Background(), memoryPool, bufferSize)
+	frameBuffer, err := service.GetFramebuffer(context.Background(), memoryPool, bufferSize, transport.ApplicationXRgb24MediaType)
 
 	assert.Error(t, err)
 	assert.ErrorContains(t, err, "write data to memory buffer:")
@@ -427,7 +427,7 @@ func TestGetFramebuffer_BufferWrapping(t *testing.T) {
 			"peripheralIdentifier": "id:test-peripheral",
 		},
 		Header: transport.Header{
-			"accept": "",
+			"accept": "application/x-rgb24",
 		},
 	}).Return(&transport.Response{
 		StatusCode: 200,
@@ -445,7 +445,7 @@ func TestGetFramebuffer_BufferWrapping(t *testing.T) {
 	service, err := NewService(roundTripper, machineIdentifier, peripheralIdentifier)
 	assert.NoError(t, err)
 
-	frameBuffer, err := service.GetFramebuffer(context.Background(), memoryPool, bufferSize)
+	frameBuffer, err := service.GetFramebuffer(context.Background(), memoryPool, bufferSize, transport.ApplicationXRgb24MediaType)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, frameBuffer)
@@ -482,7 +482,7 @@ func TestGetFramebuffer_WithReadCloser(t *testing.T) {
 			"peripheralIdentifier": "id:test-peripheral",
 		},
 		Header: transport.Header{
-			"accept": "",
+			"accept": "application/x-rgb24",
 		},
 	}).Return(&transport.Response{
 		StatusCode: 200,
@@ -498,7 +498,7 @@ func TestGetFramebuffer_WithReadCloser(t *testing.T) {
 	service, err := NewService(roundTripper, machineIdentifier, peripheralIdentifier)
 	assert.NoError(t, err)
 
-	frameBuffer, err := service.GetFramebuffer(context.Background(), memoryPool, bufferSize)
+	frameBuffer, err := service.GetFramebuffer(context.Background(), memoryPool, bufferSize, transport.ApplicationXRgb24MediaType)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, frameBuffer)

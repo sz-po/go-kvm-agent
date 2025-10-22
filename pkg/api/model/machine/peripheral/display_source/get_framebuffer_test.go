@@ -5,7 +5,6 @@ import (
 	"io"
 	"testing"
 
-	"github.com/elnormous/contenttype"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/szymonpodeszwa/go-kvm-agent/pkg/api/model/machine"
@@ -137,7 +136,7 @@ func TestParseGetFramebufferRequest(t *testing.T) {
 				Headers: GetFramebufferRequestHeaders{
 					Accept: "application/x-rgb24",
 				},
-				MediaType: FramebufferMediaTypeRGB24,
+				MediaType: transport.ApplicationXRgb24MediaType,
 			},
 		},
 		{
@@ -194,7 +193,7 @@ func TestParseGetFramebufferRequest(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
-			request, err := ParseGetFramebufferRequest(testCase.request, []contenttype.MediaType{FramebufferMediaTypeRGB24})
+			request, err := ParseGetFramebufferRequest(testCase.request, []transport.MediaType{transport.ApplicationXRgb24MediaType})
 
 			if testCase.wantErr != "" {
 				assert.Error(t, err)
