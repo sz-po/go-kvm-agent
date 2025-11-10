@@ -25,6 +25,15 @@ func (pixelFormat DisplayPixelFormat) BytesPerPixel() int {
 	}
 }
 
+func (pixelFormat DisplayPixelFormat) FourCC() string {
+	switch pixelFormat {
+	case DisplayPixelFormatRGB24:
+		return "RGB3"
+	default:
+		return ""
+	}
+}
+
 // String returns the string representation of the pixel format.
 func (pixelFormat DisplayPixelFormat) String() string {
 	return string(pixelFormat)
@@ -82,3 +91,4 @@ type DisplayInfo struct {
 }
 
 var ErrUnsupportedDisplayMode = errors.New("unsupported display mode")
+var ErrUnsupportedPixelFormat = errors.New("unsupported pixel format")

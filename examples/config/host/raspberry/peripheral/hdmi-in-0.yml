@@ -1,0 +1,4 @@
+driverKind: v4l2-display-source
+name: hdmi-in-0
+config:
+  devicePath: /dev/video0

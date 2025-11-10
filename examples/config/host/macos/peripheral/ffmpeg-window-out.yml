@@ -1,0 +1,14 @@
+driverKind: ffmpeg-display-sink
+name: ffmpeg-window-out
+config:
+  title: "Hello World"
+  supportedDisplayModes:
+    - width: 800
+      height: 600
+      refreshRate: 30
+    - width: 1280
+      height: 720
+      refreshRate: 30
+    - width: 1920
+      height: 1080
+      refreshRate: 30

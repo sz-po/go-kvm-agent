@@ -11,27 +11,27 @@ func TestNewPeripheralName(t *testing.T) {
 	t.Run("creates valid peripheral name", func(t *testing.T) {
 		name, err := NewPeripheralName("mpv-peripheral")
 		assert.NoError(t, err)
-		assert.Equal(t, PeripheralName("mpv-peripheral"), name)
+		assert.Equal(t, Name("mpv-peripheral"), name)
 	})
 
 	t.Run("returns error for empty name", func(t *testing.T) {
 		name, err := NewPeripheralName("")
 		assert.Error(t, err)
-		assert.Equal(t, PeripheralName(""), name)
+		assert.Equal(t, Name(""), name)
 		assert.Contains(t, err.Error(), "cannot be empty")
 	})
 
 	t.Run("returns error for non-kebab-case name", func(t *testing.T) {
 		name, err := NewPeripheralName("TestPeripheral")
 		assert.Error(t, err)
-		assert.Equal(t, PeripheralName(""), name)
+		assert.Equal(t, Name(""), name)
 		assert.Contains(t, err.Error(), "must be kebab-case")
 	})
 
 	t.Run("returns error for name with underscores", func(t *testing.T) {
 		name, err := NewPeripheralName("test_peripheral")
 		assert.Error(t, err)
-		assert.Equal(t, PeripheralName(""), name)
+		assert.Equal(t, Name(""), name)
 		assert.Contains(t, err.Error(), "must be kebab-case")
 	})
 }
@@ -40,27 +40,27 @@ func TestNewPeripheralId(t *testing.T) {
 	t.Run("creates valid peripheral id", func(t *testing.T) {
 		id, err := NewPeripheralId("mpv-peripheral-123")
 		assert.NoError(t, err)
-		assert.Equal(t, PeripheralId("mpv-peripheral-123"), id)
+		assert.Equal(t, Id("mpv-peripheral-123"), id)
 	})
 
 	t.Run("returns error for empty id", func(t *testing.T) {
 		id, err := NewPeripheralId("")
 		assert.Error(t, err)
-		assert.Equal(t, PeripheralId(""), id)
+		assert.Equal(t, Id(""), id)
 		assert.Contains(t, err.Error(), "cannot be empty")
 	})
 
 	t.Run("returns error for non-kebab-case id", func(t *testing.T) {
 		id, err := NewPeripheralId("TestPeripheral123")
 		assert.Error(t, err)
-		assert.Equal(t, PeripheralId(""), id)
+		assert.Equal(t, Id(""), id)
 		assert.Contains(t, err.Error(), "should be kebab-case")
 	})
 
 	t.Run("returns error for id with underscores", func(t *testing.T) {
 		id, err := NewPeripheralId("test_peripheral_123")
 		assert.Error(t, err)
-		assert.Equal(t, PeripheralId(""), id)
+		assert.Equal(t, Id(""), id)
 		assert.Contains(t, err.Error(), "should be kebab-case")
 	})
 }
@@ -105,14 +105,14 @@ func TestPeripheralRole_String(t *testing.T) {
 
 func TestPeripheralName_String(t *testing.T) {
 	t.Run("returns string representation", func(t *testing.T) {
-		name := PeripheralName("mpv-name")
+		name := Name("mpv-name")
 		assert.Equal(t, "mpv-name", name.String())
 	})
 }
 
 func TestPeripheralId_String(t *testing.T) {
 	t.Run("returns string representation", func(t *testing.T) {
-		id := PeripheralId("mpv-id-123")
+		id := Id("mpv-id-123")
 		assert.Equal(t, "mpv-id-123", id.String())
 	})
 }
@@ -170,7 +170,7 @@ func TestPeripheralCapability_Validate(t *testing.T) {
 
 	t.Run("returns error when peripheral does not implement interface", func(t *testing.T) {
 		capability := NewCapability[DisplaySource](PeripheralKindDisplay, PeripheralRoleSource)
-		id := PeripheralId("mpv-sink")
+		id := Id("mpv-sink")
 		displaySink := NewDisplaySinkMock(t)
 		displaySink.EXPECT().GetId().Return(id)
 
@@ -190,7 +190,7 @@ func TestPeripheralCapability_Validate(t *testing.T) {
 
 	t.Run("returns error when display sink does not implement display source", func(t *testing.T) {
 		capability := NewCapability[DisplaySource](PeripheralKindDisplay, PeripheralRoleSource)
-		id := PeripheralId("mpv-sink")
+		id := Id("mpv-sink")
 		displaySink := NewDisplaySinkMock(t)
 		displaySink.EXPECT().GetId().Return(id)
 
@@ -218,7 +218,7 @@ func TestValidatePeripheralCapabilities(t *testing.T) {
 	})
 
 	t.Run("returns error when keyboard source capability validation fails", func(t *testing.T) {
-		keyboardSourceID := PeripheralId("keyboard-source")
+		keyboardSourceID := Id("keyboard-source")
 		capability := NewCapability[KeyboardSource](PeripheralKindKeyboard, PeripheralRoleSource)
 
 		mockedPeripheral := NewPeripheralMock(t)
@@ -240,7 +240,7 @@ func TestValidatePeripheralCapabilities(t *testing.T) {
 	})
 
 	t.Run("returns error when keyboard sink capability validation fails", func(t *testing.T) {
-		keyboardSinkID := PeripheralId("keyboard-sink")
+		keyboardSinkID := Id("keyboard-sink")
 		capability := NewCapability[KeyboardSink](PeripheralKindKeyboard, PeripheralRoleSink)
 
 		mockedPeripheral := NewPeripheralMock(t)
@@ -270,7 +270,7 @@ func TestValidatePeripheralCapabilities(t *testing.T) {
 	})
 
 	t.Run("returns error when capability validation fails", func(t *testing.T) {
-		id := PeripheralId("mpv-sink")
+		id := Id("mpv-sink")
 
 		// Create a capability that expects DisplaySource but give it a DisplaySink
 		capability := NewCapability[DisplaySource](PeripheralKindDisplay, PeripheralRoleSource)

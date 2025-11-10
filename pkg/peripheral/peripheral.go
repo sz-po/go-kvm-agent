@@ -7,13 +7,11 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/alecthomas/kong"
 	"github.com/google/uuid"
 	"github.com/iancoleman/strcase"
 	"github.com/szymonpodeszwa/go-kvm-agent/internal/pkg/utils"
 )
-
-// PeripheralDriver identifies the driver implementation used for a peripheral.
-type PeripheralDriver string
 
 // PeripheralKind defines the category of peripheral device.
 type PeripheralKind string
@@ -90,54 +88,48 @@ func (pc PeripheralCapability) Equals(test PeripheralCapability) bool {
 	return pc.Kind == test.Kind && pc.Role == test.Role
 }
 
-// PeripheralName uniquely identifies a peripheral device.
-type PeripheralName string
+// Name uniquely identifies a peripheral device.
+type Name string
 
-// NewPeripheralName constructs a new PeripheralName with the given identifier.
+// NewPeripheralName constructs a new Name with the given identifier.
 // Returns an error if the id is empty or not in kebab-case format.
-func NewPeripheralName(name string) (PeripheralName, error) {
+func NewPeripheralName(name string) (Name, error) {
 	if name == "" {
 		return "", errors.New("peripheral name cannot be empty")
 	}
 	if !utils.IsKebabCase(name) {
 		return "", errors.New("peripheral name must be kebab-case")
 	}
-	return PeripheralName(name), nil
+	return Name(name), nil
 }
 
 // String returns the string representation of the peripheral Name.
-func (name PeripheralName) String() string {
+func (name Name) String() string {
 	return string(name)
 }
 
-// UnmarshalJSON implements json.Unmarshaler interface with validation.
-func (name *PeripheralName) UnmarshalJSON(data []byte) error {
-	var nameStr string
-	if err := json.Unmarshal(data, &nameStr); err != nil {
-		return fmt.Errorf("unmarshal peripheral name: %w", err)
+func (name *Name) Decode(ctx *kong.DecodeContext) error {
+	var rawName string
+	if err := ctx.Scan.PopValueInto("string", &rawName); err != nil {
+		return err
 	}
 
-	validated, err := NewPeripheralName(nameStr)
+	validatedName, err := NewPeripheralName(rawName)
 	if err != nil {
-		return fmt.Errorf("unmarshal peripheral name: %w", err)
+		return err
 	}
 
-	*name = validated
+	*name = validatedName
 	return nil
 }
 
-// MarshalJSON implements json.Marshaler interface.
-func (name PeripheralName) MarshalJSON() ([]byte, error) {
-	return json.Marshal(string(name))
+type Id string
+
+func CreatePeripheralRandomId(prefix string) Id {
+	return Id(fmt.Sprintf("%s-%s", strcase.ToKebab(prefix), uuid.NewString()))
 }
 
-type PeripheralId string
-
-func CreatePeripheralRandomId(prefix string) PeripheralId {
-	return PeripheralId(fmt.Sprintf("%s-%s", strcase.ToKebab(prefix), uuid.NewString()))
-}
-
-func NewPeripheralId(id string) (PeripheralId, error) {
+func NewPeripheralId(id string) (Id, error) {
 	if id == "" {
 		return "", errors.New("peripheral id cannot be empty")
 	}
@@ -146,15 +138,15 @@ func NewPeripheralId(id string) (PeripheralId, error) {
 		return "", errors.New("peripheral id should be kebab-case")
 	}
 
-	return PeripheralId(id), nil
+	return Id(id), nil
 }
 
-func (id PeripheralId) String() string {
+func (id Id) String() string {
 	return string(id)
 }
 
 // UnmarshalJSON implements json.Unmarshaler interface with validation.
-func (id *PeripheralId) UnmarshalJSON(data []byte) error {
+func (id *Id) UnmarshalJSON(data []byte) error {
 	var idStr string
 	if err := json.Unmarshal(data, &idStr); err != nil {
 		return fmt.Errorf("unmarshal peripheral id: %w", err)
@@ -170,7 +162,7 @@ func (id *PeripheralId) UnmarshalJSON(data []byte) error {
 }
 
 // MarshalJSON implements json.Marshaler interface.
-func (id PeripheralId) MarshalJSON() ([]byte, error) {
+func (id Id) MarshalJSON() ([]byte, error) {
 	return json.Marshal(string(id))
 }
 
@@ -188,9 +180,9 @@ func ValidatePeripheralCapabilities(peripheral Peripheral) error {
 type Peripheral interface {
 	GetCapabilities() []PeripheralCapability
 
-	GetId() PeripheralId
+	GetId() Id
 
-	GetName() PeripheralName
+	GetName() Name
 
 	// Terminate peripheral. It must be called only once in peripheral life.
 	Terminate(ctx context.Context) error

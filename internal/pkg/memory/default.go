@@ -10,6 +10,10 @@ import (
 var defaultMemoryPool memorySDK.Pool
 var defaultMemoryPoolLock sync.RWMutex
 
+func DefaultMemoryPoolProvider() (memorySDK.Pool, error) {
+	return GetDefaultMemoryPool()
+}
+
 func GetDefaultMemoryPool() (memorySDK.Pool, error) {
 	defaultMemoryPoolLock.RLock()
 	defer defaultMemoryPoolLock.RUnlock()

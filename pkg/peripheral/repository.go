@@ -6,8 +6,8 @@ import (
 )
 
 type Repository interface {
-	GetPeripheralById(ctx context.Context, id PeripheralId) (Peripheral, error)
-	GetPeripheralByName(ctx context.Context, name PeripheralName) (Peripheral, error)
+	GetPeripheralById(ctx context.Context, id Id) (Peripheral, error)
+	GetPeripheralByName(ctx context.Context, name Name) (Peripheral, error)
 
 	GetAllPeripherals(ctx context.Context) ([]Peripheral, error)
 	GetAllDisplaySources(ctx context.Context) ([]DisplaySource, error)

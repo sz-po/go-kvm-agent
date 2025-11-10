@@ -137,18 +137,18 @@ func (_c *KeyboardSourceMock_GetCurrentLayout_Call) RunAndReturn(run func() (Key
 }
 
 // GetId provides a mock function for the type KeyboardSourceMock
-func (_mock *KeyboardSourceMock) GetId() PeripheralId {
+func (_mock *KeyboardSourceMock) GetId() Id {
 	ret := _mock.Called()
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetId")
 	}
 
-	var r0 PeripheralId
-	if returnFunc, ok := ret.Get(0).(func() PeripheralId); ok {
+	var r0 Id
+	if returnFunc, ok := ret.Get(0).(func() Id); ok {
 		r0 = returnFunc()
 	} else {
-		r0 = ret.Get(0).(PeripheralId)
+		r0 = ret.Get(0).(Id)
 	}
 	return r0
 }
@@ -170,29 +170,29 @@ func (_c *KeyboardSourceMock_GetId_Call) Run(run func()) *KeyboardSourceMock_Get
 	return _c
 }
 
-func (_c *KeyboardSourceMock_GetId_Call) Return(peripheralId PeripheralId) *KeyboardSourceMock_GetId_Call {
-	_c.Call.Return(peripheralId)
+func (_c *KeyboardSourceMock_GetId_Call) Return(id Id) *KeyboardSourceMock_GetId_Call {
+	_c.Call.Return(id)
 	return _c
 }
 
-func (_c *KeyboardSourceMock_GetId_Call) RunAndReturn(run func() PeripheralId) *KeyboardSourceMock_GetId_Call {
+func (_c *KeyboardSourceMock_GetId_Call) RunAndReturn(run func() Id) *KeyboardSourceMock_GetId_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // GetName provides a mock function for the type KeyboardSourceMock
-func (_mock *KeyboardSourceMock) GetName() PeripheralName {
+func (_mock *KeyboardSourceMock) GetName() Name {
 	ret := _mock.Called()
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetName")
 	}
 
-	var r0 PeripheralName
-	if returnFunc, ok := ret.Get(0).(func() PeripheralName); ok {
+	var r0 Name
+	if returnFunc, ok := ret.Get(0).(func() Name); ok {
 		r0 = returnFunc()
 	} else {
-		r0 = ret.Get(0).(PeripheralName)
+		r0 = ret.Get(0).(Name)
 	}
 	return r0
 }
@@ -214,12 +214,12 @@ func (_c *KeyboardSourceMock_GetName_Call) Run(run func()) *KeyboardSourceMock_G
 	return _c
 }
 
-func (_c *KeyboardSourceMock_GetName_Call) Return(peripheralName PeripheralName) *KeyboardSourceMock_GetName_Call {
-	_c.Call.Return(peripheralName)
+func (_c *KeyboardSourceMock_GetName_Call) Return(name Name) *KeyboardSourceMock_GetName_Call {
+	_c.Call.Return(name)
 	return _c
 }
 
-func (_c *KeyboardSourceMock_GetName_Call) RunAndReturn(run func() PeripheralName) *KeyboardSourceMock_GetName_Call {
+func (_c *KeyboardSourceMock_GetName_Call) RunAndReturn(run func() Name) *KeyboardSourceMock_GetName_Call {
 	_c.Call.Return(run)
 	return _c
 }

@@ -4,9 +4,6 @@ filename: "{{.InterfaceName | snakecase}}_mock.go"
 structname: '{{.InterfaceName}}Mock'
 inpackage: true
 packages:
-  github.com/szymonpodeszwa/go-kvm-agent/pkg/api/client/transport:
-    interfaces:
-      RoundTripper:
   github.com/szymonpodeszwa/go-kvm-agent/pkg/peripheral:
     interfaces:
       Peripheral:
@@ -20,6 +17,20 @@ packages:
   github.com/szymonpodeszwa/go-kvm-agent/pkg/routing:
     interfaces:
       DisplayRouter:
+  github.com/szymonpodeszwa/go-kvm-agent/pkg/driver:
+    interfaces:
+      Driver:
+      DriverRepository:
+  github.com/szymonpodeszwa/go-kvm-agent/pkg/api:
+    interfaces:
+      Transport:
+      Codec:
+  github.com/szymonpodeszwa/go-kvm-agent/pkg/node:
+    interfaces:
+      Node:
+      NodeRepository:
+      Service:
+      ServiceRepository:
   github.com/szymonpodeszwa/go-kvm-agent/pkg/memory:
     interfaces:
       Pool:

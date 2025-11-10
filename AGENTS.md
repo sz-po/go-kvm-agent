@@ -16,6 +16,8 @@
   - You're uncertain whether your proposed solution aligns with user expectations
   - Multiple valid approaches exist and the best choice depends on user preferences or requirements
   - **Never guess or assume** - it's always better to ask than to implement the wrong solution. Present your understanding and ask for confirmation before proceeding with significant changes.
+- **Defensive Validation**: Do not add unnecessary nil checks or validations for function parameters (e.g., `context.Context`, interface implementations, struct pointers). Trust that callers provide valid parameters - focus on validating business logic and user input, not internal API contracts. If you believe validation is necessary, ask the user first.
+- **Context Convention**: When adding methods or functions that require `context.Context`, the context parameter must always be the first parameter in the parameter list (for example `func ProcessRequest(ctx context.Context, userID string, data []byte)` instead of `func ProcessRequest(userID string, ctx context.Context, data []byte)`). This follows the standard Go convention for context propagation.
 - **Enum Convention**: When defining integer-based enums in Go (using `iota`), always include an `Unknown` or equivalent zero-value constant as the first element (position 0). This ensures a safe default state for uninitialized or invalid values.
 - **Structured Logging**: When using Go's `slog`, always wrap attribute values with the appropriate helpers (for example `slog.String`, `slog.Int`). Prefer camelCase over snake_case for field names in contextual loggers (e.g., `slog.String("userId", id)` instead of `slog.String("user_id", id)`). Log messages should be complete sentences with proper capitalization and punctuation (e.g., `logger.Info("Failed to connect to server.")` instead of `logger.Info("failed to connect")`).
 - **Error Convention**: When it makes sense, define errors as variables with the `Err` prefix (for example `var ErrNotFound = errors.New("not found")`). This is the standard Go convention for sentinel errors.
@@ -33,6 +35,8 @@
     ```
   - See [testify/mock documentation](https://pkg.go.dev/github.com/stretchr/testify/mock) for details on expecter pattern, `Return()`, `Once()`, and argument matchers like `mock.Anything` or `mock.MatchedBy()`.
 - **Peripheral SDK Alias**: Always import `github.com/szymonpodeszwa/go-kvm-agent/pkg/peripheral` using the alias `peripheralSDK` to avoid naming conflicts with internal packages.
+- **Home Directory Expansion**: Use `github.com/mitchellh/go-homedir` whenever you need to resolve `~` in file paths rather than manipulating strings manually.
+- **YAML Parsing**: Use `sigs.k8s.io/yaml` for all YAML decoding and encoding tasks in the project.
 - **Naming Conventions**:
   - **JSON Tags**: Always use camelCase for field names in JSON tags (for example `json:"userName"` instead of `json:"user_name"`).
   - **Enum and Config Values**: Always use kebab-case for enum values and configuration option values (for example `"auto-detect"`, `"usb-device"`, `"high-performance"`).
@@ -45,24 +49,16 @@
   - Add comments only where truly necessary - when the code cannot be made self-explanatory or when documenting complex business logic, algorithms, or non-obvious decisions
   - Prefer refactoring unclear code over adding explanatory comments
   - When comments are needed, write them as complete sentences explaining "why" rather than "what"
-- **MCP Servers**: When performing code operations, prefer using MCP server tools over traditional command-line utilities, as they provide better integration with the development environment. Follow these preferences:
+- **MCP Servers**: The following MCP servers are available for enhanced development capabilities:
 
-  **File Operations:**
-  - Reading files: use `get_file_text_by_path` instead of `cat`, `head`, or `tail`
-  - Editing files: use `replace_text_in_file` instead of `sed` or `awk`
-  - Creating files: use `create_new_file` with content
-  - Formatting: use `reformat_file` instead of manual formatters
+  **IDE Diagnostics:**
+  - Use `mcp__ide__getDiagnostics` to retrieve diagnostic information (errors, warnings) from the IDE for specific files or the entire project
 
-  **Search Operations:**
-  - Finding files by name: use `find_files_by_name_keyword` (fastest) or `find_files_by_glob` instead of `find` or `ls`
-  - Searching in files: use `search_in_files_by_text` or `search_in_files_by_regex` instead of `grep` or `rg`
-  - Directory listing: use `list_directory_tree` instead of `ls` or `tree`
-
-  **Refactoring:**
-  - Renaming symbols (classes, functions, variables): **always** use `rename_refactoring` instead of text replacement. This tool understands code structure and updates all references project-wide
-  - Understanding symbols: use `get_symbol_info` to get declaration details and documentation
-
-  **Code Analysis:**
-  - File-level problems: use `get_file_problems` to check errors and warnings in specific files
-  - Project-level problems: use `get_project_problems` for global code analysis
-  - Project structure: use `get_project_modules` and `get_project_dependencies` to understand architecture
+  **Upstash Context7 (Library Documentation):**
+  - Use `mcp__upstash-context-7-mcp__resolve-library-id` to search for and retrieve Context7-compatible library IDs (e.g., "/mongodb/docs", "/vercel/next.js")
+  - Use `mcp__upstash-context-7-mcp__get-library-docs` to fetch up-to-date documentation and code examples for any library
+  - When to use Context7:
+    - When you need current documentation for any library (Go, JavaScript, Python, etc.)
+    - When looking for usage examples of specific functions or APIs
+    - When working with library features and need reference documentation
+    - Always call `resolve-library-id` first to obtain the correct library ID, unless the user provides an ID in the format "/org/project" or "/org/project/version"

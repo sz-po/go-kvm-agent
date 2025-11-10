@@ -2,6 +2,8 @@ package memory
 
 import "errors"
 
+type PoolProvider func() (Pool, error)
+
 type Pool interface {
 	// Borrow returns empty buffer with reference counter set to 1. Buffer should be released after use.
 	Borrow(size int) (Buffer, error)

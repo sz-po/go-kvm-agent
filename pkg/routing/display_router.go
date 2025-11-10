@@ -9,13 +9,13 @@ import (
 
 type DisplayRouter interface {
 	// Connect source to sink.
-	Connect(ctx context.Context, sourceId peripheralSDK.PeripheralId, sinkId peripheralSDK.PeripheralId) error
+	Connect(ctx context.Context, sourceId peripheralSDK.Id, sinkId peripheralSDK.Id) error
 
 	// DisconnectSink disconnects sinkId from any source.
-	DisconnectSink(ctx context.Context, sinkId peripheralSDK.PeripheralId) error
+	DisconnectSink(ctx context.Context, sinkId peripheralSDK.Id) error
 
 	// DisconnectSource disconnects all sink connected to source identified by sourceId.
-	DisconnectSource(ctx context.Context, sourceId peripheralSDK.PeripheralId) error
+	DisconnectSource(ctx context.Context, sourceId peripheralSDK.Id) error
 }
 
 var ErrDisplaySourceNotRegistered = errors.New("display source not registered")

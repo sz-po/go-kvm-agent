@@ -12,10 +12,10 @@ import (
 type LocalDisplayRouterOpt func(*LocalDisplayRouter) error
 
 type LocalDisplayRouter struct {
-	sinkIdIndex map[peripheralSDK.PeripheralId]peripheralSDK.DisplaySink
+	sinkIdIndex map[peripheralSDK.Id]peripheralSDK.DisplaySink
 	sinkLock    *sync.RWMutex
 
-	sourceIdIndex map[peripheralSDK.PeripheralId]peripheralSDK.DisplaySource
+	sourceIdIndex map[peripheralSDK.Id]peripheralSDK.DisplaySource
 	sourceLock    *sync.RWMutex
 
 	sinkConnection       map[peripheralSDK.DisplaySink]peripheralSDK.DisplaySource
@@ -53,10 +53,10 @@ func WithDisplaySource(displaySource peripheralSDK.DisplaySource) LocalDisplayRo
 
 func NewLocalDisplayRouter(opts ...LocalDisplayRouterOpt) (*LocalDisplayRouter, error) {
 	router := &LocalDisplayRouter{
-		sinkIdIndex: make(map[peripheralSDK.PeripheralId]peripheralSDK.DisplaySink),
+		sinkIdIndex: make(map[peripheralSDK.Id]peripheralSDK.DisplaySink),
 		sinkLock:    &sync.RWMutex{},
 
-		sourceIdIndex: make(map[peripheralSDK.PeripheralId]peripheralSDK.DisplaySource),
+		sourceIdIndex: make(map[peripheralSDK.Id]peripheralSDK.DisplaySource),
 		sourceLock:    &sync.RWMutex{},
 
 		sinkConnection:     make(map[peripheralSDK.DisplaySink]peripheralSDK.DisplaySource),
@@ -72,7 +72,7 @@ func NewLocalDisplayRouter(opts ...LocalDisplayRouterOpt) (*LocalDisplayRouter, 
 	return router, nil
 }
 
-func (router *LocalDisplayRouter) Connect(ctx context.Context, sourceId peripheralSDK.PeripheralId, sinkId peripheralSDK.PeripheralId) error {
+func (router *LocalDisplayRouter) Connect(ctx context.Context, sourceId peripheralSDK.Id, sinkId peripheralSDK.Id) error {
 	displaySink, err := router.getDisplaySinkById(sinkId)
 	if err != nil {
 		return fmt.Errorf("get display sink by id: %s: %w", sinkId, err)
@@ -91,16 +91,16 @@ func (router *LocalDisplayRouter) Connect(ctx context.Context, sourceId peripher
 	return nil
 }
 
-func (router *LocalDisplayRouter) DisconnectSink(ctx context.Context, sinkId peripheralSDK.PeripheralId) error {
+func (router *LocalDisplayRouter) DisconnectSink(ctx context.Context, sinkId peripheralSDK.Id) error {
 	panic("implement me")
 }
 
-func (router *LocalDisplayRouter) DisconnectSource(ctx context.Context, sourceId peripheralSDK.PeripheralId) error {
+func (router *LocalDisplayRouter) DisconnectSource(ctx context.Context, sourceId peripheralSDK.Id) error {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (router *LocalDisplayRouter) getDisplaySinkById(sinkId peripheralSDK.PeripheralId) (peripheralSDK.DisplaySink, error) {
+func (router *LocalDisplayRouter) getDisplaySinkById(sinkId peripheralSDK.Id) (peripheralSDK.DisplaySink, error) {
 	router.sinkLock.RLock()
 	defer router.sinkLock.RUnlock()
 
@@ -112,7 +112,7 @@ func (router *LocalDisplayRouter) getDisplaySinkById(sinkId peripheralSDK.Periph
 	return displaySink, nil
 }
 
-func (router *LocalDisplayRouter) getDisplaySourceById(sourceId peripheralSDK.PeripheralId) (peripheralSDK.DisplaySource, error) {
+func (router *LocalDisplayRouter) getDisplaySourceById(sourceId peripheralSDK.Id) (peripheralSDK.DisplaySource, error) {
 	router.sourceLock.RLock()
 	defer router.sourceLock.RUnlock()
 
