@@ -1,6 +1,7 @@
 package node
 
 import (
+	"context"
 	"fmt"
 	"io"
 )
@@ -15,5 +16,5 @@ func (id ServiceId) WithArgument(argument string) ServiceId {
 
 type Service interface {
 	GetServiceId() ServiceId
-	Handle(stream io.ReadWriteCloser)
+	Handle(ctx context.Context, stream io.ReadWriteCloser)
 }

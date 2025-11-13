@@ -4,7 +4,6 @@ import (
 	"context"
 	"io"
 	"log/slog"
-	"time"
 
 	"github.com/szymonpodeszwa/go-kvm-agent/pkg/api"
 	"github.com/szymonpodeszwa/go-kvm-agent/pkg/api/codec"
@@ -19,6 +18,12 @@ type RepositoryAdapter struct {
 	repository peripheralSDK.Repository
 	serviceId  nodeSDK.ServiceId
 	logger     *slog.Logger
+}
+
+func WithRepositoryAdapterLogger(logger *slog.Logger) RepositoryAdapterOpt {
+	return func(adapter *RepositoryAdapter) {
+		adapter.logger = logger
+	}
 }
 
 func NewRepositoryAdapter(repository peripheralSDK.Repository, opts ...RepositoryAdapterOpt) *RepositoryAdapter {
@@ -41,13 +46,10 @@ func (adapter *RepositoryAdapter) GetServiceId() nodeSDK.ServiceId {
 	return adapter.serviceId
 }
 
-func (adapter *RepositoryAdapter) Handle(stream io.ReadWriteCloser) {
+func (adapter *RepositoryAdapter) Handle(ctx context.Context, stream io.ReadWriteCloser) {
 	defer func() {
 		_ = stream.Close()
 	}()
-
-	requestCtx, requestCtxCancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer requestCtxCancel()
 
 	jsonCodec := codec.NewJsonCodec(stream)
 
@@ -65,18 +67,14 @@ func (adapter *RepositoryAdapter) Handle(stream io.ReadWriteCloser) {
 
 	switch requestHeader.MethodName {
 	case RepositoryGetPeripheralByIdMethod:
-		handleErr = utils.HandleServiceRequest(requestCtx, jsonCodec, adapter.handleGetPeripheralById)
+		handleErr = utils.HandleServiceRequest(ctx, jsonCodec, adapter.handleGetPeripheralById)
 	case RepositoryGetPeripheralByNameMethod:
-		handleErr = utils.HandleServiceRequest(requestCtx, jsonCodec, adapter.handleGetPeripheralByName)
+		handleErr = utils.HandleServiceRequest(ctx, jsonCodec, adapter.handleGetPeripheralByName)
 	case RepositoryGetAllPeripheralsMethod:
-		handleErr = utils.HandleServiceRequest(requestCtx, jsonCodec, adapter.handleGetAllPeripherals)
-	case RepositoryGetAllDisplaySourcesMethod:
-		handleErr = utils.HandleServiceRequest(requestCtx, jsonCodec, adapter.handleGetAllDisplaySources)
-	case RepositoryGetAllDisplaySinksMethod:
-		handleErr = utils.HandleServiceRequest(requestCtx, jsonCodec, adapter.handleGetAllDisplaySinks)
+		handleErr = utils.HandleServiceRequest(ctx, jsonCodec, adapter.handleGetAllPeripherals)
 	default:
 		_ = jsonCodec.Encode(&api.ResponseHeader{
-			Error: api.ErrUnsupportedMethod,
+			Error: api.ErrUnsupportedMethod.Error(),
 		})
 		logger.Warn("Unsupported request method.")
 		return
@@ -125,37 +123,5 @@ func (adapter *RepositoryAdapter) handleGetAllPeripherals(ctx context.Context, r
 
 	return &RepositoryGetAllPeripheralsResponse{
 		Peripherals: repositoryPeripherals,
-	}, nil
-}
-
-func (adapter *RepositoryAdapter) handleGetAllDisplaySources(ctx context.Context, request RepositoryGetAllDisplaySourcesRequest) (*RepositoryGetAllDisplaySourcesResponse, error) {
-	displaySources, err := adapter.repository.GetAllDisplaySources(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	repositoryPeripherals := make([]peripheralDescriptor, 0, len(displaySources))
-	for _, displaySource := range displaySources {
-		repositoryPeripherals = append(repositoryPeripherals, createPeripheralDescriptor(displaySource))
-	}
-
-	return &RepositoryGetAllDisplaySourcesResponse{
-		DisplaySources: repositoryPeripherals,
-	}, nil
-}
-
-func (adapter *RepositoryAdapter) handleGetAllDisplaySinks(ctx context.Context, request RepositoryGetAllDisplaySinksRequest) (*RepositoryGetAllDisplaySinksResponse, error) {
-	displaySinks, err := adapter.repository.GetAllDisplaySinks(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	repositoryPeripherals := make([]peripheralDescriptor, 0, len(displaySinks))
-	for _, displaySink := range displaySinks {
-		repositoryPeripherals = append(repositoryPeripherals, createPeripheralDescriptor(displaySink))
-	}
-
-	return &RepositoryGetAllDisplaySinksResponse{
-		DisplaySinks: repositoryPeripherals,
 	}, nil
 }

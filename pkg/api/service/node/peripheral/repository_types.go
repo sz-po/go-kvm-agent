@@ -8,11 +8,9 @@ import (
 const PeripheralRepositoryServiceId = nodeSDK.ServiceId("node/peripheral/repository")
 
 const (
-	RepositoryGetPeripheralByIdMethod    nodeSDK.MethodName = "get-peripheral-by-id"
-	RepositoryGetPeripheralByNameMethod  nodeSDK.MethodName = "get-peripheral-by-name"
-	RepositoryGetAllPeripheralsMethod    nodeSDK.MethodName = "get-all-peripherals"
-	RepositoryGetAllDisplaySourcesMethod nodeSDK.MethodName = "get-all-display-sources"
-	RepositoryGetAllDisplaySinksMethod   nodeSDK.MethodName = "get-all-display-sinks"
+	RepositoryGetPeripheralByIdMethod   nodeSDK.MethodName = "get-peripheral-by-id"
+	RepositoryGetPeripheralByNameMethod nodeSDK.MethodName = "get-peripheral-by-name"
+	RepositoryGetAllPeripheralsMethod   nodeSDK.MethodName = "get-all-peripherals"
 )
 
 type RepositoryGetPeripheralByIdRequest struct {
@@ -36,18 +34,4 @@ type RepositoryGetAllPeripheralsRequest struct {
 
 type RepositoryGetAllPeripheralsResponse struct {
 	Peripherals []peripheralDescriptor `json:"peripherals"`
-}
-
-type RepositoryGetAllDisplaySourcesRequest struct {
-}
-
-type RepositoryGetAllDisplaySourcesResponse struct {
-	DisplaySources []peripheralDescriptor `json:"displaySources"`
-}
-
-type RepositoryGetAllDisplaySinksRequest struct {
-}
-
-type RepositoryGetAllDisplaySinksResponse struct {
-	DisplaySinks []peripheralDescriptor `json:"displaySinks"`
 }

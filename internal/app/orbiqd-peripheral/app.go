@@ -17,6 +17,7 @@ import (
 	peripheralAPI "github.com/szymonpodeszwa/go-kvm-agent/pkg/api/service/node/peripheral"
 	driverSDK "github.com/szymonpodeszwa/go-kvm-agent/pkg/driver"
 	nodeSDK "github.com/szymonpodeszwa/go-kvm-agent/pkg/node"
+	peripheralSDK "github.com/szymonpodeszwa/go-kvm-agent/pkg/peripheral"
 )
 
 func Start(ctx context.Context, wg *sync.WaitGroup, config Config) error {
@@ -153,7 +154,21 @@ func setupPeripherals(ctx context.Context, wg *sync.WaitGroup, driverRepository 
 		if err != nil {
 			return nil, err
 		}
-		services = append(services, peripheralAPI.NewPeripheralAdapter(peripheralInstance))
+		services = append(services, peripheralAPI.NewPeripheralAdapter(peripheralInstance,
+			peripheralAPI.WithPeripheralAdapterLogger(logger),
+		))
+
+		if displaySource, isDisplaySource := peripheralInstance.(peripheralSDK.DisplaySource); isDisplaySource {
+			services = append(services, peripheralAPI.NewDisplaySourceAdapter(displaySource,
+				peripheralAPI.WithDisplaySourceAdapterLogger(logger),
+			))
+		}
+
+		if displaySink, isDisplaySink := peripheralInstance.(peripheralSDK.DisplaySink); isDisplaySink {
+			services = append(services, peripheralAPI.NewDisplaySinkAdapter(displaySink,
+				peripheralAPI.WithDisplaySinkAdapterLogger(logger),
+			))
+		}
 
 		repositoryOpts = append(repositoryOpts, peripheral.WithPeripheral(peripheralInstance))
 
@@ -172,11 +187,15 @@ func setupPeripherals(ctx context.Context, wg *sync.WaitGroup, driverRepository 
 		logger.Info("Peripheral ready.")
 	}
 
+	logger := slog.Default()
+
 	peripheralRepository, err := peripheral.NewRepository(repositoryOpts...)
 	if err != nil {
 		return nil, fmt.Errorf("create peripheral repository: %w", err)
 	}
-	services = append(services, peripheralAPI.NewRepositoryAdapter(peripheralRepository))
+	services = append(services, peripheralAPI.NewRepositoryAdapter(peripheralRepository,
+		peripheralAPI.WithRepositoryAdapterLogger(logger),
+	))
 
 	return services, nil
 }

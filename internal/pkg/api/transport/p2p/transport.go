@@ -196,7 +196,11 @@ func (transport *Transport) registerService(service nodeSDK.Service) error {
 	protocolId := transport.getProtocolId(serviceId)
 
 	transport.host.SetStreamHandler(protocolId, func(stream p2pnetwork.Stream) {
-		service.Handle(stream)
+		ctx := context.WithValue(context.Background(), "transport", transport)
+		ctx, ctxCancel := context.WithTimeout(ctx, time.Second*10)
+		defer ctxCancel()
+
+		service.Handle(ctx, stream)
 	})
 
 	transport.logger.Info("Registered service.", slog.String("protocolId", string(protocolId)))

@@ -12,7 +12,7 @@ const (
 	NodeGetHostNameMethod nodeSDK.MethodName = "get-host-name"
 	NodeGetUptimeMethod   nodeSDK.MethodName = "get-uptime"
 	NodeGetPlatformMethod nodeSDK.MethodName = "get-platform"
-	NodeGetRoleMethod     nodeSDK.MethodName = "get-role"
+	NodeGetRolesMethod    nodeSDK.MethodName = "get-role"
 )
 
 type NodeGetHostNameRequest struct {

@@ -4,7 +4,6 @@ import (
 	"context"
 	"io"
 	"log/slog"
-	"time"
 
 	"github.com/szymonpodeszwa/go-kvm-agent/pkg/api"
 	"github.com/szymonpodeszwa/go-kvm-agent/pkg/api/codec"
@@ -19,6 +18,12 @@ type PeripheralAdapter struct {
 	implementation peripheral.Peripheral
 	serviceId      nodeSDK.ServiceId
 	logger         *slog.Logger
+}
+
+func WithPeripheralAdapterLogger(logger *slog.Logger) PeripheralAdapterOpt {
+	return func(adapter *PeripheralAdapter) {
+		adapter.logger = logger
+	}
 }
 
 func NewPeripheralAdapter(implementation peripheral.Peripheral, opts ...PeripheralAdapterOpt) *PeripheralAdapter {
@@ -41,13 +46,10 @@ func (adapter *PeripheralAdapter) GetServiceId() nodeSDK.ServiceId {
 	return adapter.serviceId
 }
 
-func (adapter *PeripheralAdapter) Handle(stream io.ReadWriteCloser) {
+func (adapter *PeripheralAdapter) Handle(ctx context.Context, stream io.ReadWriteCloser) {
 	defer func() {
 		_ = stream.Close()
 	}()
-
-	requestCtx, requestCtxCancel := context.WithTimeout(context.Background(), time.Second*10)
-	defer requestCtxCancel()
 
 	jsonCodec := codec.NewJsonCodec(stream)
 
@@ -64,14 +66,14 @@ func (adapter *PeripheralAdapter) Handle(stream io.ReadWriteCloser) {
 
 	switch requestHeader.MethodName {
 	case PeripheralTerminateMethod:
-		err := utils.HandleServiceRequest(requestCtx, jsonCodec, adapter.handleTerminate)
+		err := utils.HandleServiceRequest(ctx, jsonCodec, adapter.handleTerminate)
 		if err != nil {
 			logger.Error("Failed to handle request.", slog.String("error", err.Error()))
 			return
 		}
 	default:
 		jsonCodec.Encode(&api.ResponseHeader{
-			Error: api.ErrUnsupportedMethod,
+			Error: api.ErrUnsupportedMethod.Error(),
 		})
 		logger.Warn("Unsupported request method.")
 		return

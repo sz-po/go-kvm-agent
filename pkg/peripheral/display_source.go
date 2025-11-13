@@ -1,7 +1,5 @@
 package peripheral
 
-import "errors"
-
 // DisplaySourceCapability is the capability provided by all DisplaySource implementations.
 var DisplaySourceCapability = NewCapability[DisplaySource](PeripheralKindDisplay, PeripheralRoleSource)
 
@@ -16,19 +14,3 @@ type DisplaySource interface {
 
 	GetDisplaySourceMetrics() DisplaySourceMetrics
 }
-
-func AsDisplaySource(peripheral Peripheral) (DisplaySource, error) {
-	err := DisplaySourceCapability.Validate(peripheral)
-	if err != nil {
-		return nil, err
-	}
-
-	displaySource, isDisplaySource := peripheral.(DisplaySource)
-	if !isDisplaySource {
-		return nil, ErrNotDisplaySource
-	}
-
-	return displaySource, nil
-}
-
-var ErrNotDisplaySource = errors.New("not display source")

@@ -17,7 +17,7 @@ type NodeDetachedEvent struct {
 }
 
 type RepositorySnapshotEvent struct {
-	Nodes map[NodeId]string `json:"nodes"`
+	Nodes []NodeId `json:"nodes"`
 }
 
 type NodeRegistrar interface {
@@ -29,12 +29,9 @@ type NodeRegistrar interface {
 }
 
 type NodeRepository interface {
-	GetNodeByHostName(ctx context.Context, hostName string) (Node, error)
 	GetNodeById(ctx context.Context, nodeId NodeId) (Node, error)
 	GetAllNodeIds(ctx context.Context) ([]NodeId, error)
 }
 
-var ErrNodeHostNameAlreadyExists = errors.New("node host name already exists")
-var ErrNodeHostNameNotFound = errors.New("node host name not found")
 var ErrNodeIdAlreadyExists = errors.New("node id already exists")
 var ErrNodeIdNotFound = errors.New("node id not found")

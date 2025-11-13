@@ -14,13 +14,13 @@ func HandleServiceRequest[REQ any, RES any](ctx context.Context, codec api.Codec
 	err := codec.Decode(&request)
 
 	if err != nil {
-		_ = codec.Encode(&api.ResponseHeader{Error: api.ErrMalformedRequest})
+		_ = codec.Encode(&api.ResponseHeader{Error: api.ErrMalformedRequest.Error()})
 		return api.ErrMalformedRequest
 	}
 
 	response, err := handler(ctx, request)
 	if err != nil {
-		_ = codec.Encode(&api.ResponseHeader{Error: err})
+		_ = codec.Encode(&api.ResponseHeader{Error: err.Error()})
 		return err
 	}
 

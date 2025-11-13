@@ -128,7 +128,7 @@ func (client *NodeClient) GetRoles(ctx context.Context) ([]nodeSDK.NodeRole, err
 
 	jsonCodec := codec.NewJsonCodec(stream)
 
-	response, err := utils.HandleClientRequest[NodeGetRoleRequest, NodeGetRoleResponse](ctx, jsonCodec, NodeGetRoleMethod, NodeGetRoleRequest{})
+	response, err := utils.HandleClientRequest[NodeGetRoleRequest, NodeGetRoleResponse](ctx, jsonCodec, NodeGetRolesMethod, NodeGetRoleRequest{})
 	if err != nil {
 		return nil, fmt.Errorf("call: %w", err)
 	}

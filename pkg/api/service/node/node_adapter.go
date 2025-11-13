@@ -4,7 +4,6 @@ import (
 	"context"
 	"io"
 	"log/slog"
-	"time"
 
 	"github.com/szymonpodeszwa/go-kvm-agent/pkg/api"
 	"github.com/szymonpodeszwa/go-kvm-agent/pkg/api/codec"
@@ -40,13 +39,10 @@ func (adapter *NodeAdapter) GetServiceId() nodeSDK.ServiceId {
 	return adapter.serviceId
 }
 
-func (adapter *NodeAdapter) Handle(stream io.ReadWriteCloser) {
+func (adapter *NodeAdapter) Handle(ctx context.Context, stream io.ReadWriteCloser) {
 	defer func() {
 		_ = stream.Close()
 	}()
-
-	requestCtx, requestCtxCancel := context.WithTimeout(context.Background(), time.Second*10)
-	defer requestCtxCancel()
 
 	jsonCodec := codec.NewJsonCodec(stream)
 
@@ -63,38 +59,38 @@ func (adapter *NodeAdapter) Handle(stream io.ReadWriteCloser) {
 
 	switch requestHeader.MethodName {
 	case NodeGetIdMethod:
-		err := utils.HandleServiceRequest(requestCtx, jsonCodec, adapter.handleGetId)
+		err := utils.HandleServiceRequest(ctx, jsonCodec, adapter.handleGetId)
 		if err != nil {
 			logger.Error("Failed to handle request.", slog.String("error", err.Error()))
 			return
 		}
 	case NodeGetHostNameMethod:
-		err := utils.HandleServiceRequest(requestCtx, jsonCodec, adapter.handleGetHostName)
+		err := utils.HandleServiceRequest(ctx, jsonCodec, adapter.handleGetHostName)
 		if err != nil {
 			logger.Error("Failed to handle request.", slog.String("error", err.Error()))
 			return
 		}
 	case NodeGetUptimeMethod:
-		err := utils.HandleServiceRequest(requestCtx, jsonCodec, adapter.handleGetUptime)
+		err := utils.HandleServiceRequest(ctx, jsonCodec, adapter.handleGetUptime)
 		if err != nil {
 			logger.Error("Failed to handle request.", slog.String("error", err.Error()))
 			return
 		}
 	case NodeGetPlatformMethod:
-		err := utils.HandleServiceRequest(requestCtx, jsonCodec, adapter.handleGetPlatform)
+		err := utils.HandleServiceRequest(ctx, jsonCodec, adapter.handleGetPlatform)
 		if err != nil {
 			logger.Error("Failed to handle request.", slog.String("error", err.Error()))
 			return
 		}
-	case NodeGetRoleMethod:
-		err := utils.HandleServiceRequest(requestCtx, jsonCodec, adapter.handleGetRole)
+	case NodeGetRolesMethod:
+		err := utils.HandleServiceRequest(ctx, jsonCodec, adapter.handleGetRoles)
 		if err != nil {
 			logger.Error("Failed to handle request.", slog.String("error", err.Error()))
 			return
 		}
 	default:
 		jsonCodec.Encode(&api.ResponseHeader{
-			Error: api.ErrUnsupportedMethod,
+			Error: api.ErrUnsupportedMethod.Error(),
 		})
 		logger.Warn("Unsupported request method.")
 		return
@@ -147,7 +143,7 @@ func (adapter *NodeAdapter) handleGetPlatform(ctx context.Context, request NodeG
 	}, nil
 }
 
-func (adapter *NodeAdapter) handleGetRole(ctx context.Context, request NodeGetRoleRequest) (*NodeGetRoleResponse, error) {
+func (adapter *NodeAdapter) handleGetRoles(ctx context.Context, request NodeGetRoleRequest) (*NodeGetRoleResponse, error) {
 	roles, err := adapter.implementation.GetRoles(ctx)
 	if err != nil {
 		return nil, err

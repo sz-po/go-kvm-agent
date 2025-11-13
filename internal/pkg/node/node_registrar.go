@@ -53,12 +53,7 @@ func (registrar *NodeRegistrar) AttachNode(ctx context.Context, node nodeSDK.Nod
 		return nodeSDK.ErrNodeIdAlreadyExists
 	}
 
-	if _, found := registrar.repository.nodeHostNameIndex[*nodeHostName]; found {
-		return nodeSDK.ErrNodeHostNameAlreadyExists
-	}
-
 	registrar.repository.nodeIdIndex[*nodeId] = node
-	registrar.repository.nodeHostNameIndex[*nodeHostName] = *nodeId
 
 	defer registrar.emitEvent(nodeSDK.NodeAttachedEvent{
 		Id:       *nodeId,
@@ -66,12 +61,12 @@ func (registrar *NodeRegistrar) AttachNode(ctx context.Context, node nodeSDK.Nod
 	})
 
 	defer func() {
-		nodes := make(map[nodeSDK.NodeId]string)
-		for hostName, nodeId := range registrar.repository.nodeHostNameIndex {
-			nodes[nodeId] = hostName
+		var nodeIdList []nodeSDK.NodeId
+		for nodeId := range registrar.repository.nodeIdIndex {
+			nodeIdList = append(nodeIdList, nodeId)
 		}
 		registrar.emitEvent(nodeSDK.RepositorySnapshotEvent{
-			Nodes: nodes,
+			Nodes: nodeIdList,
 		})
 	}()
 
@@ -86,28 +81,19 @@ func (registrar *NodeRegistrar) DetachNode(nodeId nodeSDK.NodeId) error {
 		return nodeSDK.ErrNodeIdNotFound
 	}
 
-	var nodeHostName string
-	for indexHostName, indexNodeId := range registrar.repository.nodeHostNameIndex {
-		if nodeId == indexNodeId {
-			nodeHostName = indexHostName
-			break
-		}
-	}
-
 	delete(registrar.repository.nodeIdIndex, nodeId)
-	delete(registrar.repository.nodeHostNameIndex, nodeHostName)
 
 	defer registrar.emitEvent(nodeSDK.NodeDetachedEvent{
 		Id: nodeId,
 	})
 
 	defer func() {
-		nodes := make(map[nodeSDK.NodeId]string)
-		for hostName, nodeId := range registrar.repository.nodeHostNameIndex {
-			nodes[nodeId] = hostName
+		var nodeIdList []nodeSDK.NodeId
+		for nodeId := range registrar.repository.nodeIdIndex {
+			nodeIdList = append(nodeIdList, nodeId)
 		}
 		registrar.emitEvent(nodeSDK.RepositorySnapshotEvent{
-			Nodes: nodes,
+			Nodes: nodeIdList,
 		})
 	}()
 

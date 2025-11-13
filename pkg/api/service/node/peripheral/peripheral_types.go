@@ -30,3 +30,20 @@ func createPeripheralDescriptor(peripheral peripheralSDK.Peripheral) peripheralD
 		Capabilities: peripheral.GetCapabilities(),
 	}
 }
+
+func (descriptor peripheralDescriptor) hasCapability(capability peripheralSDK.PeripheralCapability) bool {
+	for _, descriptorCapability := range descriptor.Capabilities {
+		if descriptorCapability.Equals(capability) {
+			return true
+		}
+	}
+	return false
+}
+
+func (descriptor peripheralDescriptor) isDisplaySource() bool {
+	return descriptor.hasCapability(peripheralSDK.DisplaySourceCapability)
+}
+
+func (descriptor peripheralDescriptor) isDisplaySink() bool {
+	return descriptor.hasCapability(peripheralSDK.DisplaySinkCapability)
+}

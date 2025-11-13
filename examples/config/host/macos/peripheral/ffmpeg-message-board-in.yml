@@ -1,6 +1,0 @@
-input:
-  messageBoard:
-    displayMode:
-      width: 800
-      height: 600
-      refreshRate: 30

@@ -78,15 +78,5 @@ func (repository *Repository) GetAllPeripherals(ctx context.Context) ([]peripher
 	return peripherals, nil
 }
 
-func (repository *Repository) GetAllDisplaySources(ctx context.Context) ([]peripheralSDK.DisplaySource, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (repository *Repository) GetAllDisplaySinks(ctx context.Context) ([]peripheralSDK.DisplaySink, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
 var ErrPeripheralIdAlreadyTaken = errors.New("peripheral id already taken")
 var ErrPeripheralNameAlreadyTaken = errors.New("peripheral name already taken")

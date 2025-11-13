@@ -49,7 +49,7 @@ func (client *RepositoryClient) GetPeripheralById(ctx context.Context, id periph
 		return nil, fmt.Errorf("call %s: %w", RepositoryGetPeripheralByIdMethod, err)
 	}
 
-	return newPeripheralClient(client.transport, client.nodeId, response.Peripheral), nil
+	return client.wrapPeripheral(response.Peripheral), nil
 }
 
 func (client *RepositoryClient) GetPeripheralByName(ctx context.Context, name peripheralSDK.Name) (peripheralSDK.Peripheral, error) {
@@ -68,7 +68,7 @@ func (client *RepositoryClient) GetPeripheralByName(ctx context.Context, name pe
 		return nil, fmt.Errorf("call %s: %w", RepositoryGetPeripheralByNameMethod, err)
 	}
 
-	return newPeripheralClient(client.transport, client.nodeId, response.Peripheral), nil
+	return client.wrapPeripheral(response.Peripheral), nil
 }
 
 func (client *RepositoryClient) GetAllPeripherals(ctx context.Context) ([]peripheralSDK.Peripheral, error) {
@@ -89,16 +89,12 @@ func (client *RepositoryClient) GetAllPeripherals(ctx context.Context) ([]periph
 
 	peripherals := make([]peripheralSDK.Peripheral, 0, len(response.Peripherals))
 	for _, descriptor := range response.Peripherals {
-		peripherals = append(peripherals, newPeripheralClient(client.transport, client.nodeId, descriptor))
+		peripherals = append(peripherals, client.wrapPeripheral(descriptor))
 	}
 
 	return peripherals, nil
 }
 
-func (client *RepositoryClient) GetAllDisplaySources(ctx context.Context) ([]peripheralSDK.DisplaySource, error) {
-	panic("implement me")
-}
-
-func (client *RepositoryClient) GetAllDisplaySinks(ctx context.Context) ([]peripheralSDK.DisplaySink, error) {
-	panic("implement me")
+func (client *RepositoryClient) wrapPeripheral(descriptor peripheralDescriptor) peripheralSDK.Peripheral {
+	return newPeripheralClient(client.transport, client.nodeId, descriptor)
 }

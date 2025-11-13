@@ -2,6 +2,7 @@ package utils
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	apiSDK "github.com/szymonpodeszwa/go-kvm-agent/pkg/api"
@@ -28,8 +29,8 @@ func HandleClientRequest[REQ any, RES any](ctx context.Context, codec apiSDK.Cod
 		return nil, fmt.Errorf("decode response header: %w", err)
 	}
 
-	if responseHeader.Error != nil {
-		return nil, responseHeader.Error
+	if len(responseHeader.Error) > 0 {
+		return nil, errors.New(responseHeader.Error)
 	}
 
 	var response RES
